@@ -1,106 +1,133 @@
 import pandas as pd
-import sklearn as sk
+import os
 import numpy as np
-import math
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error
+from sklearn import linear_model
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error
+import seaborn as sns
+
+#%% H01D01---------------------------------------------------------------------
 
 def model_h01d01(df):
-    # Model H01D01
-    "Import data as Arrays"
-
-    SET=np.array(df["SET [°C]"])
-    SExT=np.array(df["SExT [°C]"])
-    Sfr=np.array(df["SFR [l/s]"])
-    LET=np.array(df["LET [°C]"])
-    LExT=np.array(df["LExT [°C]"])
-    LFR=np.array(df["LFR [kg/s]"])
-    HC=np.array(df["Heat Abs EVA [kW[]"])
-    PLF=np.array(df["PLF"])
-    COP=np.array(df["COP"])
-
-    "Create matrix and calculations"
-    LExT_SET=LExT-SET
-    LExT_SET_sq=(LExT-SET)**2
-    cost=np.ones(len(HC))
-
-    X=np.column_stack([cost,SET,Sfr,LExT_SET,LExT_SET_sq,PLF])
-    Xt=np.transpose(X)
-    Y=COP
-
-    A=np.matmul(np.linalg.inv(np.matmul(Xt,X)),np.matmul(Xt,Y))
-    "Test and error calculation"
-    Y_predict=np.matmul(X,A)
-    MSE=mean_squared_error(Y, Y_predict)
-    #MSE = np.square(np.subtract(Y,Y_predict)).mean() 
-    RMSE = np.sqrt(MSE)
     
-    "Plot"
-    fig,ax=plt.subplots(nrows=1,ncols=1)
-    plt.title('COP real vs COP predicted')
-    plt.xlabel('COP real [/]')
-    plt.ylabel('COP predicted [/]')
-    ax.scatter(Y,Y_predict,c='r',edgecolor='k',label='COP')
-    ax.plot([0,5,7],[0,5,7],'k--',label='Bisector')
-    ax.plot([0,5,7],[0,3.5,4.9],'k-.',label='-30%')
-    ax.plot([0,5,7],[0,6.5,9.1],'k-.',label='+30%')
-    plt.xlim(1,6.5)
-    plt.ylim(1,6.5)
-    ax.legend()
-    ax.grid(True)
+    "Import data as Arrays"
+    SET = np.array(df["SET [°C]"])
+    SExT = np.array(df["SExT [°C]"])
+    Sfr = np.array(df["SFR [l/s]"])
+    LET = np.array(df["LET [°C]"])
+    LExT = np.array(df["LExT [°C]"])
+    LFR = np.array(df["LFR [kg/s]"])
+    HC = np.array(df["Heat Abs EVA [kW[]"])
+    PLF = np.array(df["PLF"])
+    COP = np.array(df["COP"])
+    
+    "Create matrix and calculations"
+    LExT_SET = LExT-SET
+    LExT_SET_2 = (LExT-SET)**2
+    cost = np.ones(len(HC))
+    X = np.column_stack([cost,SET,Sfr,LExT_SET,LExT_SET_2,PLF])
+    Y = COP
+    
+    model_reg = linear_model.LinearRegression().fit(X, Y)
+    
+    return model_reg
 
-
-    return Y_predict, Y, MSE, RMSE, A
+#%% H01D02---------------------------------------------------------------------
 
 def model_h01d02(df):
     
+    "Filter DataFrame"
+    df_FL = df[df['PLF']==1]
+    
+    
     "Import data as Arrays"
-
-    SET=np.array(df["SET [°C]"])
-    SExT=np.array(df["SExT [°C]"])
-    Sfr=np.array(df["SFR [l/s]"])
-    LET=np.array(df["LET [°C]"])
-    LExT=np.array(df["LExT [°C]"])
-    LFR=np.array(df["LFR [kg/s]"])
-    HC=np.array(df["Heat Abs EVA [kW[]"])
-    PLF=np.array(df["PLF"])
-    COP=np.array(df["COP"])
+    SET = np.array(df["SET [°C]"])
+    SExT = np.array(df["SExT [°C]"])
+    Sfr = np.array(df["SFR [l/s]"])
+    LET = np.array(df["LET [°C]"])
+    LExT = np.array(df["LExT [°C]"])
+    LFR = np.array(df["LFR [kg/s]"])
+    HC = np.array(df["Heat Abs EVA [kW[]"])
+    PLF = np.array(df["PLF"])
+    COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    LExT_SET=LExT-SET
-    LExT_SET_sq=(LExT-SET)**2
-    PLF_sq=PLF**2
-
-    cost=np.ones(len(HC))   
-    X=np.column_stack([cost,SET,Sfr,LExT_SET,LExT_SET_sq,PLF,PLF_sq])
-    Xt=np.transpose(X)
-    L=np.matmul(Xt,X)
-    return L 
-    pass
-    Y=COP
-    A=np.matmul(np.linalg.inv(np.matmul(Xt,X)),np.matmul(Xt,Y))
-   
-    "Test and error calculation"
-    Y_predict=np.matmul(X,A)
-    MSE=mean_squared_error(Y, Y_predict)
-    RMSE = np.sqrt(MSE)
+    LExT_SET = LExT-SET
+    LExT_SET_2 = (LExT-SET)**2
+    PLF_2 = PLF**2
+    cost = np.ones(len(HC))
+    X = np.column_stack([cost,SET,Sfr,LExT_SET,LExT_SET_2,PLF,PLF_2])
+    Y = COP
     
-    "Plot"
-    fig,ax=plt.subplots(nrows=1,ncols=1)
-    plt.title('COP real vs COP predicted')
-    plt.xlabel('COP real [/]')
-    plt.ylabel('COP predicted [/]')
-    ax.scatter(Y,Y_predict,c='r',edgecolor='k',label='COP')
-    ax.plot([0,5,7],[0,5,7],'k--',label='Bisector')
-    ax.plot([0,5,7],[0,3.5,4.9],'k-.',label='-30%')
-    ax.plot([0,5,7],[0,6.5,9.1],'k-.',label='+30%')
-    plt.xlim(1,6.5)
-    plt.ylim(1,6.5)
-    ax.legend()
-    ax.grid(True)
+    model_reg = linear_model.LinearRegression().fit(X, Y)
     
-    return Y_predict, Y, MSE, RMSE, A
+    return model_reg
 
+#%% H01N-----------------------------------------------------------------------
+
+def model_h01n(df,curve):
+    
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1]
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+
+    "Create matrix and full load calculations"
+    LExT_SET_FL = LExT_FL-SET_FL
+    LExT_SET_2_FL = (LExT_FL-SET_FL)**2
+    cost = np.ones(len(HC_FL))
+    X_FL = np.column_stack([cost,SET_FL,Sfr_FL,LExT_SET_FL,LExT_SET_2_FL])
+    Y_FL = COP_FL
+    
+    model_reg_FL = linear_model.LinearRegression().fit(X_FL, Y_FL)
+    
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_FL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+  
+    "Create matrix and part load calculations"
+    LExT_SET_PL = LExT_PL-SET_PL
+    LExT_SET_2_PL = (LExT_PL-SET_PL)**2
+    cost = np.ones(len(HC_PL))
+    X_PL = np.column_stack([cost,SET_PL,Sfr_PL,LExT_SET_PL,LExT_SET_2_PL])
+    
+    COP_FL_pred = model_reg_FL.predict(X_FL)
+    
+    "Method 1: f_cop by linear regression"
+    f_COP_1 = COP_PL/COP_FL_pred
+    
+    "Method 2: f_cop derived by curves"
+    PLF_curve = np.array(curve["X"])
+    f_COP_curve = np.array(curve["f_cop"])
+    f_COP_2 = np.interp(PLF_PL, PLF_curve, f_COP_curve)
+    
+    "Method 3: f_cop calculated"
+    a=1/PLF_PL-1
+    b=PLF_PL-1
+    c=1/f_COP_1-1
+    X3=np.column_stack([a,b])
+    
+    model_reg_3 = linear_model.LinearRegression().fit(X3,c)
+    coeff_3 = model_reg_3.coef_
+    intercept_3 = model_reg_3.intercept_
     
     
 
