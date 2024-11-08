@@ -113,7 +113,16 @@ def model_h01n(df,curve):
     
     "Method 1: f_cop by linear regression"
     f_COP_1 = COP_PL/COP_FL_pred
+    PLF_1=np.ones(len(PLF_PL))
     
+    for i in range(len(PLF_PL)):
+        if PLF_PL [i] >= 0.25:
+            PLF_1[i]=1;
+        else:
+            PLF_1[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
+    
+    COP_1PL = PLF_1*COP_FL_pred
+            
     "Method 2: f_cop derived by curves"
     PLF_curve = np.array(curve["X"])
     f_COP_curve = np.array(curve["f_cop"])
@@ -128,7 +137,10 @@ def model_h01n(df,curve):
     model_reg_3 = linear_model.LinearRegression().fit(X3,c)
     coeff_3 = model_reg_3.coef_
     intercept_3 = model_reg_3.intercept_
+    f_COP_3 = np.ones(len(PLF_PL))
     
-    
+    for m in range(len(PLF_PL)):
+        f_COP_3[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
+        
+    return model_reg_FL,f_COP_1, f_COP_2, f_COP_3  
 
-    

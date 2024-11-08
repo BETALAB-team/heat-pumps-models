@@ -66,7 +66,6 @@ for i in range(len(PLF_PL)):
 
 COP_1PL = PLF_1*COP_FL_pred
         
-
 "Method 2: f_cop derived by curves"
 PLF_curve = np.array(curve["X"])
 f_COP_curve = np.array(curve["f_cop"])
@@ -81,6 +80,12 @@ X3=np.column_stack([a,b])
 model_reg_3 = linear_model.LinearRegression().fit(X3,c)
 coeff_3 = model_reg_3.coef_
 intercept_3 = model_reg_3.intercept_
+f_COP_3 = np.ones(len(PLF_PL))
+
+for m in range(len(PLF_PL)):
+    f_COP_3[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
+
+
 
 #%% H01D01---------------------------------------------------------------------
 
