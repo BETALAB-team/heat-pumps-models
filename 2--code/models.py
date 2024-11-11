@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error
-import seaborn as sns
+# import seaborn as sns
 
 #%% H01D01---------------------------------------------------------------------
 
@@ -30,7 +30,8 @@ def model_h01d01(df):
     
     model_reg = linear_model.LinearRegression().fit(X, Y)
     
-    return model_reg
+       
+    return {"scikit model": model_reg}
 
 #%% H01D02---------------------------------------------------------------------
 
@@ -61,15 +62,21 @@ def model_h01d02(df):
     
     model_reg = linear_model.LinearRegression().fit(X, Y)
     
-    return model_reg
+    return {"scikit model": model_reg}
 
 #%% H01N-----------------------------------------------------------------------
 
-def model_h01n(df,curve):
+def model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+    
+    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
+        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
+        
     
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
     df_PL= df[df['PLF']!=1]
+    
+    
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
@@ -109,38 +116,66 @@ def model_h01n(df,curve):
     cost = np.ones(len(HC_PL))
     X_PL = np.column_stack([cost,SET_PL,Sfr_PL,LExT_SET_PL,LExT_SET_2_PL])
     
-    COP_FL_pred = model_reg_FL.predict(X_FL)
+    COP_FL_pred = model_reg_FL.predict(X_PL)
     
-    "Method 1: f_cop by linear regression"
-    f_COP_1 = COP_PL/COP_FL_pred
-    PLF_1=np.ones(len(PLF_PL))
+    f_COP_model_FL = COP_PL/COP_FL_pred
     
-    for i in range(len(PLF_PL)):
-        if PLF_PL [i] >= 0.25:
-            PLF_1[i]=1;
-        else:
-            PLF_1[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
-    
-    COP_1PL = PLF_1*COP_FL_pred
-            
-    "Method 2: f_cop derived by curves"
-    PLF_curve = np.array(curve["X"])
-    f_COP_curve = np.array(curve["f_cop"])
-    f_COP_2 = np.interp(PLF_PL, PLF_curve, f_COP_curve)
-    
-    "Method 3: f_cop calculated"
-    a=1/PLF_PL-1
-    b=PLF_PL-1
-    c=1/f_COP_1-1
-    X3=np.column_stack([a,b])
-    
-    model_reg_3 = linear_model.LinearRegression().fit(X3,c)
-    coeff_3 = model_reg_3.coef_
-    intercept_3 = model_reg_3.intercept_
-    f_COP_3 = np.ones(len(PLF_PL))
-    
-    for m in range(len(PLF_PL)):
-        f_COP_3[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
+    if indirect_model == "ISO 13612-2 mod A":
         
-    return model_reg_FL,f_COP_1, f_COP_2, f_COP_3  
+        "Method 1: f_cop by linear regression"
+
+        # f_COP=np.ones(len(PLF_PL))
+ 
+        # for i in range(len(PLF_PL)):
+        #     if PLF_PL [i] >= 0.25:
+        #         f_COP[i]=1;
+        #     else:
+        #         f_COP[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
+        
+        def f_COP(x):
+            if not isinstance(x,np.ndarray):
+                x = np.array([x])
+            f_COP=np.ones(len(x))
+            for i in range(len(x)):
+                if x[i] >= 0.25:
+                    f_COP[i]=1;
+                else:
+                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+            
+            return f_COP
+        
+            
+    elif indirect_model == "ISO 13612-2 mod B":
+        
+        "Method 2: f_cop derived by curves"
+        
+        curve.sort_values("X", inplace = True)
+        PLF_curve = np.array(curve["X"])
+        f_COP_curve = np.array(curve["f_cop"])
+        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
+        
+        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+    
+    elif indirect_model == "C method":
+        
+        "Method 3: f_cop calculated"
+        
+        a=1/PLF_PL-1
+        b=PLF_PL-1
+        c=1/f_COP_model_FL-1
+        X3=np.column_stack([a,b])
+        
+        model_reg_3 = linear_model.LinearRegression().fit(X3,c)
+        coeff_3 = model_reg_3.coef_
+        intercept_3 = model_reg_3.intercept_
+        # f_COP = np.ones(len(PLF_PL))
+        # for m in range(len(PLF_PL)):
+        #     f_COP[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
+            
+        f_COP = lambda x : x/(intercept_3+coeff_3[0]*x+coeff_3[1]*x**2)
+        
+    return {
+        "scikit model": model_reg_FL,
+        "F_COP": f_COP,
+        }
 
