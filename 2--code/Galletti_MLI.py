@@ -96,6 +96,12 @@ Model['H01D01'] = H01D01
 
 H01D02 = model_h01d02(df)
 Model['H01D02'] = H01D02
+
+#%% H10N
+
+Model['H01N - mod A'] = model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A")
+Model['H01N - mod B'] = model_h01n(df, curve, indirect_model = "ISO 13612-2 mod B")
+Model['H01N - mod C'] = model_h01n(df, curve, indirect_model = "C method")
  
 #%% H01N  ---------------------------------------------------------------------
 
