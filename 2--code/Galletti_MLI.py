@@ -85,6 +85,15 @@ Model['H05N - mod C'] = model_h05n(df, curve, indirect_model = "C method")
 
 Model['H06D01'] = model_h06d01(df)
 
+#%% H06D02---------------------------------------------------------------------
+
+Model['H06D02'] = model_h06d02(df)
+
+#%% H05N-----------------------------------------------------------------------
+
+Model['H05N - mod A'] = model_h05n(df, curve, indirect_model = "ISO 13612-2 mod A")
+Model['H05N - mod B'] = model_h05n(df, curve, indirect_model = "ISO 13612-2 mod B")  
+Model['H05N - mod C'] = model_h05n(df, curve, indirect_model = "C method")
 
 
 # fig, axs1 = plt.subplots(1,1, figsize = (19,9.5))
@@ -95,8 +104,37 @@ Model['H06D01'] = model_h06d01(df)
 # axs1.axline((0, 0), slope=1.3, color="black", linestyle=(0, (5, 5)), )
 # axs1.set_xlim([0, 6.5])
 # axs1.set_ylim([0, 6.5])
-# axs1.set_title('sono ebete')
-# axs1.legend()
-# fig.savefig('model_2.png', dpi = 600)
+#%% H06N-----------------------------------------------------------------------
 
+Model['H06N - mod A'] = model_h06n(df, curve, indirect_model = "ISO 13612-2 mod A")
+Model['H06N - mod B'] = model_h06n(df, curve, indirect_model = "ISO 13612-2 mod B")  
+Model['H06N - mod C'] = model_h06n(df, curve, indirect_model = "C method")
+
+#%% H07D01---------------------------------------------------------------------
+
+Model['H07D01'] = model_h07d01(df)
+
+#%% H07D02---------------------------------------------------------------------
+
+Model['H07D02'] = model_h07d02(df)
+
+#%% H07N-----------------------------------------------------------------------
+
+Model['H07N - mod A'] = model_h07n(df, curve, indirect_model = "ISO 13612-2 mod A")
+Model['H07N - mod B'] = model_h07n(df, curve, indirect_model = "ISO 13612-2 mod B")  
+Model['H07N - mod C'] = model_h07n(df, curve, indirect_model = "C method")
+
+#%% H08D01---------------------------------------------------------------------
+
+Model['H08D01'] = model_h08d01(df)
+
+#%% H08D02---------------------------------------------------------------------
+
+Model['H08D02'] = model_h08d02(df)
+
+#%% H08N-----------------------------------------------------------------------
+
+Model['H08N - mod A'] = model_h08n(df, curve, indirect_model = "ISO 13612-2 mod A")
+Model['H08N - mod B'] = model_h08n(df, curve, indirect_model = "ISO 13612-2 mod B")  
+Model['H08N - mod C'] = model_h08n(df, curve, indirect_model = "C method")
 
