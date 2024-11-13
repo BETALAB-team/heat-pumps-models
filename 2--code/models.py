@@ -1,10 +1,10 @@
 import pandas as pd
 import os
 import numpy as np
-import scipy as sp
 # import matplotlib.pyplot as plt
 from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error
+from scipy.optimize import curve_fit
 # import seaborn as sns
 
 #%% H01D01---------------------------------------------------------------------
@@ -860,14 +860,17 @@ def model_h06d01(df):
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([SET, LET, LET * SET, PLF])
-    Y=COP
+    X = np.column_stack([SET, LET, PLF])
+    Y = COP
+    A0 = np.ones(6)
     
-    def calculate (x, y, z, w)
-    A0=np.ones(6)
-    COP_pred = lambda x, y, z, w : A0[0]**(A0[1]*SET + A0[2]) + A0[3]*z + A0[4] * w +A0[5]
-    Y_pred=COP_pred(SET, LET, LET * SET, PLF)
-    Residual=sum ((Y_pred-Y)**2)
+    def fun(X,A0):
+        
+        Y_pred =  A0[0]**(A0[1]*X[0] + A0[2]*X[1]) + A0[3]*X[0]/X[1] + A0[4] *X[2] +A0[5]
+                
+        return Y_pred
+    
+    A = curve_fit(fun, X, Y)
     #A=sp.optimize.minimize(COP(SET, LET, LET * SET, PLF), Y)
     model_reg = linear_model.LinearRegression().fit(X, Y)
     
