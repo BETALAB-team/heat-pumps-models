@@ -1,8 +1,5 @@
-import pandas as pd
-import os
 import numpy as np
 from sklearn import linear_model
-from sklearn.metrics import mean_absolute_error, root_mean_squared_error
 from scipy.optimize import minimize
 
 #%% H01D01---------------------------------------------------------------------
@@ -1579,7 +1576,7 @@ def model_h09n(df, curve, indirect_model = "ISO 13612-2 mod A"):
 
 #%% H10N-----------------------------------------------------------------------
 
-def model_h10n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h10n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1603,9 +1600,9 @@ def model_h10n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_FL = np.array(df_FL["COP"])
 
     "Carnot efficency full load calculations"
-        
-    SET_data = 7 #[°C]
-    LExT_data = 35 #[°C]
+            
+    SET_data = design_point_T[0] #[°C]
+    LExT_data = design_point_T[1] #[°C]
     curve = curve.set_index(curve['SET'])
     COP_data = curve.loc[SET_data, 'COP_fl']
     COP_carnot = (LExT_data + 273.15 )/ (LExT_data - SET_data)
@@ -1718,7 +1715,7 @@ def model_h10n(df, curve, indirect_model = "ISO 13612-2 mod A"):
 
 #%% H11N-----------------------------------------------------------------------
 
-def model_h11n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h11n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1743,8 +1740,8 @@ def model_h11n(df, curve, indirect_model = "ISO 13612-2 mod A"):
 
     "Carnot efficency full load calculations"
         
-    SET_data = 7 #[°C]
-    LExT_data = 35 #[°C]
+    SET_data = design_point_T[0] #[°C]
+    LExT_data = design_point_T[1] #[°C]
     curve = curve.set_index(curve['SET'])
     COP_data = curve.loc[SET_data, 'COP_fl']
     COP_carnot = (LExT_data + 273.15 )/ (LExT_data - SET_data)
@@ -1850,7 +1847,7 @@ def model_h11n(df, curve, indirect_model = "ISO 13612-2 mod A"):
 
 #%% H12N-----------------------------------------------------------------------
 
-def model_h11n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h12n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1875,8 +1872,8 @@ def model_h11n(df, curve, indirect_model = "ISO 13612-2 mod A"):
 
     "Carnot efficency full load calculations"
         
-    SET_data = 7 #[°C]
-    LExT_data = 35 #[°C]
+    SET_data = design_point_T[0] #[°C]
+    LExT_data = design_point_T[1] #[°C]
     curve = curve.set_index(curve['SET'])
     COP_data = curve.loc[SET_data, 'COP_fl']
     COP_carnot = (LExT_data + 273.15 )/ (LExT_data - SET_data)
@@ -1897,24 +1894,41 @@ def model_h11n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     
     X=np.column_stack([SET_PL, LExT_PL, COP_PL])
     
-    def f_COP_fun_Carnot(x, y):
+    def f_COP_fun_Carnot(x, y, z): 
+        
+        #x = Inputs (SET_PL, LExT_PL, COP_PL)
+        #y = eta_FL
+        #z = COP_carnot 
         
         SET_PL = x[:, 0]
         LExT_PL = x[:, 1]
         COP_PL = x[:, 2]
-        COP_carnot_PL1=np.ones(len(SET_PL))
+        eta = np.ones(len(SET_PL))
+        COP_carnot_PL1 = np.ones(len(SET_PL))
+        COP_carnot_PL2 = np.ones(len(SET_PL))
+        COP_carnot_PL =  np.ones(len(SET_PL))
         COP_FL_pred=np.ones(len(SET_PL))
         
         for i in range(len(LExT_PL)):
             
-            COP_carnot_PL1[i] =(273+ LExT_PL[i])/max((LExT_PL[i] - SET_PL[i]),1)
-            COP_FL_pred[i] = COP_carnot_PL[i] * eta_FL
-            f_COP_model_FL = COP_PL/ COP_FL_pred
+            COP_carnot_PL1[i] = (273+ LExT_PL[i])/max((LExT_PL[i] - SET_PL[i]),1)
+            if LExT_PL[i] > SET_PL[i]:
+                
+               COP_carnot_PL2[i] = (273+ LExT_PL[i])/(LExT_PL[i] - SET_PL[i])
+            else:
+                COP_carnot_PL2[i] = (273+ LExT_PL[i])/max((LExT_PL[i] - SET_PL[i]),1)
+                
+            COP_carnot_PL[i] = min(COP_carnot_PL1[i],  COP_carnot_PL2[i])
+            eta[i] = y/ (y*(1-COP_carnot_PL[i]/z) + COP_carnot_PL[i]/z )
+        
+        COP_FL_pred = eta* COP_carnot_PL
+        f_COP_model_FL = COP_PL/ COP_FL_pred
+        
         return f_COP_model_FL    
     
-    f_COP_fl = lambda x, y:  f_COP_fun_Carnot(x, y)  
+    f_COP_fl = lambda x, y, z:  f_COP_fun_Carnot(x, y, z)  
     
-    f_COP_model_FL = f_COP_fl(X, eta_FL)
+    f_COP_model_FL = f_COP_fl(X, eta_FL, COP_carnot)
    
     if indirect_model == "ISO 13612-2 mod A":
         
@@ -1976,6 +1990,7 @@ def model_h11n(df, curve, indirect_model = "ISO 13612-2 mod A"):
         
     return {
         "Carnot efficency": eta_FL,
+        "COP_Carnot_Data": COP_carnot,
         "F_COP_function_FL": f_COP_fl,
         "F_COP": f_COP,
         "Debug": f_COP(PLF_PL),
