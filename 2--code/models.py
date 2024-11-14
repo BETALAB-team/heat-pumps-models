@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 import numpy as np
-# import matplotlib.pyplot as plt
 from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error
 from scipy.optimize import minimize
@@ -1394,6 +1393,614 @@ def model_h08n(df, curve, indirect_model = "ISO 13612-2 mod A"):
         "F_COP": f_COP,
         "Debug": f_COP(PLF_PL),
         }
+
+#%% H09D01N--------------------------------------------------------------------
+def model_h09d01(df):
+       
+    "Import data as Arrays"
+    SET = np.array(df["SET [°C]"])
+    SExT = np.array(df["SExT [°C]"])
+    Sfr = np.array(df["SFR [l/s]"])
+    LET = np.array(df["LET [°C]"])
+    LExT = np.array(df["LExT [°C]"])
+    LFR = np.array(df["LFR [kg/s]"])
+    HC = np.array(df["Heat Abs EVA [kW[]"])
+    PLF = np.array(df["PLF"])
+    COP = np.array(df["COP"])
+    
+    "Create matrix and calculations"
+    X = np.column_stack([SExT, LET, PLF])
+    Y = COP
+    A0 = np.zeros(6)
+    
+    def fun(x0, xdata, ydata):
+          
+        Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]
+        res = sum((ydata-Y_pred)**2)
+        
+        return res
+    
+    model_reg = minimize(fun, A0, args = (X, Y), method = 'L-BFGS-B')
+        
+    return {"scipy model": model_reg}
+
+#%% H09D02---------------------------------------------------------------------
+
+def model_h09d02(df):
+       
+    "Import data as Arrays"
+    SET = np.array(df["SET [°C]"])
+    SExT = np.array(df["SExT [°C]"])
+    Sfr = np.array(df["SFR [l/s]"])
+    LET = np.array(df["LET [°C]"])
+    LExT = np.array(df["LExT [°C]"])
+    LFR = np.array(df["LFR [kg/s]"])
+    HC = np.array(df["Heat Abs EVA [kW[]"])
+    PLF = np.array(df["PLF"])
+    COP = np.array(df["COP"])
+    
+    "Create matrix and calculations"
+    X = np.column_stack([SExT, LET, PLF])
+    Y = COP
+    A0 = np.zeros(7)
+    
+    def fun(x0, xdata, ydata):
+          
+        Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]* xdata[:,2]**2 + x0[6]
+        res = sum((ydata-Y_pred)**2)
+        
+        return res
+    
+    model_reg = minimize(fun, A0, args = (X, Y), method = 'L-BFGS-B')
+        
+    return {"scipy model": model_reg}
+
+#%% H09N-----------------------------------------------------------------------
+
+def model_h09n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+    
+    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
+        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
+        
+    
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1]
+    
+    
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+
+    "Create matrix and full load calculations"
+    X_FL = np.column_stack([SExT_FL, LET_FL])
+    Y_FL = COP_FL
+    
+    A0 = np.zeros(5)
+    
+    def fun_FL(x0, xdata, ydata):
+          
+        Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1]+ x0[4]
+        res = sum((ydata-Y_pred)**2)
+        
+        return res
+    
+    model_reg_FL = minimize(fun_FL, A0, args = (X_FL, Y_FL), method = 'L-BFGS-B')
+    A= model_reg_FL['x']
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_FL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+  
+    "Create matrix and part load calculations"
+    
+    X_PL = np.column_stack([SExT_PL, LET_PL])
+    
+    COP_FL_pred = A[0]*np.exp(A[1]*X_PL[:,0] + A[2]*X_PL[:,1]) + A[3]*X_PL[:,0]/X_PL[:,1] + A[4]
+    
+    f_COP_model_FL = COP_PL/COP_FL_pred
+    
+    if indirect_model == "ISO 13612-2 mod A":
+        
+        "Method 1: f_cop by linear regression"
+
+        # f_COP=np.ones(len(PLF_PL))
+ 
+        # for i in range(len(PLF_PL)):
+        #     if PLF_PL [i] >= 0.25:
+        #         f_COP[i]=1;
+        #     else:
+        #         f_COP[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
+        
+        def f_COP_fun(x):
+            if not isinstance(x,np.ndarray):
+                x = np.array([x])
+            f_COP=np.ones(len(x))
+            for i in range(len(x)):
+                if  x[i] >= 0.25:
+                    f_COP[i]=1;
+                else:
+                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+            return f_COP
+                
+        f_COP = lambda x : f_COP_fun(x)
+        
+            
+    elif indirect_model == "ISO 13612-2 mod B":
+        
+        "Method 2: f_cop derived by curves"
+        
+        curve.sort_values("X", inplace = True)
+        PLF_curve = np.array(curve["X"])
+        f_COP_curve = np.array(curve["f_cop"])
+        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
+        
+        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+
+    
+    elif indirect_model == "C method":
+        
+        "Method 3: f_cop calculated"
+        
+        a=1/PLF_PL-1
+        b=PLF_PL-1
+        c=1/f_COP_model_FL-1
+        X3=np.column_stack([a,b])
+        
+        model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
+        coeff_3 = model_reg_3.coef_
+        coeff_0 = 1-coeff_3[0] -coeff_3[1]
+        # f_COP = np.ones(len(PLF_PL))
+        # for m in range(len(PLF_PL)):
+        #     f_COP[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
+            
+        f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
+        
+    return {
+        "scipy model": model_reg_FL,
+        "F_COP": f_COP,
+        "Debug": f_COP(PLF_PL),
+        }
+
+#%% H10N-----------------------------------------------------------------------
+
+def model_h10n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+    
+    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
+        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
+        
+    
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1]
+    
+    
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+
+    "Carnot efficency full load calculations"
+        
+    SET_data = 7 #[°C]
+    LExT_data = 35 #[°C]
+    curve = curve.set_index(curve['SET'])
+    COP_data = curve.loc[SET_data, 'COP_fl']
+    COP_carnot = (LExT_data + 273.15 )/ (LExT_data - SET_data)
+    eta_FL = COP_data / COP_carnot # second principle efficency for full load data point
+       
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_FL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+  
+    "Create function to calculate COP_FL_pred" 
+    
+    X=np.column_stack([SET_PL, LExT_PL, COP_PL])
+    
+    def f_COP_fun_Carnot(x, y):
+        
+        SET_PL = x[:, 0]
+        LExT_PL = x[:, 1]
+        COP_PL = x[:, 2]
+        COP_carnot_PL=np.ones(len(SET_PL))
+        COP_FL_pred=np.ones(len(SET_PL))
+        
+        for i in range(len(LExT_PL)):
+        
+            if LExT_PL[i] <= SET_PL[i]:
+                COP_carnot_PL[i]=50;
+            else:
+                COP_carnot_PL[i] = (273+ LExT_PL[i])/(LExT_PL[i] - SET_PL[i])
+        
+            COP_FL_pred[i] = COP_carnot_PL[i] * eta_FL
+            
+        f_COP_model_FL = COP_PL/ COP_FL_pred
+        
+        return f_COP_model_FL    
+    
+    f_COP_fl = lambda x, y:  f_COP_fun_Carnot(x, y)  
+    
+    f_COP_model_FL = f_COP_fl(X, eta_FL)
+   
+    if indirect_model == "ISO 13612-2 mod A":
+        
+        "Method 1: f_cop by linear regression"
+
+        # f_COP=np.ones(len(PLF_PL))
+ 
+        # for i in range(len(PLF_PL)):
+        #     if PLF_PL [i] >= 0.25:
+        #         f_COP[i]=1;
+        #     else:
+        #         f_COP[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
+        
+        def f_COP_fun(x):
+            
+            if not isinstance(x,np.ndarray):
+                x = np.array([x])
+            f_COP=np.ones(len(x))
+            
+            for i in range(len(x)):
+                if  x[i] >= 0.25:
+                    f_COP[i]=1;
+                else:
+                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+            return f_COP
+                
+        f_COP = lambda x : f_COP_fun(x)
+        
+            
+    elif indirect_model == "ISO 13612-2 mod B":
+        
+        "Method 2: f_cop derived by curves"
+        
+        curve.sort_values("X", inplace = True)
+        PLF_curve = np.array(curve["X"])
+        f_COP_curve = np.array(curve["f_cop"])
+        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
+        
+        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+
+    
+    elif indirect_model == "C method":
+        
+        "Method 3: f_cop calculated"
+        
+        a=1/PLF_PL-1
+        b=PLF_PL-1
+        c=1/f_COP_model_FL-1
+        X3=np.column_stack([a,b])
+        
+        model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
+        coeff_3 = model_reg_3.coef_
+        coeff_0 = 1-coeff_3[0] -coeff_3[1]
+        # f_COP = np.ones(len(PLF_PL))
+        # for m in range(len(PLF_PL)):
+        #     f_COP[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
+            
+        f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
+        
+    return {
+        "Carnot efficency": eta_FL,
+        "F_COP_function_FL": f_COP_fl,
+        "F_COP": f_COP,
+        "Debug": f_COP(PLF_PL),
+        }
+
+#%% H11N-----------------------------------------------------------------------
+
+def model_h11n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+    
+    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
+        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
+        
+    
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1]
+    
+    
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+
+    "Carnot efficency full load calculations"
+        
+    SET_data = 7 #[°C]
+    LExT_data = 35 #[°C]
+    curve = curve.set_index(curve['SET'])
+    COP_data = curve.loc[SET_data, 'COP_fl']
+    COP_carnot = (LExT_data + 273.15 )/ (LExT_data - SET_data)
+    eta_FL = COP_data / COP_carnot # second principle efficency for full load data point
+       
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_FL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+  
+    "Create function to calculate COP_FL_pred" 
+    
+    X=np.column_stack([SET_PL, LExT_PL, COP_PL])
+    
+    def f_COP_fun_Carnot(x, y):
+        
+        SET_PL = x[:, 0]
+        LExT_PL = x[:, 1]
+        COP_PL = x[:, 2]
+        COP_carnot_PL=np.ones(len(SET_PL))
+        COP_FL_pred=np.ones(len(SET_PL))
+        
+        for i in range(len(LExT_PL)):
+            COP_carnot_PL[i] = (273+ LExT_PL[i])/max((LExT_PL[i] - SET_PL[i]),18)
+            COP_FL_pred[i] = COP_carnot_PL[i] * eta_FL
+            f_COP_model_FL = COP_PL/ COP_FL_pred
+        return f_COP_model_FL    
+    
+    f_COP_fl = lambda x, y:  f_COP_fun_Carnot(x, y)  
+    
+    f_COP_model_FL = f_COP_fl(X, eta_FL)
+   
+    if indirect_model == "ISO 13612-2 mod A":
+        
+        "Method 1: f_cop by linear regression"
+
+        # f_COP=np.ones(len(PLF_PL))
+ 
+        # for i in range(len(PLF_PL)):
+        #     if PLF_PL [i] >= 0.25:
+        #         f_COP[i]=1;
+        #     else:
+        #         f_COP[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
+        
+        def f_COP_fun(x):
+            
+            if not isinstance(x,np.ndarray):
+                x = np.array([x])
+            f_COP=np.ones(len(x))
+            
+            for i in range(len(x)):
+                if  x[i] >= 0.25:
+                    f_COP[i]=1;
+                else:
+                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+            return f_COP
+                
+        f_COP = lambda x : f_COP_fun(x)
+        
+            
+    elif indirect_model == "ISO 13612-2 mod B":
+        
+        "Method 2: f_cop derived by curves"
+        
+        curve.sort_values("X", inplace = True)
+        PLF_curve = np.array(curve["X"])
+        f_COP_curve = np.array(curve["f_cop"])
+        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
+        
+        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+
+    
+    elif indirect_model == "C method":
+        
+        "Method 3: f_cop calculated"
+        
+        a=1/PLF_PL-1
+        b=PLF_PL-1
+        c=1/f_COP_model_FL-1
+        X3=np.column_stack([a,b])
+        
+        model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
+        coeff_3 = model_reg_3.coef_
+        coeff_0 = 1-coeff_3[0] -coeff_3[1]
+        # f_COP = np.ones(len(PLF_PL))
+        # for m in range(len(PLF_PL)):
+        #     f_COP[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
+            
+        f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
+        
+    return {
+        "Carnot efficency": eta_FL,
+        "F_COP_function_FL": f_COP_fl,
+        "F_COP": f_COP,
+        "Debug": f_COP(PLF_PL),
+        }
+
+#%% H12N-----------------------------------------------------------------------
+
+def model_h11n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+    
+    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
+        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
+        
+    
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1]
+    
+    
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+
+    "Carnot efficency full load calculations"
+        
+    SET_data = 7 #[°C]
+    LExT_data = 35 #[°C]
+    curve = curve.set_index(curve['SET'])
+    COP_data = curve.loc[SET_data, 'COP_fl']
+    COP_carnot = (LExT_data + 273.15 )/ (LExT_data - SET_data)
+    eta_FL = COP_data / COP_carnot # second principle efficency for full load data point
+       
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_FL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+  
+    "Create function to calculate COP_FL_pred" 
+    
+    X=np.column_stack([SET_PL, LExT_PL, COP_PL])
+    
+    def f_COP_fun_Carnot(x, y):
+        
+        SET_PL = x[:, 0]
+        LExT_PL = x[:, 1]
+        COP_PL = x[:, 2]
+        COP_carnot_PL1=np.ones(len(SET_PL))
+        COP_FL_pred=np.ones(len(SET_PL))
+        
+        for i in range(len(LExT_PL)):
+            
+            COP_carnot_PL1[i] =(273+ LExT_PL[i])/max((LExT_PL[i] - SET_PL[i]),1)
+            COP_FL_pred[i] = COP_carnot_PL[i] * eta_FL
+            f_COP_model_FL = COP_PL/ COP_FL_pred
+        return f_COP_model_FL    
+    
+    f_COP_fl = lambda x, y:  f_COP_fun_Carnot(x, y)  
+    
+    f_COP_model_FL = f_COP_fl(X, eta_FL)
+   
+    if indirect_model == "ISO 13612-2 mod A":
+        
+        "Method 1: f_cop by linear regression"
+
+        # f_COP=np.ones(len(PLF_PL))
+ 
+        # for i in range(len(PLF_PL)):
+        #     if PLF_PL [i] >= 0.25:
+        #         f_COP[i]=1;
+        #     else:
+        #         f_COP[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
+        
+        def f_COP_fun(x):
+            
+            if not isinstance(x,np.ndarray):
+                x = np.array([x])
+            f_COP=np.ones(len(x))
+            
+            for i in range(len(x)):
+                if  x[i] >= 0.25:
+                    f_COP[i]=1;
+                else:
+                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+            return f_COP
+                
+        f_COP = lambda x : f_COP_fun(x)
+        
+            
+    elif indirect_model == "ISO 13612-2 mod B":
+        
+        "Method 2: f_cop derived by curves"
+        
+        curve.sort_values("X", inplace = True)
+        PLF_curve = np.array(curve["X"])
+        f_COP_curve = np.array(curve["f_cop"])
+        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
+        
+        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+
+    
+    elif indirect_model == "C method":
+        
+        "Method 3: f_cop calculated"
+        
+        a=1/PLF_PL-1
+        b=PLF_PL-1
+        c=1/f_COP_model_FL-1
+        X3=np.column_stack([a,b])
+        
+        model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
+        coeff_3 = model_reg_3.coef_
+        coeff_0 = 1-coeff_3[0] -coeff_3[1]
+        # f_COP = np.ones(len(PLF_PL))
+        # for m in range(len(PLF_PL)):
+        #     f_COP[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
+            
+        f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
+        
+    return {
+        "Carnot efficency": eta_FL,
+        "F_COP_function_FL": f_COP_fl,
+        "F_COP": f_COP,
+        "Debug": f_COP(PLF_PL),
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
