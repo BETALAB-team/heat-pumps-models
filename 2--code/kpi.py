@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import cm
 from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score
 from models import *
@@ -23,6 +25,7 @@ def kpi_h01d01(Models, df, curve):
     cost = np.ones(len(HC))
     X = np.column_stack([cost,SET,Sfr,LExT_SET,LExT_SET_2,PLF])
     COP_pred = Models['H01D01']['scikit model'].predict(X)
+     
     
     "Evaluation of performance"
     MAE = mean_absolute_error(COP, COP_pred)
@@ -1903,7 +1906,8 @@ def load_test(df, curve):
     Test['H12N - mod C'] = kpi_h12n(Models, df, curve, indirect_model = "C method")
 
     return Test
-   
+
+
     
     
     
