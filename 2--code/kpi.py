@@ -8,6 +8,10 @@ from models import *
 #%% Test H01DO1----------------------------------------------------------------
 
 def kpi_h01d01(Models, df, curve):
+    df_model=df.copy()
+    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    
+    df_model = df_model[x_variables]
     
     SET = np.array(df["SET [°C]"])
     SExT = np.array(df["SExT [°C]"])
@@ -24,15 +28,17 @@ def kpi_h01d01(Models, df, curve):
     LExT_SET_2 = (LExT-SET)**2
     cost = np.ones(len(HC))
     X = np.column_stack([cost,SET,Sfr,LExT_SET,LExT_SET_2,PLF])
+    
     COP_pred = Models['H01D01']['scikit model'].predict(X)
-     
+    df_model["COP_pred"]=COP_pred
     
     "Evaluation of performance"
     MAE = mean_absolute_error(COP, COP_pred)
     RMSE = root_mean_squared_error(COP, COP_pred)
     r2 = r2_score(COP, COP_pred)
     
-    return {"COP_pred": COP_pred,
+    return {"df":df_model,
+            "COP_pred": COP_pred,
             "MAE": MAE,
             "RMSE": RMSE,
             "r2": r2}
