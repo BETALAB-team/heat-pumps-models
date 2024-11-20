@@ -19,14 +19,12 @@ def model_h01d01(df):
     
     "Create matrix and calculations"
     X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF])
-    Y = COP
-    
-    model_reg = linear_model.LinearRegression().fit(X, Y)
+    model_reg = linear_model.LinearRegression().fit(X, COP)
     
        
     return {"scikit model": model_reg}
 
-#%% H01D02---------------------------------------------------------------------
+#%%H01D02----------------------------------------------------------------------
 
 def model_h01d02(df):
     
@@ -42,14 +40,12 @@ def model_h01d02(df):
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF, PLF**2])
-    Y = COP
-    
-    model_reg = linear_model.LinearRegression().fit(X, Y)
+    X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF, PLF**2])   
+    model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
 
-#%% H01N-----------------------------------------------------------------------
+#%%H01N------------------------------------------------------------------------
 
 def model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     
@@ -75,13 +71,8 @@ def model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    LExT_SET_FL = LExT_FL-SET_FL
-    LExT_SET_2_FL = (LExT_FL-SET_FL)**2
-    cost = np.ones(len(HC_FL))
-    X_FL = np.column_stack([cost,SET_FL,Sfr_FL,LExT_SET_FL,LExT_SET_2_FL])
-    Y_FL = COP_FL
-    
-    model_reg_FL = linear_model.LinearRegression().fit(X_FL, Y_FL)
+    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,Sfr_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2])
+    model_reg_FL = linear_model.LinearRegression().fit(X_FL, COP_FL)
     
     
     "Import data as Arrays - Part Load"
@@ -96,27 +87,13 @@ def model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    LExT_SET_PL = LExT_PL-SET_PL
-    LExT_SET_2_PL = (LExT_PL-SET_PL)**2
-    cost = np.ones(len(HC_PL))
-    X_PL = np.column_stack([cost,SET_PL,Sfr_PL,LExT_SET_PL,LExT_SET_2_PL])
-    
+    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,Sfr_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2])
     COP_FL_pred = model_reg_FL.predict(X_PL)
-    
     f_COP_model_FL = COP_PL/COP_FL_pred
     
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-
-        # f_COP=np.ones(len(PLF_PL))
- 
-        # for i in range(len(PLF_PL)):
-        #     if PLF_PL [i] >= 0.25:
-        #         f_COP[i]=1;
-        #     else:
-        #         f_COP[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
-        
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
                 x = np.array([x])
@@ -134,7 +111,6 @@ def model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        
         curve.sort_values("X", inplace = True)
         PLF_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
@@ -146,7 +122,6 @@ def model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        
         a=1/PLF_PL-1
         b=PLF_PL-1
         c=1/f_COP_model_FL-1
@@ -155,16 +130,12 @@ def model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A"):
         model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
         coeff_3 = model_reg_3.coef_
         coeff_0 = 1-coeff_3[0] -coeff_3[1]
-        # f_COP = np.ones(len(PLF_PL))
-        # for m in range(len(PLF_PL)):
-        #     f_COP[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
             
         f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
         
     return {
         "scikit model": model_reg_FL,
         "F_COP": f_COP,
-        "Debug": f_COP(PLF_PL),
         }
 
 #%% H02D01---------------------------------------------------------------------
@@ -183,14 +154,8 @@ def model_h02d01(df):
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    LExT_SET = LExT-SET
-    LExT_SET_2 = (LExT-SET)**2
-    PLF_2 = PLF**2
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost,SET,LExT_SET,LExT_SET_2,PLF])
-    Y = COP
-    
-    model_reg = linear_model.LinearRegression().fit(X, Y)
+    X = np.column_stack([np.ones(len(HC)),SET,LExT-SET,(LExT-SET)**2,PLF])   
+    model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
 
@@ -211,14 +176,8 @@ def model_h02d02(df):
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    LExT_SET = LExT-SET
-    LExT_SET_2 = (LExT-SET)**2
-    PLF_2 = PLF**2
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost,SET,LExT_SET,LExT_SET_2,PLF,PLF_2])
-    Y = COP
-    
-    model_reg = linear_model.LinearRegression().fit(X, Y)
+    X = np.column_stack([np.ones(len(HC)),SET,LExT-SET,(LExT-SET)**2,PLF,PLF**2])
+    model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
 
@@ -248,13 +207,8 @@ def model_h02n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    LExT_SET_FL = LExT_FL-SET_FL
-    LExT_SET_2_FL = (LExT_FL-SET_FL)**2
-    cost = np.ones(len(HC_FL))
-    X_FL = np.column_stack([cost,SET_FL,LExT_SET_FL,LExT_SET_2_FL])
-    Y_FL = COP_FL
-    
-    model_reg_FL = linear_model.LinearRegression().fit(X_FL, Y_FL)
+    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2])
+    model_reg_FL = linear_model.LinearRegression().fit(X_FL, COP_FL)
     
     
     "Import data as Arrays - Part Load"
@@ -269,27 +223,13 @@ def model_h02n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    LExT_SET_PL = LExT_PL-SET_PL
-    LExT_SET_2_PL = (LExT_PL-SET_PL)**2
-    cost = np.ones(len(HC_PL))
-    X_PL = np.column_stack([cost,SET_PL,LExT_SET_PL,LExT_SET_2_PL])
-    
+    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,LExT_PL-SET_PL, (LExT_PL-SET_PL)**2])
     COP_FL_pred = model_reg_FL.predict(X_PL)
-    
     f_COP_model_FL = COP_PL/COP_FL_pred
     
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-
-        # f_COP=np.ones(len(PLF_PL))
- 
-        # for i in range(len(PLF_PL)):
-        #     if PLF_PL [i] >= 0.25:
-        #         f_COP[i]=1;
-        #     else:
-        #         f_COP[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
-        
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
                 x = np.array([x])
@@ -306,12 +246,10 @@ def model_h02n(df, curve, indirect_model = "ISO 13612-2 mod A"):
             
     elif indirect_model == "ISO 13612-2 mod B":
         
-        "Method 2: f_cop derived by curves"
-        
+        "Method 2: f_cop derived by curves"       
         curve.sort_values("X", inplace = True)
         PLF_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
-        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
         
         f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
 
@@ -319,7 +257,6 @@ def model_h02n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        
         a=1/PLF_PL-1
         b=PLF_PL-1
         c=1/f_COP_model_FL-1
@@ -328,16 +265,12 @@ def model_h02n(df, curve, indirect_model = "ISO 13612-2 mod A"):
         model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
         coeff_3 = model_reg_3.coef_
         coeff_0 = 1-coeff_3[0] -coeff_3[1]
-        # f_COP = np.ones(len(PLF_PL))
-        # for m in range(len(PLF_PL)):
-        #     f_COP[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
             
         f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
         
     return {
         "scikit model": model_reg_FL,
         "F_COP": f_COP,
-        "Debug": f_COP(PLF_PL),
         }
 #%% H03D01---------------------------------------------------------------------
 
@@ -355,12 +288,8 @@ def model_h03d01(df):
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    SET_2 = SET**2
-    X = np.column_stack([cost,SET,Sfr,SET_2,PLF])
-    Y = COP
-    
-    model_reg = linear_model.LinearRegression().fit(X, Y)
+    X = np.column_stack([np.ones(len(HC)),SET,Sfr,SET**2,PLF])
+    model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
 
@@ -380,13 +309,8 @@ def model_h03d02(df):
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    SET_2 = SET**2
-    PLF_2=PLF**2
-    X = np.column_stack([cost,SET,Sfr,SET_2,PLF, PLF_2])
-    Y = COP
-    
-    model_reg = linear_model.LinearRegression().fit(X, Y)
+    X = np.column_stack([np.ones(len(HC)),SET,Sfr,SET**2,PLF, PLF**2])
+    model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
 
@@ -416,12 +340,8 @@ def model_h03n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    cost = np.ones(len(HC_FL))
-    SET_2_FL = SET_FL**2
-    X_FL = np.column_stack([cost,SET_FL, Sfr_FL, SET_2_FL])
-    Y_FL = COP_FL
-    
-    model_reg_FL = linear_model.LinearRegression().fit(X_FL, Y_FL)
+    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL, Sfr_FL,  SET_FL**2])    
+    model_reg_FL = linear_model.LinearRegression().fit(X_FL, COP_FL)
     
     
     "Import data as Arrays - Part Load"
@@ -436,26 +356,13 @@ def model_h03n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    cost = np.ones(len(HC_PL))
-    SET_2_PL = SET_PL**2
-    X_PL = np.column_stack([cost, SET_PL, Sfr_PL, SET_2_PL])
-    
+    X_PL = np.column_stack([np.ones(len(HC_PL)), SET_PL, Sfr_PL, SET_PL**2])   
     COP_FL_pred = model_reg_FL.predict(X_PL)
-    
     f_COP_model_FL = COP_PL/COP_FL_pred
     
     if indirect_model == "ISO 13612-2 mod A":
         
-        "Method 1: f_cop by linear regression"
-
-        # f_COP=np.ones(len(PLF_PL))
- 
-        # for i in range(len(PLF_PL)):
-        #     if PLF_PL [i] >= 0.25:
-        #         f_COP[i]=1;
-        #     else:
-        #         f_COP[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
-        
+        "Method 1: f_cop by linear regression"       
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
                 x = np.array([x])
@@ -472,20 +379,18 @@ def model_h03n(df, curve, indirect_model = "ISO 13612-2 mod A"):
             
     elif indirect_model == "ISO 13612-2 mod B":
         
-        "Method 2: f_cop derived by curves"
-        
+        "Method 2: f_cop derived by curves"     
         curve.sort_values("X", inplace = True)
         PLF_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
-        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
+
         
         f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
-        "Method 3: f_cop calculated"
-        
+        "Method 3: f_cop calculated"     
         a=1/PLF_PL-1
         b=PLF_PL-1
         c=1/f_COP_model_FL-1
@@ -494,16 +399,12 @@ def model_h03n(df, curve, indirect_model = "ISO 13612-2 mod A"):
         model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
         coeff_3 = model_reg_3.coef_
         coeff_0 = 1-coeff_3[0] -coeff_3[1]
-        # f_COP = np.ones(len(PLF_PL))
-        # for m in range(len(PLF_PL)):
-        #     f_COP[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
-            
+ 
         f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
         
     return {
         "scikit model": model_reg_FL,
         "F_COP": f_COP,
-        "Debug": f_COP(PLF_PL),
         }
 
 #%% H04D01---------------------------------------------------------------------
@@ -522,11 +423,8 @@ def model_h04d01(df):
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost, SET, LExT, LExT * SET, PLF])
-    Y = COP
-    
-    model_reg = linear_model.LinearRegression().fit(X, Y)
+    X = np.column_stack([np.ones(len(HC)), SET, LExT, LExT * SET, PLF])   
+    model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
 
@@ -546,11 +444,8 @@ def model_h04d02(df):
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost, SET, LExT, LExT * SET, PLF, PLF**2])
-    Y = COP
-    
-    model_reg = linear_model.LinearRegression().fit(X, Y)
+    X = np.column_stack([np.ones(len(HC)), SET, LExT, LExT * SET, PLF, PLF**2])
+    model_reg = linear_model.LinearRegression().fit(X,  COP)
     
     return {"scikit model": model_reg}
 
@@ -580,11 +475,8 @@ def model_h04n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    cost = np.ones(len(HC_FL))
-    X_FL = np.column_stack([cost, SET_FL, LExT_FL, SET_FL*LExT_FL])
-    Y_FL = COP_FL
-    
-    model_reg_FL = linear_model.LinearRegression().fit(X_FL, Y_FL)
+    X_FL = np.column_stack([np.ones(len(HC_FL)), SET_FL, LExT_FL, SET_FL*LExT_FL])   
+    model_reg_FL = linear_model.LinearRegression().fit(X_FL, COP_FL)
     
     
     "Import data as Arrays - Part Load"
@@ -610,15 +502,6 @@ def model_h04n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-
-        # f_COP=np.ones(len(PLF_PL))
- 
-        # for i in range(len(PLF_PL)):
-        #     if PLF_PL [i] >= 0.25:
-        #         f_COP[i]=1;
-        #     else:
-        #         f_COP[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
-        
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
                 x = np.array([x])
@@ -635,12 +518,10 @@ def model_h04n(df, curve, indirect_model = "ISO 13612-2 mod A"):
             
     elif indirect_model == "ISO 13612-2 mod B":
         
-        "Method 2: f_cop derived by curves"
-        
+        "Method 2: f_cop derived by curves"    
         curve.sort_values("X", inplace = True)
         PLF_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
-        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
         
         f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
 
@@ -648,7 +529,6 @@ def model_h04n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        
         a=1/PLF_PL-1
         b=PLF_PL-1
         c=1/f_COP_model_FL-1
@@ -657,16 +537,12 @@ def model_h04n(df, curve, indirect_model = "ISO 13612-2 mod A"):
         model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
         coeff_3 = model_reg_3.coef_
         coeff_0 = 1-coeff_3[0] -coeff_3[1]
-        # f_COP = np.ones(len(PLF_PL))
-        # for m in range(len(PLF_PL)):
-        #     f_COP[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
             
         f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
         
     return {
         "scikit model": model_reg_FL,
         "F_COP": f_COP,
-        "Debug": f_COP(PLF_PL),
         }
 
 #%% H05D01---------------------------------------------------------------------
@@ -685,11 +561,8 @@ def model_h05d01(df):
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost, SET, LET, LET * SET, PLF])
-    Y = COP
-    
-    model_reg = linear_model.LinearRegression().fit(X, Y)
+    X = np.column_stack([np.ones(len(HC)), SET, LET, LET * SET, PLF])
+    model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
 
@@ -709,11 +582,8 @@ def model_h05d02(df):
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost, SET, LET, LET * SET, PLF, PLF**2])
-    Y = COP
-    
-    model_reg = linear_model.LinearRegression().fit(X, Y)
+    X = np.column_stack([np.ones(len(HC)), SET, LET, LET * SET, PLF, PLF**2])
+    model_reg = linear_model.LinearRegression().fit(X,COP)
     
     return {"scikit model": model_reg}
 
@@ -743,11 +613,8 @@ def model_h05n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    cost = np.ones(len(HC_FL))
-    X_FL = np.column_stack([cost, SET_FL, LET_FL, SET_FL*LET_FL])
-    Y_FL = COP_FL
-    
-    model_reg_FL = linear_model.LinearRegression().fit(X_FL, Y_FL)
+    X_FL = np.column_stack([np.ones(len(HC_FL)), SET_FL, LET_FL, SET_FL*LET_FL])
+    model_reg_FL = linear_model.LinearRegression().fit(X_FL, COP_FL)
     
     
     "Import data as Arrays - Part Load"
@@ -762,26 +629,13 @@ def model_h05n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    cost = np.ones(len(HC_PL))
-    SET_2_PL = SET_PL**2
-    X_PL = np.column_stack([cost, SET_PL, LET_PL, SET_PL*LET_PL])
-    
+    X_PL = np.column_stack([np.ones(len(HC_PL)), SET_PL, LET_PL, SET_PL*LET_PL]) 
     COP_FL_pred = model_reg_FL.predict(X_PL)
-    
     f_COP_model_FL = COP_PL/COP_FL_pred
     
     if indirect_model == "ISO 13612-2 mod A":
         
-        "Method 1: f_cop by linear regression"
-
-        # f_COP=np.ones(len(PLF_PL))
- 
-        # for i in range(len(PLF_PL)):
-        #     if PLF_PL [i] >= 0.25:
-        #         f_COP[i]=1;
-        #     else:
-        #         f_COP[i]=PLF_PL[i]/(0.9*4*PLF_PL+0.1)
-        
+        "Method 1: f_cop by linear regression"      
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
                 x = np.array([x])
@@ -798,12 +652,10 @@ def model_h05n(df, curve, indirect_model = "ISO 13612-2 mod A"):
             
     elif indirect_model == "ISO 13612-2 mod B":
         
-        "Method 2: f_cop derived by curves"
-        
+        "Method 2: f_cop derived by curves"      
         curve.sort_values("X", inplace = True)
         PLF_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
-        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
         
         f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
 
@@ -811,7 +663,6 @@ def model_h05n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        
         a=1/PLF_PL-1
         b=PLF_PL-1
         c=1/f_COP_model_FL-1
@@ -820,16 +671,11 @@ def model_h05n(df, curve, indirect_model = "ISO 13612-2 mod A"):
         model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
         coeff_3 = model_reg_3.coef_
         coeff_0 = 1-coeff_3[0] -coeff_3[1]
-        # f_COP = np.ones(len(PLF_PL))
-        # for m in range(len(PLF_PL)):
-        #     f_COP[m] = PLF_PL[m]/(intercept_3+coeff_3[0]*PLF_PL[m]+coeff_3[1]*PLF_PL[m]**2)
-            
         f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
         
     return {
         "scikit model": model_reg_FL,
         "F_COP": f_COP,
-        "Debug": f_COP(PLF_PL),
         }
 
 #%% H06D01---------------------------------------------------------------------
@@ -849,7 +695,6 @@ def model_h06d01(df):
     
     "Create matrix and calculations"
     X = np.column_stack([SET, LET, PLF])
-    Y = COP
     A0 = np.zeros(6)
     
     def fun(x0, xdata, ydata):
@@ -859,8 +704,7 @@ def model_h06d01(df):
         
         return res
     
-    model_reg = minimize(fun, A0, args = (X, Y), method = 'L-BFGS-B')
-        
+    model_reg = minimize(fun, A0, args = (X, COP), method = 'L-BFGS-B')    
     return {"scipy model": model_reg}
 
 #%% H06D02---------------------------------------------------------------------

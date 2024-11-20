@@ -15,6 +15,7 @@ curve=pd.read_excel(os.path.join('..', 'Data', 'Galletti MLI 18 kW.xlsx'), sheet
 Models = load_models(df, curve)
 KPI = load_test(df, curve)
 
+#%%
 
 
 # fig1, axs1 = plt.subplots(3, figsize = (19,9.5))

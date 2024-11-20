@@ -5,7 +5,7 @@ from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score
 from models import *
 import pandas as pd
-#%% Test H01DO1----------------------------------------------------------------
+#%% Test H01D01----------------------------------------------------------------
 
 def kpi_h01d01(Models, df, curve):
     
@@ -72,36 +72,33 @@ def kpi_h01d01(Models, df, curve):
     df_model_TOT["COP_pred"]=COP_pred_TOT
     
     "Evaluation of performance"
-    MAE_FL = mean_absolute_error(COP_FL, COP_pred_FL)
-    RMSE_FL = root_mean_squared_error(COP_FL, COP_pred_FL)
-    r2_FL = r2_score(COP_FL, COP_pred_FL)
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
     
-    MAE_PL = mean_absolute_error(COP_PL, COP_pred_PL)
-    RMSE_PL = root_mean_squared_error(COP_PL, COP_pred_PL)
-    r2_PL = r2_score(COP_PL, COP_pred_PL)
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
     
-    MAE_TOT = mean_absolute_error(COP_TOT, COP_pred_TOT)
-    RMSE_TOT = root_mean_squared_error(COP_TOT, COP_pred_TOT)
-    r2_TOT = r2_score(COP_TOT, COP_pred_TOT)
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
     
     return {"df_FL":df_model_FL,
             "df_PL":df_model_PL,
             "df_tot":df_model_TOT,
-            "MAE_FL": MAE_FL,
-            "RMSE_FL": RMSE_FL,
-            "r2_FL": r2_FL,
-            "MAE_PL": MAE_PL,
-            "RMSE_PL": RMSE_PL,
-            "r2_PL": r2_PL,
-            "MAE_TOT": MAE_TOT,
-            "RMSE_TOT": RMSE_TOT,
-            "r2_TOT": r2_TOT}
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
-#%% Test H01DO1----------------------------------------------------------------
+#%% Test H01D02----------------------------------------------------------------
 
 def kpi_h01d02(Models, df, curve):
-    
-        
+      
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
     df_PL= df[df['PLF']!=1] 
@@ -165,30 +162,28 @@ def kpi_h01d02(Models, df, curve):
     df_model_TOT["COP_pred"]=COP_pred_TOT
     
     "Evaluation of performance"
-    MAE_FL = mean_absolute_error(COP_FL, COP_pred_FL)
-    RMSE_FL = root_mean_squared_error(COP_FL, COP_pred_FL)
-    r2_FL = r2_score(COP_FL, COP_pred_FL)
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
     
-    MAE_PL = mean_absolute_error(COP_PL, COP_pred_PL)
-    RMSE_PL = root_mean_squared_error(COP_PL, COP_pred_PL)
-    r2_PL = r2_score(COP_PL, COP_pred_PL)
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
     
-    MAE_TOT = mean_absolute_error(COP_TOT, COP_pred_TOT)
-    RMSE_TOT = root_mean_squared_error(COP_TOT, COP_pred_TOT)
-    r2_TOT = r2_score(COP_TOT, COP_pred_TOT)
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
     
     return {"df_FL":df_model_FL,
             "df_PL":df_model_PL,
             "df_tot":df_model_TOT,
-            "MAE_FL": MAE_FL,
-            "RMSE_FL": RMSE_FL,
-            "r2_FL": r2_FL,
-            "MAE_PL": MAE_PL,
-            "RMSE_PL": RMSE_PL,
-            "r2_PL": r2_PL,
-            "MAE_TOT": MAE_TOT,
-            "RMSE_TOT": RMSE_TOT,
-            "r2_TOT": r2_TOT}
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
 #%% Test H01N------------------------------------------------------------------
 
@@ -254,8 +249,6 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         "Method 3: f_cop calculated"
         f_COP =  Models['H01N - mod C']['F_COP'](PLF_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
-     
-    #All points calculation
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
@@ -276,7 +269,7 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         
         "Method 1: f_cop by linear regression"
         f_COP =  Models['H01N - mod A']['F_COP'](PLF)
-        COP_pred_TOT = f_COP * COP_FL_pred_TOT       
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
@@ -289,7 +282,8 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         "Method 3: f_cop calculated"
         f_COP =  Models['H01N - mod C']['F_COP'](PLF)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
- 
+    
+    
     "Create output table"
     df_model_FL=df_FL.copy()
     x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
@@ -307,37 +301,61 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     df_model_TOT["COP_pred"] = COP_pred_TOT
     
     "Evaluation of performance"
-    MAE_FL = mean_absolute_error(COP_FL, COP_pred_FL)
-    RMSE_FL = root_mean_squared_error(COP_FL, COP_pred_FL)
-    r2_FL = r2_score(COP_FL, COP_pred_FL)
     
-    MAE_PL = mean_absolute_error(COP_PL, COP_pred_PL)
-    RMSE_PL = root_mean_squared_error(COP_PL, COP_pred_PL)
-    r2_PL = r2_score(COP_PL, COP_pred_PL)
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
     
-    MAE_TOT = mean_absolute_error(COP_TOT, COP_pred_TOT)
-    RMSE_TOT = root_mean_squared_error(COP_TOT, COP_pred_TOT)
-    r2_TOT = r2_score(COP_TOT, COP_pred_TOT)
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
     
     return {"df_FL":df_model_FL,
             "df_PL":df_model_PL,
             "df_tot":df_model_TOT,
-            "MAE_FL": MAE_FL,
-            "RMSE_FL": RMSE_FL,
-            "r2_FL": r2_FL,
-            "MAE_PL": MAE_PL,
-            "RMSE_PL": RMSE_PL,
-            "r2_PL": r2_PL,
-            "MAE_TOT": MAE_TOT,
-            "RMSE_TOT": RMSE_TOT,
-            "r2_TOT": r2_TOT}
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
-        
- #%% Test H02DO1----------------------------------------------------------------
+#%% Test H02D01----------------------------------------------------------------
 
 def kpi_h02d01(Models, df, curve):
     
-    "Import data as Arrays"
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1] 
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+    
+    "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     SExT = np.array(df["SExT [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
@@ -346,31 +364,88 @@ def kpi_h02d01(Models, df, curve):
     LFR = np.array(df["LFR [kg/s]"])
     HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
-
+    COP_TOT = np.array(df["COP"])
+       
     "Create matrix and calculations"
-    LExT_SET = LExT-SET
-    LExT_SET_2 = (LExT-SET)**2
-    PLF_2 = PLF**2
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost,SET,LExT_SET,LExT_SET_2,PLF])
-    COP_pred = Models['H02D01']['scikit model'].predict(X)
+    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2,PLF_FL])
+    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2,PLF_PL])
+    X_TOT = np.column_stack([np.ones(len(HC)),SET,LExT-SET,(LExT-SET)**2,PLF])
+    
+    COP_pred_FL = Models['H02D01']['scikit model'].predict(X_FL)
+    COP_pred_PL = Models['H02D01']['scikit model'].predict(X_PL)
+    COP_pred_TOT = Models['H02D01']['scikit model'].predict(X_TOT)
+    
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
     
     "Evaluation of performance"
-    MAE = mean_absolute_error(COP, COP_pred)
-    RMSE = root_mean_squared_error(COP, COP_pred)
-    r2 = r2_score(COP, COP_pred)
     
-    return {"COP_pred": COP_pred,
-            "MAE": MAE,
-            "RMSE": RMSE,
-            "r2": r2}
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
-#%% Test H02DO2----------------------------------------------------------------
+#%% Test H02D02----------------------------------------------------------------
 
 def kpi_h02d02(Models, df, curve):
-   
-    "Import data as Arrays"
+    
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1] 
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+    
+    "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     SExT = np.array(df["SExT [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
@@ -379,28 +454,58 @@ def kpi_h02d02(Models, df, curve):
     LFR = np.array(df["LFR [kg/s]"])
     HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
-
+    COP_TOT = np.array(df["COP"])
+       
     "Create matrix and calculations"
-    LExT_SET = LExT-SET
-    LExT_SET_2 = (LExT-SET)**2
-    PLF_2 = PLF**2
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost,SET,LExT_SET,LExT_SET_2,PLF,PLF_2])
-    COP_pred = Models['H02D02']['scikit model'].predict(X)
+    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2,PLF_FL,PLF_FL**2])
+    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2,PLF_PL, PLF_PL**2])
+    X_TOT = np.column_stack([np.ones(len(HC)),SET,LExT-SET,(LExT-SET)**2,PLF,PLF**2])
+    
+    COP_pred_FL = Models['H02D02']['scikit model'].predict(X_FL)
+    COP_pred_PL = Models['H02D02']['scikit model'].predict(X_PL)
+    COP_pred_TOT = Models['H02D02']['scikit model'].predict(X_TOT)
+    
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
     
     "Evaluation of performance"
-    MAE = mean_absolute_error(COP, COP_pred)
-    RMSE = root_mean_squared_error(COP, COP_pred)
-    r2 = r2_score(COP, COP_pred)
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
     
-    return {"COP_pred": COP_pred,
-            "MAE": MAE,
-            "RMSE": RMSE,
-            "r2": r2}
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
-#%% Test H02N----------------------------------------------------------------
-
+#%% Test H02N------------------------------------------------------------------
+ 
 def kpi_h02n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
@@ -423,16 +528,8 @@ def kpi_h02n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    LExT_SET_FL = LExT_FL-SET_FL
-    LExT_SET_2_FL = (LExT_FL-SET_FL)**2
-    cost = np.ones(len(HC_FL))
-    X_FL = np.column_stack([cost,SET_FL,LExT_SET_FL,LExT_SET_2_FL])
-    COP_FL_pred_FL = Models['H02N - mod A']['scikit model'].predict(X_FL) #COP_FL predicted using X_FL
-    
-    "Evaluation of performance-FL"
-    MAE_FL = mean_absolute_error(COP_FL, COP_FL_pred_FL)
-    RMSE_FL = root_mean_squared_error(COP_FL, COP_FL_pred_FL)
-    r2_FL = r2_score(COP_FL, COP_FL_pred_FL)
+    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2])
+    COP_pred_FL = Models['H02N - mod A']['scikit model'].predict(X_FL) #COP_FL predicted using X_FL
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
@@ -440,71 +537,138 @@ def kpi_h02n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     Sfr_PL = np.array(df_PL["SFR [l/s]"])
     LET_PL = np.array(df_PL["LET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    LFR_FL = np.array(df_PL["LFR [kg/s]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
     HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
     PLF_PL = np.array(df_PL["PLF"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    LExT_SET_PL = LExT_PL-SET_PL
-    LExT_SET_2_PL = (LExT_PL-SET_PL)**2
-    cost = np.ones(len(HC_PL))
-    X_PL = np.column_stack([cost,SET_PL,LExT_SET_PL,LExT_SET_2_PL])
-    COP_FL_pred = Models['H02N - mod A']['scikit model'].predict(X_PL) #COP_FL predicted using X_PL
+    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2])
+    COP_FL_pred_PL = Models['H02N - mod A']['scikit model'].predict(X_PL) #COP_FL predicted using X_PL
     
     
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
         f_COP =  Models['H02N - mod A']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred 
-        
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
-       
+        COP_pred_PL = f_COP * COP_FL_pred_PL      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
         f_COP =  Models['H02N - mod B']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred 
-        
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
+        COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         f_COP =  Models['H02N - mod C']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred
+        COP_pred_PL = f_COP * COP_FL_pred_PL
         
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
-    
-        
+    "Import data as Arrays - TOT"
+    SET = np.array(df["SET [°C]"])
+    SExT = np.array(df["SExT [°C]"])
+    Sfr = np.array(df["SFR [l/s]"])
+    LET = np.array(df["LET [°C]"])
+    LExT = np.array(df["LExT [°C]"])
+    LFR = np.array(df["LFR [kg/s]"])
+    HC = np.array(df["Heat Abs EVA [kW[]"])
+    PLF = np.array(df["PLF"])
+    COP_TOT = np.array(df["COP"])
       
-    return {"COP_FL_pred": COP_FL_pred_FL,
-                "MAE_FL": MAE_FL,
-                "RMSE_FL": RMSE_FL,
-                "r2_FL": r2_FL,
-        "COP_pred": COP_pred,
-                "MAE": MAE,
-                "RMSE": RMSE,
-                "r2": r2}
-#%% Test H03DO1----------------------------------------------------------------
+    "Create matrix and calculations-TOT"
+    X_TOT = np.column_stack([np.ones(len(HC)),SET,LExT-SET,(LExT-SET)**2])
+    COP_FL_pred_TOT = Models['H02N - mod A']['scikit model'].predict(X_TOT) #COP_FL calculated for all data
+    
+    if indirect_model == "ISO 13612-2 mod A":
+        
+        "Method 1: f_cop by linear regression"
+        f_COP =  Models['H02N - mod A']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT      
+            
+    elif indirect_model == "ISO 13612-2 mod B":
+        
+        "Method 2: f_cop derived by curves"
+        f_COP =  Models['H02N - mod B']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT 
+    
+    elif indirect_model == "C method":
+        
+        "Method 3: f_cop calculated"
+        f_COP =  Models['H02N - mod C']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT
+    
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
+    
+    "Evaluation of performance"
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
+
+#%% Test H03D01----------------------------------------------------------------
 
 def kpi_h03d01(Models, df, curve):
     
-    "Import data as Arrays"
+    
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1] 
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+    
+    "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     SExT = np.array(df["SExT [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
@@ -513,29 +677,87 @@ def kpi_h03d01(Models, df, curve):
     LFR = np.array(df["LFR [kg/s]"])
     HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
+    COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    SET_2 = SET**2
-    X = np.column_stack([cost,SET,Sfr,SET_2,PLF])
-    COP_pred = Models['H03D01']['scikit model'].predict(X)
+    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,Sfr_FL,SET_FL**2,PLF_FL])
+    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,Sfr_PL,SET_PL**2,PLF_PL])
+    X_TOT = np.column_stack([np.ones(len(HC)),SET,Sfr,SET**2,PLF])
+    
+    COP_pred_FL = Models['H03D01']['scikit model'].predict(X_FL)
+    COP_pred_PL = Models['H03D01']['scikit model'].predict(X_PL)
+    COP_pred_TOT = Models['H03D01']['scikit model'].predict(X_TOT)
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","SFR [l/s]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
     
     "Evaluation of performance"
-    MAE = mean_absolute_error(COP, COP_pred)
-    RMSE = root_mean_squared_error(COP, COP_pred)
-    r2 = r2_score(COP, COP_pred)
     
-    return {"COP_pred": COP_pred,
-            "MAE": MAE,
-            "RMSE": RMSE,
-            "r2": r2}
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
-#%% Test H03DO2----------------------------------------------------------------
+#%% Test H03D02----------------------------------------------------------------
 
 def kpi_h03d02(Models, df, curve):
    
-    "Import data as Arrays"
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1] 
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+    
+    "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     SExT = np.array(df["SExT [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
@@ -544,26 +766,56 @@ def kpi_h03d02(Models, df, curve):
     LFR = np.array(df["LFR [kg/s]"])
     HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
+    COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    SET_2 = SET**2
-    PLF_2=PLF**2
-    X = np.column_stack([cost,SET,Sfr,SET_2,PLF, PLF_2])
-    COP_pred = Models['H03D02']['scikit model'].predict(X)
+    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,Sfr_FL, SET_FL**2,PLF_FL, PLF_FL**2])
+    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,Sfr_PL, SET_PL**2,PLF_PL, PLF_PL**2])
+    X_TOT = np.column_stack([np.ones(len(HC)),SET,Sfr, SET**2,PLF, PLF**2])
+    
+    COP_pred_FL = Models['H03D02']['scikit model'].predict(X_FL)
+    COP_pred_PL = Models['H03D02']['scikit model'].predict(X_PL)
+    COP_pred_TOT = Models['H03D02']['scikit model'].predict(X_TOT)
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","SFR [l/s]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
     
     "Evaluation of performance"
-    MAE = mean_absolute_error(COP, COP_pred)
-    RMSE = root_mean_squared_error(COP, COP_pred)
-    r2 = r2_score(COP, COP_pred)
     
-    return {"COP_pred": COP_pred,
-            "MAE": MAE,
-            "RMSE": RMSE,
-            "r2": r2}
-
-#%% Test H03N----------------------------------------------------------------
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
+#%% Test H03N------------------------------------------------------------------
 
 def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     
@@ -574,13 +826,6 @@ def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
     df_PL= df[df['PLF']!=1] 
-
-  
-    "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
-    
-    
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
@@ -594,15 +839,8 @@ def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    cost = np.ones(len(HC_FL))
-    SET_2_FL = SET_FL**2
-    X_FL = np.column_stack([cost,SET_FL, Sfr_FL, SET_2_FL])
-    COP_FL_pred_FL = Models['H03N - mod A']['scikit model'].predict(X_FL) #COP_FL predicted using X_FL
-    
-    "Evaluation of performance-FL"
-    MAE_FL = mean_absolute_error(COP_FL, COP_FL_pred_FL)
-    RMSE_FL = root_mean_squared_error(COP_FL, COP_FL_pred_FL)
-    r2_FL = r2_score(COP_FL, COP_FL_pred_FL)
+    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,Sfr_FL,SET_FL**2])
+    COP_pred_FL = Models['H03N - mod A']['scikit model'].predict(X_FL) #COP_FL predicted using X_FL
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
@@ -610,69 +848,136 @@ def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     Sfr_PL = np.array(df_PL["SFR [l/s]"])
     LET_PL = np.array(df_PL["LET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    LFR_FL = np.array(df_PL["LFR [kg/s]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
     HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
     PLF_PL = np.array(df_PL["PLF"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    cost = np.ones(len(HC_PL))
-    SET_2_PL = SET_PL**2
-    X_PL = np.column_stack([cost, SET_PL, Sfr_PL, SET_2_PL])
-    COP_FL_pred = Models['H03N - mod A']['scikit model'].predict(X_PL) #COP_FL predicted using X_PL
+    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,Sfr_PL,SET_PL**2])
+    COP_FL_pred_PL = Models['H03N - mod A']['scikit model'].predict(X_PL) #COP_FL predicted using X_PL
+    
     
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
         f_COP =  Models['H03N - mod A']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred 
-        
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
-       
+        COP_pred_PL = f_COP * COP_FL_pred_PL      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
         f_COP =  Models['H03N - mod B']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred 
-        
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
+        COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         f_COP =  Models['H03N - mod C']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred
+        COP_pred_PL = f_COP * COP_FL_pred_PL
         
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
+    "Import data as Arrays - TOT"
+    SET = np.array(df["SET [°C]"])
+    SExT = np.array(df["SExT [°C]"])
+    Sfr = np.array(df["SFR [l/s]"])
+    LET = np.array(df["LET [°C]"])
+    LExT = np.array(df["LExT [°C]"])
+    LFR = np.array(df["LFR [kg/s]"])
+    HC = np.array(df["Heat Abs EVA [kW[]"])
+    PLF = np.array(df["PLF"])
+    COP_TOT = np.array(df["COP"])
+      
+    "Create matrix and calculations-TOT"
+    X_TOT = np.column_stack([np.ones(len(HC)),SET,Sfr,SET**2])
+    COP_FL_pred_TOT = Models['H03N - mod A']['scikit model'].predict(X_TOT) #COP_FL calculated for all data
     
+    if indirect_model == "ISO 13612-2 mod A":
         
-    return {"COP_FL_pred": COP_FL_pred_FL,
-                "MAE_FL": MAE_FL,
-                "RMSE_FL": RMSE_FL,
-                "r2_FL": r2_FL,
-        "COP_pred": COP_pred,
-                "MAE": MAE,
-                "RMSE": RMSE,
-                "r2": r2}
-
-#%% Test H04DO1----------------------------------------------------------------
+        "Method 1: f_cop by linear regression"
+        f_COP =  Models['H03N - mod A']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT      
+            
+    elif indirect_model == "ISO 13612-2 mod B":
+        
+        "Method 2: f_cop derived by curves"
+        f_COP =  Models['H03N - mod B']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT 
+    
+    elif indirect_model == "C method":
+        
+        "Method 3: f_cop calculated"
+        f_COP =  Models['H03N - mod C']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT
+    
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","SFR [l/s]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
+    
+    "Evaluation of performance"
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
+#%% Test H04D01----------------------------------------------------------------
 
 def kpi_h04d01(Models, df, curve):
     
-    "Import data as Arrays"
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1] 
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+    
+    "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     SExT = np.array(df["SExT [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
@@ -681,28 +986,87 @@ def kpi_h04d01(Models, df, curve):
     LFR = np.array(df["LFR [kg/s]"])
     HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
+    COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost, SET, LExT, LExT * SET, PLF])
-    COP_pred = Models['H04D01']['scikit model'].predict(X)
+    X_FL = np.column_stack([np.ones(len(HC_FL)), SET_FL, LExT_FL, LExT_FL * SET_FL, PLF_FL])
+    X_PL = np.column_stack([np.ones(len(HC_PL)), SET_PL, LExT_PL, LExT_PL * SET_PL, PLF_PL])
+    X_TOT = np.column_stack([np.ones(len(HC)), SET, LExT, LExT * SET, PLF]) 
+    
+    COP_pred_FL = Models['H04D01']['scikit model'].predict(X_FL)
+    COP_pred_PL = Models['H04D01']['scikit model'].predict(X_PL)
+    COP_pred_TOT = Models['H04D01']['scikit model'].predict(X_TOT)
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
     
     "Evaluation of performance"
-    MAE = mean_absolute_error(COP, COP_pred)
-    RMSE = root_mean_squared_error(COP, COP_pred)
-    r2 = r2_score(COP, COP_pred)
     
-    return {"COP_pred": COP_pred,
-            "MAE": MAE,
-            "RMSE": RMSE,
-            "r2": r2}
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
-#%% Test H04DO2----------------------------------------------------------------
+#%% Test H04D02----------------------------------------------------------------
 
 def kpi_h04d02(Models, df, curve):
    
-    "Import data as Arrays"
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1] 
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+    
+    "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     SExT = np.array(df["SExT [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
@@ -711,34 +1075,67 @@ def kpi_h04d02(Models, df, curve):
     LFR = np.array(df["LFR [kg/s]"])
     HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
+    COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost, SET, LExT, LExT * SET, PLF, PLF**2])
-    COP_pred = Models['H04D02']['scikit model'].predict(X)
+    X_FL = np.column_stack([np.ones(len(HC_FL)), SET_FL, LExT_FL, LExT_FL * SET_FL, PLF_FL, PLF_FL**2])
+    X_PL = np.column_stack([np.ones(len(HC_PL)), SET_PL, LExT_PL, LExT_PL * SET_PL, PLF_PL, PLF_PL**2])
+    X_TOT = np.column_stack([np.ones(len(HC)), SET, LExT, LExT * SET, PLF, PLF**2]) 
+    
+    COP_pred_FL = Models['H04D02']['scikit model'].predict(X_FL)
+    COP_pred_PL = Models['H04D02']['scikit model'].predict(X_PL)
+    COP_pred_TOT = Models['H04D02']['scikit model'].predict(X_TOT)
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
     
     "Evaluation of performance"
-    MAE = mean_absolute_error(COP, COP_pred)
-    RMSE = root_mean_squared_error(COP, COP_pred)
-    r2 = r2_score(COP, COP_pred)
     
-    return {"COP_pred": COP_pred,
-            "MAE": MAE,
-            "RMSE": RMSE,
-            "r2": r2}
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
-#%% Test H04N----------------------------------------------------------------
+#%% Test H04N------------------------------------------------------------------
 
 def kpi_h04n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
         
-
+    
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_PL= df[df['PLF']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
@@ -752,15 +1149,8 @@ def kpi_h04n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    cost = np.ones(len(HC_FL))
-    X_FL = np.column_stack([cost, SET_FL, LExT_FL, SET_FL*LExT_FL])
-    COP_FL_pred_FL = Models['H04N - mod A']['scikit model'].predict(X_FL) #COP_FL predicted using X_FL
-    
-    "Evaluation of performance-FL"
-    MAE_FL = mean_absolute_error(COP_FL, COP_FL_pred_FL)
-    RMSE_FL = root_mean_squared_error(COP_FL, COP_FL_pred_FL)
-    r2_FL = r2_score(COP_FL, COP_FL_pred_FL)
-    
+    X_FL = np.column_stack([np.ones(len(HC_FL)), SET_FL, LExT_FL, SET_FL*LExT_FL])
+    COP_pred_FL = Models['H04N - mod A']['scikit model'].predict(X_FL) #COP_FL predicted using X_FL
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
@@ -768,69 +1158,137 @@ def kpi_h04n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     Sfr_PL = np.array(df_PL["SFR [l/s]"])
     LET_PL = np.array(df_PL["LET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    LFR_FL = np.array(df_PL["LFR [kg/s]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
     HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
     PLF_PL = np.array(df_PL["PLF"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    cost = np.ones(len(HC_PL))
-    SET_2_PL = SET_PL**2
-    X_PL = np.column_stack([cost,SET_PL, LExT_PL, SET_PL*LExT_PL])
-    COP_FL_pred = Models['H04N - mod A']['scikit model'].predict(X_PL) #COP_FL predicted using X_PL
+    X_PL = np.column_stack([np.ones(len(HC_PL)), SET_PL, LExT_PL, SET_PL*LExT_PL])
+    COP_FL_pred_PL = Models['H04N - mod A']['scikit model'].predict(X_PL) #COP_FL predicted using X_PL
+    
     
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
         f_COP =  Models['H04N - mod A']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred 
-        
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
-       
+        COP_pred_PL = f_COP * COP_FL_pred_PL      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
         f_COP =  Models['H04N - mod B']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred 
-        
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
+        COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         f_COP =  Models['H04N - mod C']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred
+        COP_pred_PL = f_COP * COP_FL_pred_PL
         
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
+    "Import data as Arrays - TOT"
+    SET = np.array(df["SET [°C]"])
+    SExT = np.array(df["SExT [°C]"])
+    Sfr = np.array(df["SFR [l/s]"])
+    LET = np.array(df["LET [°C]"])
+    LExT = np.array(df["LExT [°C]"])
+    LFR = np.array(df["LFR [kg/s]"])
+    HC = np.array(df["Heat Abs EVA [kW[]"])
+    PLF = np.array(df["PLF"])
+    COP_TOT = np.array(df["COP"])
+      
+    "Create matrix and calculations-TOT"
+    X_TOT = np.column_stack([np.ones(len(HC)), SET, LExT, SET*LExT])
+    COP_FL_pred_TOT = Models['H04N - mod A']['scikit model'].predict(X_TOT) #COP_FL calculated for all data
     
+    if indirect_model == "ISO 13612-2 mod A":
         
-    return {"COP_FL_pred": COP_FL_pred_FL,
-                "MAE_FL": MAE_FL,
-                "RMSE_FL": RMSE_FL,
-                "r2_FL": r2_FL,
-        "COP_pred": COP_pred,
-                "MAE": MAE,
-                "RMSE": RMSE,
-                "r2": r2}
+        "Method 1: f_cop by linear regression"
+        f_COP =  Models['H04N - mod A']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT      
+            
+    elif indirect_model == "ISO 13612-2 mod B":
+        
+        "Method 2: f_cop derived by curves"
+        f_COP =  Models['H04N - mod B']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT 
+    
+    elif indirect_model == "C method":
+        
+        "Method 3: f_cop calculated"
+        f_COP =  Models['H04N - mod C']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT
+    
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
+    
+    "Evaluation of performance"
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
-#%% Test H05DO1----------------------------------------------------------------
+#%% Test H05D01----------------------------------------------------------------
 
 def kpi_h05d01(Models, df, curve):
     
-    "Import data as Arrays"
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1] 
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+    
+    "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     SExT = np.array(df["SExT [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
@@ -839,28 +1297,87 @@ def kpi_h05d01(Models, df, curve):
     LFR = np.array(df["LFR [kg/s]"])
     HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
+    COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost, SET, LET, LET * SET, PLF])
-    COP_pred = Models['H05D01']['scikit model'].predict(X)
+    X_FL = np.column_stack([np.ones(len(HC_FL)), SET_FL, LET_FL, LET_FL * SET_FL, PLF_FL])
+    X_PL = np.column_stack([np.ones(len(HC_PL)), SET_PL, LET_PL, LET_PL * SET_PL, PLF_PL])
+    X_TOT = np.column_stack([np.ones(len(HC)), SET, LET, LET * SET, PLF]) 
+    
+    COP_pred_FL = Models['H05D01']['scikit model'].predict(X_FL)
+    COP_pred_PL = Models['H05D01']['scikit model'].predict(X_PL)
+    COP_pred_TOT = Models['H05D01']['scikit model'].predict(X_TOT)
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","LET [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
     
     "Evaluation of performance"
-    MAE = mean_absolute_error(COP, COP_pred)
-    RMSE = root_mean_squared_error(COP, COP_pred)
-    r2 = r2_score(COP, COP_pred)
     
-    return {"COP_pred": COP_pred,
-            "MAE": MAE,
-            "RMSE": RMSE,
-            "r2": r2}
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
-#%% Test H05DO2----------------------------------------------------------------
+#%% Test H05D02----------------------------------------------------------------
 
 def kpi_h05d02(Models, df, curve):
-   
-    "Import data as Arrays"
+    
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1] 
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+    
+    "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     SExT = np.array(df["SExT [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
@@ -869,24 +1386,57 @@ def kpi_h05d02(Models, df, curve):
     LFR = np.array(df["LFR [kg/s]"])
     HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
+    COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost, SET, LET, LET * SET, PLF, PLF**2])
-    COP_pred = Models['H05D02']['scikit model'].predict(X)
+    X_FL = np.column_stack([np.ones(len(HC_FL)), SET_FL, LET_FL, LET_FL * SET_FL, PLF_FL, PLF_FL**2])
+    X_PL = np.column_stack([np.ones(len(HC_PL)), SET_PL, LET_PL, LET_PL * SET_PL, PLF_PL, PLF_PL**2])
+    X_TOT = np.column_stack([np.ones(len(HC)), SET, LET, LET * SET, PLF, PLF**2]) 
+    
+    COP_pred_FL = Models['H05D02']['scikit model'].predict(X_FL)
+    COP_pred_PL = Models['H05D02']['scikit model'].predict(X_PL)
+    COP_pred_TOT = Models['H05D02']['scikit model'].predict(X_TOT)
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","LET [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
     
     "Evaluation of performance"
-    MAE = mean_absolute_error(COP, COP_pred)
-    RMSE = root_mean_squared_error(COP, COP_pred)
-    r2 = r2_score(COP, COP_pred)
     
-    return {"COP_pred": COP_pred,
-            "MAE": MAE,
-            "RMSE": RMSE,
-            "r2": r2}
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
-#%% Test H05N----------------------------------------------------------------
+#%% Test H05N------------------------------------------------------------------
 
 def kpi_h05n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     
@@ -894,9 +1444,14 @@ def kpi_h05n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
         
     
+    
+    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
+        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
+        
+    
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_PL= df[df['PLF']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
@@ -910,14 +1465,8 @@ def kpi_h05n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    cost = np.ones(len(HC_FL))
-    X_FL = np.column_stack([cost, SET_FL, LET_FL, SET_FL*LET_FL])
-    COP_FL_pred_FL = Models['H05N - mod A']['scikit model'].predict(X_FL) #COP_FL predicted using X_FL
-    
-    "Evaluation of performance-FL"
-    MAE_FL = mean_absolute_error(COP_FL, COP_FL_pred_FL)
-    RMSE_FL = root_mean_squared_error(COP_FL, COP_FL_pred_FL)
-    r2_FL = r2_score(COP_FL, COP_FL_pred_FL)
+    X_FL = np.column_stack([np.ones(len(HC_FL)), SET_FL, LET_FL, SET_FL*LET_FL])
+    COP_pred_FL = Models['H05N - mod A']['scikit model'].predict(X_FL) #COP_FL predicted using X_FL
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
@@ -925,70 +1474,35 @@ def kpi_h05n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     Sfr_PL = np.array(df_PL["SFR [l/s]"])
     LET_PL = np.array(df_PL["LET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    LFR_FL = np.array(df_PL["LFR [kg/s]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
     HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
     PLF_PL = np.array(df_PL["PLF"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    cost = np.ones(len(HC_PL))
-    SET_2_PL = SET_PL**2
-    X_PL = np.column_stack([cost, SET_PL, LET_PL, SET_PL*LET_PL])
-    COP_FL_pred = Models['H05N - mod A']['scikit model'].predict(X_PL) #COP_FL predicted using X_PL
+    X_PL = np.column_stack([np.ones(len(HC_PL)), SET_PL, LET_PL, SET_PL*LET_PL])
+    COP_FL_pred_PL = Models['H05N - mod A']['scikit model'].predict(X_PL) #COP_FL predicted using X_PL
     
     
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
         f_COP =  Models['H05N - mod A']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred 
-        
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
-       
+        COP_pred_PL = f_COP * COP_FL_pred_PL      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
         f_COP =  Models['H05N - mod B']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred 
-        
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
+        COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         f_COP =  Models['H05N - mod C']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred
+        COP_pred_PL = f_COP * COP_FL_pred_PL
         
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
-    
-        
-    return {"COP_FL_pred": COP_FL_pred_FL,
-                "MAE_FL": MAE_FL,
-                "RMSE_FL": RMSE_FL,
-                "r2_FL": r2_FL,
-        "COP_pred": COP_pred,
-                "MAE": MAE,
-                "RMSE": RMSE,
-                "r2": r2}
-
-#%% Test H06DO1----------------------------------------------------------------
-
-def kpi_h06d01(Models, df, curve):
-    
-    "Import data as Arrays"
+    "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     SExT = np.array(df["SExT [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
@@ -997,22 +1511,158 @@ def kpi_h06d01(Models, df, curve):
     LFR = np.array(df["LFR [kg/s]"])
     HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
+    COP_TOT = np.array(df["COP"])
+      
+    "Create matrix and calculations-TOT"
+    X_TOT = np.column_stack([np.ones(len(HC)), SET, LET, SET*LET])
+    COP_FL_pred_TOT = Models['H05N - mod A']['scikit model'].predict(X_TOT) #COP_FL calculated for all data
     
-    "Create matrix and calculations"
-    X = np.column_stack([SET, LET, PLF])
-    A = Models['H06D01']['scipy model']['x']
-    COP_pred =  A[0]*np.exp(A[1]*X[:,0] + A[2]*X[:,1]) + A[3]*X[:,0]/X[:,1] + A[4] *X[:,2] +A[5]
+    if indirect_model == "ISO 13612-2 mod A":
+        
+        "Method 1: f_cop by linear regression"
+        f_COP =  Models['H05N - mod A']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT      
+            
+    elif indirect_model == "ISO 13612-2 mod B":
+        
+        "Method 2: f_cop derived by curves"
+        f_COP =  Models['H05N - mod B']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT 
+    
+    elif indirect_model == "C method":
+        
+        "Method 3: f_cop calculated"
+        f_COP =  Models['H05N - mod C']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT
+    
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
     
     "Evaluation of performance"
-    MAE = mean_absolute_error(COP, COP_pred)
-    RMSE = root_mean_squared_error(COP, COP_pred)
-    r2 = r2_score(COP, COP_pred)
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
     
-    return {"COP_pred": COP_pred,
-            "MAE": MAE,
-            "RMSE": RMSE,
-            "r2": r2}
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
+
+#%% Test H06D01----------------------------------------------------------------
+
+def kpi_h06d01(Models, df, curve):
+    
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1] 
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    SExT_FL = np.array(df_FL["SExT [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    LET_FL = np.array(df_FL["LET [°C]"])
+    LExT_FL = np.array(df_FL["LExT [°C]"])
+    LFR_FL = np.array(df_FL["LFR [kg/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    SExT_PL = np.array(df_PL["SExT [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    LET_PL = np.array(df_PL["LET [°C]"])
+    LExT_PL = np.array(df_PL["LExT [°C]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+    
+    "Import data as Arrays - TOT"
+    SET = np.array(df["SET [°C]"])
+    SExT = np.array(df["SExT [°C]"])
+    Sfr = np.array(df["SFR [l/s]"])
+    LET = np.array(df["LET [°C]"])
+    LExT = np.array(df["LExT [°C]"])
+    LFR = np.array(df["LFR [kg/s]"])
+    HC = np.array(df["Heat Abs EVA [kW[]"])
+    PLF = np.array(df["PLF"])
+    COP_TOT = np.array(df["COP"])
+    
+    "Create matrix and calculations"
+    X_FL = np.column_stack([SET_FL, LET_FL, PLF_FL])
+    X_PL = np.column_stack([SET_PL, LET_PL, PLF_PL])
+    X_TOT = np.column_stack([SET, LET, PLF])
+    A = Models['H06D01']['scipy model']['x']
+    
+    COP_pred_FL =  A[0]*np.exp(A[1]*X_FL[:,0] + A[2]*X_FL[:,1]) + A[3]*X_FL[:,0]/X_FL[:,1] + A[4] *X_FL[:,2] +A[5]
+    COP_pred_PL =  A[0]*np.exp(A[1]*X_PL[:,0] + A[2]*X_PL[:,1]) + A[3]*X_PL[:,0]/X_PL[:,1] + A[4] *X_PL[:,2] +A[5]
+    COP_pred_TOT =  A[0]*np.exp(A[1]*X_TOT[:,0] + A[2]*X_TOT[:,1]) + A[3]*X_TOT[:,0]/X_TOT[:,1] + A[4] *X_TOT[:,2] +A[5]
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","LET [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
+    
+    "Evaluation of performance"
+    
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+           "KPI_TOT": KPI_TOT}
 
 #%% Test H06DO2----------------------------------------------------------------
 
