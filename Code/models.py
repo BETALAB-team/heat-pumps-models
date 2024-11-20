@@ -18,10 +18,7 @@ def model_h01d01(df):
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    LExT_SET = LExT-SET
-    LExT_SET_2 = (LExT-SET)**2
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost,SET,Sfr,LExT_SET,LExT_SET_2,PLF])
+    X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF])
     Y = COP
     
     model_reg = linear_model.LinearRegression().fit(X, Y)
@@ -45,11 +42,7 @@ def model_h01d02(df):
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    LExT_SET = LExT-SET
-    LExT_SET_2 = (LExT-SET)**2
-    PLF_2 = PLF**2
-    cost = np.ones(len(HC))
-    X = np.column_stack([cost,SET,Sfr,LExT_SET,LExT_SET_2,PLF,PLF_2])
+    X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF, PLF**2])
     Y = COP
     
     model_reg = linear_model.LinearRegression().fit(X, Y)
@@ -97,7 +90,7 @@ def model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     Sfr_PL = np.array(df_PL["SFR [l/s]"])
     LET_PL = np.array(df_PL["LET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    LFR_FL = np.array(df_PL["LFR [kg/s]"])
+    LFR_PL = np.array(df_PL["LFR [kg/s]"])
     HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
     PLF_PL = np.array(df_PL["PLF"])
     COP_PL = np.array(df_PL["COP"])
