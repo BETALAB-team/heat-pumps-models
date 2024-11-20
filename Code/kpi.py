@@ -4,7 +4,7 @@ from matplotlib import cm
 from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score
 from models import *
-
+import pandas as pd
 #%% Test H01DO1----------------------------------------------------------------
 
 def kpi_h01d01(Models, df, curve):
@@ -201,6 +201,8 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
     df_PL= df[df['PLF']!=1] 
+
+    # FULL load calculation
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
@@ -215,12 +217,9 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
 
     "Create matrix and full load calculations"
     X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,Sfr_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2])
-    COP_FL_pred_FL = Models['H01N - mod A']['scikit model'].predict(X_FL) #COP_FL predicted starting from X_FL
+    COP_pred_FL = Models['H01N - mod A']['scikit model'].predict(X_FL) #COP_FL predicted starting from X_FL
     
-    "Evaluation of performance-FL"
-    MAE_FL = mean_absolute_error(COP_FL, COP_FL_pred_FL)
-    RMSE_FL = root_mean_squared_error(COP_FL, COP_FL_pred_FL)
-    r2_FL = r2_score(COP_FL, COP_FL_pred_FL)
+    # Part load calculation
     
     "Import data as Array - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
@@ -236,57 +235,105 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
   
     "Create matrix and part load calculations"
     X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,Sfr_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2])
-    COP_FL_pred = Models['H01N - mod A']['scikit model'].predict(X_PL) #COP_FL predicted starting from X_PL
-      
+    COP_FL_pred_PL = Models['H01N - mod A']['scikit model'].predict(X_PL) #COP_FL predicted starting from X_PL
    
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
         f_COP =  Models['H01N - mod A']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred
-    
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
-       
+        COP_pred_PL = f_COP * COP_FL_pred_PL      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
         f_COP =  Models['H01N - mod B']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred 
-        
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
+        COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         f_COP =  Models['H01N - mod C']['F_COP'](PLF_PL)
-        COP_pred = f_COP * COP_FL_pred
-        
-        "Evaluation of performance"
-        MAE = mean_absolute_error(COP_PL, COP_pred)
-        RMSE = root_mean_squared_error(COP_PL, COP_pred)
-        r2 = r2_score(COP_PL, COP_pred)
-        
+        COP_pred_PL = f_COP * COP_FL_pred_PL
+     
+    #All points calculation
     
+    "Import data as Arrays - TOT"
+    SET = np.array(df["SET [°C]"])
+    SExT = np.array(df["SExT [°C]"])
+    Sfr = np.array(df["SFR [l/s]"])
+    LET = np.array(df["LET [°C]"])
+    LExT = np.array(df["LExT [°C]"])
+    LFR = np.array(df["LFR [kg/s]"])
+    HC = np.array(df["Heat Abs EVA [kW[]"])
+    PLF = np.array(df["PLF"])
+    COP_TOT = np.array(df["COP"])
+      
+    "Create matrix and calculations-TOT"
+    X_TOT = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2])
+    COP_FL_pred_TOT = Models['H01N - mod A']['scikit model'].predict(X_TOT) #COP_FL calculated for all data
+    
+    if indirect_model == "ISO 13612-2 mod A":
         
-    return {"COP_FL_pred": COP_FL_pred_FL,
-                "MAE_FL": MAE_FL,
-                "RMSE_FL": RMSE_FL,
-                "r2_FL": r2_FL,
-        "COP_pred": COP_pred,
-                "MAE": MAE,
-                "RMSE": RMSE,
-                "r2": r2}
+        "Method 1: f_cop by linear regression"
+        f_COP =  Models['H01N - mod A']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT       
+            
+    elif indirect_model == "ISO 13612-2 mod B":
+        
+        "Method 2: f_cop derived by curves"
+        f_COP =  Models['H01N - mod B']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT
+    
+    elif indirect_model == "C method":
+        
+        "Method 3: f_cop calculated"
+        f_COP =  Models['H01N - mod C']['F_COP'](PLF)
+        COP_pred_TOT = f_COP * COP_FL_pred_TOT
+ 
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    
+    df_model_PL=df_PL.copy()
+    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    
+    df_model_TOT=df.copy()
+    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
+    
+    "Evaluation of performance"
+    MAE_FL = mean_absolute_error(COP_FL, COP_pred_FL)
+    RMSE_FL = root_mean_squared_error(COP_FL, COP_pred_FL)
+    r2_FL = r2_score(COP_FL, COP_pred_FL)
+    
+    MAE_PL = mean_absolute_error(COP_PL, COP_pred_PL)
+    RMSE_PL = root_mean_squared_error(COP_PL, COP_pred_PL)
+    r2_PL = r2_score(COP_PL, COP_pred_PL)
+    
+    MAE_TOT = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    RMSE_TOT = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    r2_TOT = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+            "MAE_FL": MAE_FL,
+            "RMSE_FL": RMSE_FL,
+            "r2_FL": r2_FL,
+            "MAE_PL": MAE_PL,
+            "RMSE_PL": RMSE_PL,
+            "r2_PL": r2_PL,
+            "MAE_TOT": MAE_TOT,
+            "RMSE_TOT": RMSE_TOT,
+            "r2_TOT": r2_TOT}
 
-#%% Test H02DO1----------------------------------------------------------------
+        
+ #%% Test H02DO1----------------------------------------------------------------
 
 def kpi_h02d01(Models, df, curve):
     
