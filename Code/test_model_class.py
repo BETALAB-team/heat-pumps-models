@@ -19,7 +19,8 @@ plf_models = ["direct_linear",
               "direct_quadratic",
               "ISO 13612-2 mod A",
               "ISO 13612-2 mod B",
-              "C method"]
+              "C method"
+              ]
 dfs_levels = ["TOT","PL","FL"]
 kpis = ["RMSE","MAE","R2"]
 
@@ -39,6 +40,10 @@ for dev in devices:
             ["03",model_h03],
             ["04",model_h04],
             ["05",model_h05],
+            ["06",model_h06],
+            ["07",model_h07],
+            ["08",model_h08],
+            ["09",model_h09],
             ]:
         for m in plf_models:
             mod = model(plf_method=m)
@@ -51,7 +56,9 @@ for dev in devices:
                 res.loc[model_tag,m,op,"RMSE"][dev] = results[op]["RMSE_"+op]
                 res.loc[model_tag,m,op,"R2"][dev] = results[op]["r2_"+op]
 
+b = res.loc[:,:,"TOT","RMSE"]
 a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]
+
 
 #%%
 

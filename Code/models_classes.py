@@ -21,30 +21,8 @@ class model_hp():
         
     def set_curve_df(self,curve):
         self.curve = copy.deepcopy(curve)
-    
-    def get_inputs_function(self, df, model):
-        SET = np.array(df["SET [°C]"])
-        Sfr = np.array(df["SFR [l/s]"])
-        LExT = np.array(df["LExT [°C]"])
-        LET = np.array(df["LET [°C]"])
-        HC = np.array(df["Heat Abs EVA [kW[]"])
-        PLF = np.array(df["PLF"])
-        COP = np.array(df["COP"])
         
-        if model == "01":
-            X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2])
-        elif model == "02":
-            X = np.column_stack([np.ones(len(HC)),SET,LExT-SET,(LExT-SET)**2])
-        elif model == "03":
-            X = np.column_stack([np.ones(len(HC)),SET,Sfr,SET**2])
-        elif model == "04":
-            X = np.column_stack([np.ones(len(HC)), SET, LExT, LExT * SET])
-        elif model == "05":
-            X = np.column_stack([np.ones(len(HC)), SET, LET, LET * SET])
-
-        return PLF, COP, X
-    
-    def train_model(self,df):       
+    def train_linear_model(self,df):       
         self.df = df
         
         "Divide between part load and full load operative points"
@@ -54,9 +32,9 @@ class model_hp():
         self.df_FL = df_FL
         self.df_PL = df_PL
         
-        self.PLF, self.COP, self.X = self.get_inputs_function(self.df,self.model)
-        self.PLF_PL, self.COP_PL, self.X_PL = self.get_inputs_function(self.df_PL,self.model)
-        self.PLF_FL, self.COP_FL, self.X_FL = self.get_inputs_function(self.df_FL,self.model)
+        self.PLF, self.COP, self.X = self.get_inputs_function(self.df)
+        self.PLF_PL, self.COP_PL, self.X_PL = self.get_inputs_function(self.df_PL)
+        self.PLF_FL, self.COP_FL, self.X_FL = self.get_inputs_function(self.df_FL)
       
         "Create matrix and full load calculations"
         self.model_reg_FL = linear_model.LinearRegression().fit(self.X_FL, self.COP_FL)
@@ -70,14 +48,44 @@ class model_hp():
         if self.plf_method == "direct_linear":
             X_dir_lin = np.column_stack([self.X,self.PLF])
             self.model_reg = linear_model.LinearRegression().fit(X_dir_lin, self.COP)
-            self.f_COP = 1
             
         elif self.plf_method == "direct_quadratic":
             X_dir_qua = np.column_stack([self.X,self.PLF,self.PLF**2])   
             self.model_reg = linear_model.LinearRegression().fit(X_dir_qua, self.COP)
-            self.f_cop = 1
+        else:
+            self.calculate_f_cop(f_COP_model_FL)
+            
+    def train_exp_model(self,df):
+        self.df = df
+        self.df_FL = df[df['PLF']==1]
+        self.df_PL = df[df['PLF']!=1]
         
-        elif self.plf_method == "ISO 13612-2 mod A":
+        self.PLF, self.X, self.COP, self.A0 = self.get_inputs(self.df)
+        self.PLF_PL, self.X_PL, self.COP_PL, self.A0_PL = self.get_inputs(self.df_PL)
+        self.PLF_FL, self.X_FL, self.COP_FL, self.A0_FL = self.get_inputs(self.df_FL)
+                      
+        def fun(x0,xdata,ydata):
+            fun_m = {
+                    "direct_linear":self.f_method_d01,
+                    "direct_quadratic":self.f_method_d02,
+                    "ISO 13612-2 mod A":self.f_method_n,
+                    "ISO 13612-2 mod B":self.f_method_n,
+                    "C method":self.f_method_n,
+                }[self.plf_method]
+            Y_pred = fun_m(x0,xdata)
+            return sum((Y_pred-ydata)**2)
+        
+        if self.plf_method in ["direct_linear","direct_quadratic"]:
+            self.model_reg = minimize(fun, self.A0, args = (self.X, self.COP), method = 'L-BFGS-B')   
+        else:
+            self.model_reg = minimize(fun, self.A0, args = (self.X_FL, self.COP_FL), method = 'L-BFGS-B')
+            A = self.model_reg['x']
+            COP_FL_pred = A[0]*np.exp(A[1]*self.X_PL[:,0] + A[2]*self.X_PL[:,1]) + A[3]*self.X_PL[:,0]/self.X_PL[:,1] + A[4]    
+            f_COP_model_FL = self.COP_PL/COP_FL_pred
+            self.calculate_f_cop(f_COP_model_FL)
+        
+    def calculate_f_cop(self, f_COP_model_FL):
+        if self.plf_method == "ISO 13612-2 mod A":
             
             "Method 1: f_cop by linear regression"
             def f_COP_fun(x):
@@ -122,7 +130,7 @@ class model_hp():
                 
             self.f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
             
-    def calc_with_data(self, df):
+    def calc_with_data_linear(self, df):
         
         # "Import data as Arrays"
         # SET = np.array(df["SET [°C]"])
@@ -132,7 +140,7 @@ class model_hp():
         # PLF = np.array(df["PLF"])
         # X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2])
         
-        PLF, COP, X = self.get_inputs_function(df,self.model)
+        PLF, COP, X = self.get_inputs_function(df)
         
         "Create matrix and calculations"
         if self.plf_method == "direct_linear":
@@ -146,6 +154,28 @@ class model_hp():
         else:
             COP_pred = self.model_reg_FL.predict(X) * self.f_COP(PLF)
             
+        return COP_pred
+    
+    def calc_with_data_exp(self, df):
+        
+        # "Import data as Arrays"
+        # SET = np.array(df["SET [°C]"])
+        # Sfr = np.array(df["SFR [l/s]"])
+        # LExT = np.array(df["LExT [°C]"])
+        # HC = np.array(df["Heat Abs EVA [kW[]"])
+        # PLF = np.array(df["PLF"])
+        # X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2])
+        
+        PLF, X, COP, A0 = self.get_inputs(df)
+        
+        "Create matrix and calculations"
+        if self.plf_method == "direct_linear":
+            COP_pred = self.f_method_d01(self.model_reg['x'], X)            
+        elif self.plf_method == "direct_quadratic":
+            COP_pred = self.f_method_d02(self.model_reg['x'], X) 
+        else:
+            COP_pred = self.f_method_n(self.model_reg['x'], X) * self.f_COP(PLF)
+                
         return COP_pred
     
     def test_with_catalogue(self):
@@ -175,613 +205,252 @@ class model_hp():
     
 
 class model_h01(model_hp):
-    model = "01"
+    def get_inputs_function(self, df):
+        SET = np.array(df["SET [°C]"])
+        Sfr = np.array(df["SFR [l/s]"])
+        LExT = np.array(df["LExT [°C]"])
+        HC = np.array(df["Heat Abs EVA [kW[]"])
+        PLF = np.array(df["PLF"])
+        COP = np.array(df["COP"])
+        
+        X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2])
+
+        return PLF, COP, X
+    
+    def train_model(self,df):
+        self.train_linear_model(df)
+        
+    def calc_with_data(self,df):
+        return self.calc_with_data_linear(df)
     
 class model_h02(model_hp):
-    model = "02"
+    def get_inputs_function(self, df):
+        SET = np.array(df["SET [°C]"])
+        LExT = np.array(df["LExT [°C]"])
+        HC = np.array(df["Heat Abs EVA [kW[]"])
+        PLF = np.array(df["PLF"])
+        COP = np.array(df["COP"])
+        
+        X = np.column_stack([np.ones(len(HC)),SET,LExT-SET,(LExT-SET)**2])
+
+        return PLF, COP, X
+    
+    def train_model(self,df):
+        self.train_linear_model(df)
+    
+    def calc_with_data(self,df):
+        return self.calc_with_data_linear(df)
 
 class model_h03(model_hp):
-    model = "03"
+    def get_inputs_function(self, df):
+        SET = np.array(df["SET [°C]"])
+        Sfr = np.array(df["SFR [l/s]"])
+        HC = np.array(df["Heat Abs EVA [kW[]"])
+        PLF = np.array(df["PLF"])
+        COP = np.array(df["COP"])
+        
+        X = np.column_stack([np.ones(len(HC)),SET,Sfr,SET**2])
+
+        return PLF, COP, X
     
+    def train_model(self,df):
+        self.train_linear_model(df)
+        
+    def calc_with_data(self,df):
+        return self.calc_with_data_linear(df)
+        
 class model_h04(model_hp):
-    model = "04"
+    def get_inputs_function(self, df):
+        SET = np.array(df["SET [°C]"])
+        LExT = np.array(df["LExT [°C]"])
+        HC = np.array(df["Heat Abs EVA [kW[]"])
+        PLF = np.array(df["PLF"])
+        COP = np.array(df["COP"])
+        
+        X = np.column_stack([np.ones(len(HC)), SET, LExT, LExT * SET])
+
+        return PLF, COP, X
+    
+    def train_model(self,df):
+        self.train_linear_model(df)
+    
+    def calc_with_data(self,df):
+        return self.calc_with_data_linear(df)
     
 class model_h05(model_hp):
-    model = "05"
-    
+    def get_inputs_function(self, df):
+        SET = np.array(df["SET [°C]"])
+        LET = np.array(df["LET [°C]"])
+        HC = np.array(df["Heat Abs EVA [kW[]"])
+        PLF = np.array(df["PLF"])
+        COP = np.array(df["COP"])
+        
+        X = np.column_stack([np.ones(len(HC)), SET, LET, LET * SET])
 
+        return PLF, COP, X
+    
+    def train_model(self,df):
+        self.train_linear_model(df)
+        
+    def calc_with_data(self,df):
+        return self.calc_with_data_linear(df)
+    
 class model_h06(model_hp):
-    model = "06"
-    
-    @staticmethod()
-    def f_method_d01(x0, xdata, ydata):
+        
+    @staticmethod
+    def f_method_d01(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]
-        res = sum((ydata-Y_pred)**2)
-        return res
+        return Y_pred
     
-    @staticmethod()
-    def f_method_d02(x0, xdata, ydata):
+    @staticmethod
+    def f_method_d02(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]* xdata[:,2]**2 + x0[6]
-        res = sum((ydata-Y_pred)**2)
-        return res
+        return Y_pred
     
-    @staticmethod()
-    def f_method_n(x0, xdata, ydata):
-        Y_pred =  Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1]+ x0[4]
-        res = sum((ydata-Y_pred)**2)
-        return res
-    
-    # def train
-
-#%% H06D01---------------------------------------------------------------------
-
-def model_h06d01(df):
-       
-    "Import data as Arrays"
-    SET = np.array(df["SET [°C]"])
-    LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
-    
-    "Create matrix and calculations"
-    X = np.column_stack([SET, LET, PLF])
-    A0 = np.zeros(6)
-    
-    def fun(x0, xdata, ydata):
-          
-        Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
-    
-    model_reg = minimize(fun, A0, args = (X, COP), method = 'L-BFGS-B')    
-    return {"scipy model": model_reg}
-
-#%% H06D02---------------------------------------------------------------------
-
-def model_h06d02(df):
-       
-    "Import data as Arrays"
-    SET = np.array(df["SET [°C]"])
-    LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
-    
-    "Create matrix and calculations"
-    X = np.column_stack([SET, LET, PLF])
-
-    A0 = np.zeros(7)
-    
-    def fun(x0, xdata, ydata):
-          
-        Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]* xdata[:,2]**2 + x0[6]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
-    
-    model_reg = minimize(fun, A0, args = (X,  COP), method = 'L-BFGS-B')
-        
-    return {"scipy model": model_reg}
-
-#%% H06N-----------------------------------------------------------------------
-
-def model_h06n(df, curve, indirect_model = "ISO 13612-2 mod A"):
-    
-    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
-        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
-    
-    "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
-    
-    
-    
-    "Import data as Arrays - Full Load"
-    SET_FL = np.array(df_FL["SET [°C]"])
-    LET_FL = np.array(df_FL["LET [°C]"])
-    COP_FL = np.array(df_FL["COP"])
-
-    "Create matrix and full load calculations"
-    X_FL = np.column_stack([SET_FL, LET_FL])
-    A0 = np.zeros(5)
-    
-    def fun_FL(x0, xdata, ydata):
-          
+    @staticmethod
+    def f_method_n(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1]+ x0[4]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
+        return Y_pred        
     
-    model_reg_FL = minimize(fun_FL, A0, args = (X_FL, COP_FL), method = 'L-BFGS-B')
-    A= model_reg_FL['x']
+    def get_inputs(self,df):
+        SET = np.array(df["SET [°C]"])
+        LET = np.array(df["LET [°C]"])
+        PLF = np.array(df["PLF"])
+        COP = np.array(df["COP"])
+        
+        "Create matrix and calculations"
+        X = np.column_stack([SET, LET, PLF])
+        if self.plf_method == "direct_linear":
+            A0 = np.zeros(6)
+        elif self.plf_method == "direct_quadratic":
+            A0 = np.zeros(7)
+        else:
+            A0 = np.zeros(5)
+        return PLF, X, COP, A0
     
-    "Import data as Arrays - Part Load"
-    SET_PL = np.array(df_PL["SET [°C]"])
-    LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
-    COP_PL = np.array(df_PL["COP"])
-  
-    "Create matrix and part load calculations"
+    def train_model(self,df):
+        self.train_exp_model(df)
+        
+    def calc_with_data(self,df):
+        return self.calc_with_data_exp(df)
     
-    X_PL = np.column_stack([SET_PL, LET_PL])   
-    COP_FL_pred = A[0]*np.exp(A[1]*X_PL[:,0] + A[2]*X_PL[:,1]) + A[3]*X_PL[:,0]/X_PL[:,1] + A[4]    
-    f_COP_model_FL = COP_PL/COP_FL_pred
-    
-    if indirect_model == "ISO 13612-2 mod A":
+class model_h07(model_hp):
         
-        "Method 1: f_cop by linear regression"       
-        def f_COP_fun(x):
-            if not isinstance(x,np.ndarray):
-                x = np.array([x])
-            f_COP=np.ones(len(x))
-            for i in range(len(x)):
-                if  x[i] >= 0.25:
-                    f_COP[i]=1;
-                else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
-            return f_COP
-                
-        f_COP = lambda x : f_COP_fun(x)
-        
-            
-    elif indirect_model == "ISO 13612-2 mod B":
-        
-        "Method 2: f_cop derived by curves"       
-        curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
-        f_COP_curve = np.array(curve["f_cop"])
-        
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
-
-    
-    elif indirect_model == "C method":
-        
-        "Method 3: f_cop calculated"
-        
-        a=1/PLF_PL-1
-        b=PLF_PL-1
-        c=1/f_COP_model_FL-1
-        X3=np.column_stack([a,b])
-        
-        model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
-        coeff_3 = model_reg_3.coef_
-        coeff_0 = 1-coeff_3[0] -coeff_3[1]
-            
-        f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
-        
-    return {
-        "scipy model": model_reg_FL,
-        "F_COP": f_COP,
-        }
-
-#%% H07D01---------------------------------------------------------------------
-
-def model_h07d01(df):
-       
-    "Import data as Arrays"
-    SET = np.array(df["SET [°C]"])
-    LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
-    
-    "Create matrix and calculations"
-    X = np.column_stack([SET, LExT, PLF])
-    A0 = np.zeros(6)
-    
-    def fun(x0, xdata, ydata):
-          
+    @staticmethod
+    def f_method_d01(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
+        return Y_pred
     
-    model_reg = minimize(fun, A0, args = (X,COP), method = 'L-BFGS-B')
-        
-    return {"scipy model": model_reg}
-
-#%% H07D02---------------------------------------------------------------------
-
-def model_h07d02(df):
-       
-    "Import data as Arrays"
-    SET = np.array(df["SET [°C]"])
-    LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
-    
-    "Create matrix and calculations"
-    X = np.column_stack([SET, LExT, PLF])
-    A0 = np.zeros(7)
-    
-    def fun(x0, xdata, ydata):
-          
+    @staticmethod
+    def f_method_d02(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]* xdata[:,2]**2 + x0[6]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
+        return Y_pred
     
-    model_reg = minimize(fun, A0, args = (X, COP), method = 'L-BFGS-B')
-        
-    return {"scipy model": model_reg}
-
-#%% H07N-----------------------------------------------------------------------
-
-def model_h07n(df, curve, indirect_model = "ISO 13612-2 mod A"):
-    
-    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
-        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
-    
-    "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
-    
-    
-    
-    "Import data as Arrays - Full Load"
-    SET_FL = np.array(df_FL["SET [°C]"])
-    LExT_FL = np.array(df_FL["LExT [°C]"])
-    COP_FL = np.array(df_FL["COP"])
-
-    "Create matrix and full load calculations"
-    X_FL = np.column_stack([SET_FL, LExT_FL])  
-    A0 = np.zeros(5)
-    
-    def fun_FL(x0, xdata, ydata):
-          
+    @staticmethod
+    def f_method_n(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1]+ x0[4]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
+        return Y_pred        
     
-    model_reg_FL = minimize(fun_FL, A0, args = (X_FL,COP_FL), method = 'L-BFGS-B')
-    A= model_reg_FL['x']
+    def get_inputs(self,df):
+        SET = np.array(df["SET [°C]"])
+        LExT = np.array(df["LExT [°C]"])
+        PLF = np.array(df["PLF"])
+        COP = np.array(df["COP"])
+        
+        "Create matrix and calculations"
+        X = np.column_stack([SET, LExT, PLF])
+        if self.plf_method == "direct_linear":
+            A0 = np.zeros(6)
+        elif self.plf_method == "direct_quadratic":
+            A0 = np.zeros(7)
+        else:
+            A0 = np.zeros(5)
+        return PLF, X, COP, A0
     
-    "Import data as Arrays - Part Load"
-    SET_PL = np.array(df_PL["SET [°C]"])
-    LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
-    COP_PL = np.array(df_PL["COP"])
-  
-    "Create matrix and part load calculations"
-    
-    X_PL = np.column_stack([SET_PL, LExT_PL])
-    COP_FL_pred = A[0]*np.exp(A[1]*X_PL[:,0] + A[2]*X_PL[:,1]) + A[3]*X_PL[:,0]/X_PL[:,1] + A[4]
-    f_COP_model_FL = COP_PL/COP_FL_pred
-    
-    if indirect_model == "ISO 13612-2 mod A":
+    def train_model(self,df):
+        self.train_exp_model(df)
         
-        "Method 1: f_cop by linear regression"
-        def f_COP_fun(x):
-            if not isinstance(x,np.ndarray):
-                x = np.array([x])
-            f_COP=np.ones(len(x))
-            for i in range(len(x)):
-                if  x[i] >= 0.25:
-                    f_COP[i]=1;
-                else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
-            return f_COP
-                
-        f_COP = lambda x : f_COP_fun(x)
-        
-            
-    elif indirect_model == "ISO 13612-2 mod B":
-        
-        "Method 2: f_cop derived by curves"      
-        curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
-        f_COP_curve = np.array(curve["f_cop"])
-        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
-        
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
-
-    
-    elif indirect_model == "C method":
-        
-        "Method 3: f_cop calculated"
-        
-        a=1/PLF_PL-1
-        b=PLF_PL-1
-        c=1/f_COP_model_FL-1
-        X3=np.column_stack([a,b])
-        
-        model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
-        coeff_3 = model_reg_3.coef_
-        coeff_0 = 1-coeff_3[0] -coeff_3[1]
-            
-        f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
-        
-    return {
-        "scipy model": model_reg_FL,
-        "F_COP": f_COP
-        }
-
-#%% H08D01---------------------------------------------------------------------
-
-def model_h08d01(df):
+    def calc_with_data(self,df):
+        return self.calc_with_data_exp(df)
        
-    "Import data as Arrays"
-    SExT = np.array(df["SExT [°C]"])
-    LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
-    
-    "Create matrix and calculations"
-    X = np.column_stack([SExT, LExT, PLF])
-    A0 = np.zeros(6)
-    
-    def fun(x0, xdata, ydata):
-          
+class model_h08(model_hp):
+        
+    @staticmethod
+    def f_method_d01(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
+        return Y_pred
     
-    model_reg = minimize(fun, A0, args = (X,COP), method = 'L-BFGS-B')
-        
-    return {"scipy model": model_reg}
-
-#%% H08D02---------------------------------------------------------------------
-
-def model_h08d02(df):
-       
-    "Import data as Arrays"
-    SExT = np.array(df["SExT [°C]"])
-    LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
-    
-    "Create matrix and calculations"
-    X = np.column_stack([SExT, LExT, PLF])
-    A0 = np.zeros(7)
-    
-    def fun(x0, xdata, ydata):
-          
+    @staticmethod
+    def f_method_d02(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]* xdata[:,2]**2 + x0[6]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
+        return Y_pred
     
-    model_reg = minimize(fun, A0, args = (X, COP), method = 'L-BFGS-B')
-        
-    return {"scipy model": model_reg}
-
-#%% H08N-----------------------------------------------------------------------
-
-def model_h08n(df, curve, indirect_model = "ISO 13612-2 mod A"):
-    
-    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
-        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
-    
-    "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
-    
-    
-    
-    "Import data as Arrays - Full Load"
-    SExT_FL = np.array(df_FL["SExT [°C]"])
-    LExT_FL = np.array(df_FL["LExT [°C]"])
-    COP_FL = np.array(df_FL["COP"])
-
-    "Create matrix and full load calculations"
-    X_FL = np.column_stack([SExT_FL, LExT_FL])
-    A0 = np.zeros(5)
-    
-    def fun_FL(x0, xdata, ydata):
-          
+    @staticmethod
+    def f_method_n(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1]+ x0[4]
-        res = sum((ydata-Y_pred)**2)
+        return Y_pred        
+    
+    def get_inputs(self,df):
+        SExT = np.array(df["SExT [°C]"])
+        LExT = np.array(df["LExT [°C]"])
+        PLF = np.array(df["PLF"])
+        COP = np.array(df["COP"])
         
-        return res
+        "Create matrix and calculations"
+        X = np.column_stack([SExT, LExT, PLF])
+        if self.plf_method == "direct_linear":
+            A0 = np.zeros(6)
+        elif self.plf_method == "direct_quadratic":
+            A0 = np.zeros(7)
+        else:
+            A0 = np.zeros(5)
+        return PLF, X, COP, A0
     
-    model_reg_FL = minimize(fun_FL, A0, args = (X_FL, COP_FL), method = 'L-BFGS-B')
-    A= model_reg_FL['x']
-    
-    "Import data as Arrays - Part Load"
-    SExT_PL = np.array(df_PL["SExT [°C]"])
-    LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
-    COP_PL = np.array(df_PL["COP"])
-  
-    "Create matrix and part load calculations"
-    
-    X_PL = np.column_stack([SExT_PL, LExT_PL])
-    
-    COP_FL_pred = A[0]*np.exp(A[1]*X_PL[:,0] + A[2]*X_PL[:,1]) + A[3]*X_PL[:,0]/X_PL[:,1] + A[4]
-    
-    f_COP_model_FL = COP_PL/COP_FL_pred
-    
-    if indirect_model == "ISO 13612-2 mod A":
+    def train_model(self,df):
+        self.train_exp_model(df)
         
-        "Method 1: f_cop by linear regression"
-        def f_COP_fun(x):
-            if not isinstance(x,np.ndarray):
-                x = np.array([x])
-            f_COP=np.ones(len(x))
-            for i in range(len(x)):
-                if  x[i] >= 0.25:
-                    f_COP[i]=1;
-                else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
-            return f_COP
-                
-        f_COP = lambda x : f_COP_fun(x)
-        
-            
-    elif indirect_model == "ISO 13612-2 mod B":
-        
-        "Method 2: f_cop derived by curves"      
-        curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
-        f_COP_curve = np.array(curve["f_cop"])
-        
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
-
+    def calc_with_data(self,df):
+        return self.calc_with_data_exp(df)
     
-    elif indirect_model == "C method":
+class model_h09(model_hp):
         
-        "Method 3: f_cop calculated"
-        a=1/PLF_PL-1
-        b=PLF_PL-1
-        c=1/f_COP_model_FL-1
-        X3=np.column_stack([a,b])
-        
-        model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
-        coeff_3 = model_reg_3.coef_
-        coeff_0 = 1-coeff_3[0] -coeff_3[1]
-            
-        f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
-        
-    return {
-        "scipy model": model_reg_FL,
-        "F_COP": f_COP
-        }
-
-#%% H09D01---------------------------------------------------------------------
-
-def model_h09d01(df):
-       
-    "Import data as Arrays"
-    SExT = np.array(df["SExT [°C]"])
-    LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
-    
-    "Create matrix and calculations"
-    X = np.column_stack([SExT, LET, PLF])
-    A0 = np.zeros(6)
-    
-    def fun(x0, xdata, ydata):
-          
+    @staticmethod
+    def f_method_d01(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
+        return Y_pred
     
-    model_reg = minimize(fun, A0, args = (X, COP), method = 'L-BFGS-B')
-        
-    return {"scipy model": model_reg}
-
-#%% H09D02---------------------------------------------------------------------
-
-def model_h09d02(df):
-       
-    "Import data as Arrays"
-    SExT = np.array(df["SExT [°C]"])
-    LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
-    COP = np.array(df["COP"])
-    
-    "Create matrix and calculations"
-    X = np.column_stack([SExT, LET, PLF])
-    A0 = np.zeros(7)
-    
-    def fun(x0, xdata, ydata):
-          
+    @staticmethod
+    def f_method_d02(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1] + x0[4] *xdata[:,2] +x0[5]* xdata[:,2]**2 + x0[6]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
+        return Y_pred
     
-    model_reg = minimize(fun, A0, args = (X, COP), method = 'L-BFGS-B')
-        
-    return {"scipy model": model_reg}
-
-#%% H09N-----------------------------------------------------------------------
-
-def model_h09n(df, curve, indirect_model = "ISO 13612-2 mod A"):
-    
-    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
-        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
-    
-    "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
-   
-    
-    "Import data as Arrays - Full Load"
-    SExT_FL = np.array(df_FL["SExT [°C]"])
-    LET_FL = np.array(df_FL["LET [°C]"])
-    COP_FL = np.array(df_FL["COP"])
-
-    "Create matrix and full load calculations"
-    X_FL = np.column_stack([SExT_FL, LET_FL])  
-    A0 = np.zeros(5)
-    
-    def fun_FL(x0, xdata, ydata):
-          
+    @staticmethod
+    def f_method_n(x0, xdata):
         Y_pred =  x0[0]*np.exp(x0[1]*xdata[:,0] + x0[2]*xdata[:,1]) + x0[3]*xdata[:,0]/xdata[:,1]+ x0[4]
-        res = sum((ydata-Y_pred)**2)
-        
-        return res
+        return Y_pred        
     
-    model_reg_FL = minimize(fun_FL, A0, args = (X_FL, COP_FL), method = 'L-BFGS-B')
-    A= model_reg_FL['x']
+    def get_inputs(self,df):
+        SExT = np.array(df["SExT [°C]"])
+        LET = np.array(df["LET [°C]"])
+        PLF = np.array(df["PLF"])
+        COP = np.array(df["COP"])
+        
+        "Create matrix and calculations"
+        X = np.column_stack([SExT, LET, PLF])
+        if self.plf_method == "direct_linear":
+            A0 = np.zeros(6)
+        elif self.plf_method == "direct_quadratic":
+            A0 = np.zeros(7)
+        else:
+            A0 = np.zeros(5)
+        return PLF, X, COP, A0
     
-    "Import data as Arrays - Part Load"
-    SExT_PL = np.array(df_PL["SExT [°C]"])
-    LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
-    COP_PL = np.array(df_PL["COP"])
-  
-    "Create matrix and part load calculations"
-    
-    X_PL = np.column_stack([SExT_PL, LET_PL])
-    COP_FL_pred = A[0]*np.exp(A[1]*X_PL[:,0] + A[2]*X_PL[:,1]) + A[3]*X_PL[:,0]/X_PL[:,1] + A[4] 
-    f_COP_model_FL = COP_PL/COP_FL_pred
-    
-    if indirect_model == "ISO 13612-2 mod A":
+    def train_model(self,df):
+        self.train_exp_model(df)
         
-        "Method 1: f_cop by linear regression"
-        def f_COP_fun(x):
-            if not isinstance(x,np.ndarray):
-                x = np.array([x])
-            f_COP=np.ones(len(x))
-            for i in range(len(x)):
-                if  x[i] >= 0.25:
-                    f_COP[i]=1;
-                else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
-            return f_COP
-                
-        f_COP = lambda x : f_COP_fun(x)
-        
-            
-    elif indirect_model == "ISO 13612-2 mod B":
-        
-        "Method 2: f_cop derived by curves"
-        
-        curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
-        f_COP_curve = np.array(curve["f_cop"])
-        
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+    def calc_with_data(self,df):
+        return self.calc_with_data_exp(df)
 
-    
-    elif indirect_model == "C method":
-        
-        "Method 3: f_cop calculated"
-        
-        a=1/PLF_PL-1
-        b=PLF_PL-1
-        c=1/f_COP_model_FL-1
-        X3=np.column_stack([a,b])
-        
-        model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
-        coeff_3 = model_reg_3.coef_
-        coeff_0 = 1-coeff_3[0] -coeff_3[1]
-        
-        f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
-        
-    return {
-        "scipy model": model_reg_FL,
-        "F_COP": f_COP,
-        }
 
 #%% H10N-----------------------------------------------------------------------
 
