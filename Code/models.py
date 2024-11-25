@@ -41,10 +41,13 @@ def model_h01d02(df):
 
 #%%H01N------------------------------------------------------------------------
 
-def model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
+        
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")
         
     
     "Divide between part load and full load operative points"
@@ -81,15 +84,19 @@ def model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
+       
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
-                x = np.array([x])
+                x = np.array(x)
             f_COP=np.ones(len(x))
             for i in range(len(x)):
                 if  x[i] >= 0.25:
                     f_COP[i]=1;
                 else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    if source =="Water":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    elif source == "Air":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
             return f_COP
                 
         f_COP = lambda x : f_COP_fun(x)
@@ -162,11 +169,13 @@ def model_h02d02(df):
 
 #%% H02N-----------------------------------------------------------------------
 
-def model_h02n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
+   
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
@@ -200,15 +209,19 @@ def model_h02n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
+        
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
-                x = np.array([x])
+                x = np.array(x)
             f_COP=np.ones(len(x))
             for i in range(len(x)):
                 if  x[i] >= 0.25:
                     f_COP[i]=1;
                 else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    if source =="Water":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    elif source == "Air":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
             return f_COP
                 
         f_COP = lambda x : f_COP_fun(x)
@@ -278,11 +291,13 @@ def model_h03d02(df):
 
 #%% H03N-----------------------------------------------------------------------
 
-def model_h03n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h03n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
+    
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
@@ -316,15 +331,19 @@ def model_h03n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"       
+       
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
-                x = np.array([x])
+                x = np.array(x)
             f_COP=np.ones(len(x))
             for i in range(len(x)):
                 if  x[i] >= 0.25:
                     f_COP[i]=1;
                 else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    if source =="Water":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    elif source == "Air":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
             return f_COP
                 
         f_COP = lambda x : f_COP_fun(x)
@@ -396,11 +415,13 @@ def model_h04d02(df):
 
 #%% H04N-----------------------------------------------------------------------
 
-def model_h04n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
+   
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
@@ -436,16 +457,20 @@ def model_h04n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
+        
         def f_COP_fun(x):
-            if not isinstance(x,np.ndarray):
-                x = np.array([x])
-            f_COP=np.ones(len(x))
-            for i in range(len(x)):
-                if  x[i] >= 0.25:
-                    f_COP[i]=1;
-                else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
-            return f_COP
+          if not isinstance(x,np.ndarray):
+              x = np.array(x)
+          f_COP=np.ones(len(x))
+          for i in range(len(x)):
+              if  x[i] >= 0.25:
+                  f_COP[i]=1;
+              else:
+                  if source =="Water":
+                      f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                  elif source == "Air":
+                      f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
+          return f_COP
                 
         f_COP = lambda x : f_COP_fun(x)
         
@@ -515,11 +540,13 @@ def model_h05d02(df):
 
 #%% H05N-----------------------------------------------------------------------
 
-def model_h05n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
+    
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
@@ -553,17 +580,21 @@ def model_h05n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"      
+        
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
-                x = np.array([x])
+                x = np.array(x)
             f_COP=np.ones(len(x))
             for i in range(len(x)):
                 if  x[i] >= 0.25:
                     f_COP[i]=1;
                 else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    if source =="Water":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    elif source == "Air":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
             return f_COP
-                
+        
         f_COP = lambda x : f_COP_fun(x)
         
             
@@ -647,11 +678,13 @@ def model_h06d02(df):
 
 #%% H06N-----------------------------------------------------------------------
 
-def model_h06n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
+    
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
@@ -693,17 +726,21 @@ def model_h06n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"       
+       
         def f_COP_fun(x):
-            if not isinstance(x,np.ndarray):
-                x = np.array([x])
-            f_COP=np.ones(len(x))
-            for i in range(len(x)):
-                if  x[i] >= 0.25:
-                    f_COP[i]=1;
-                else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
-            return f_COP
-                
+          if not isinstance(x,np.ndarray):
+              x = np.array(x)
+          f_COP=np.ones(len(x))
+          for i in range(len(x)):
+              if  x[i] >= 0.25:
+                  f_COP[i]=1;
+              else:
+                  if source =="Water":
+                      f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                  elif source == "Air":
+                      f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
+          return f_COP
+      
         f_COP = lambda x : f_COP_fun(x)
         
             
@@ -789,11 +826,13 @@ def model_h07d02(df):
 
 #%% H07N-----------------------------------------------------------------------
 
-def model_h07n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
+    
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
@@ -835,15 +874,19 @@ def model_h07n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
+       
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
-                x = np.array([x])
+                x = np.array(x)
             f_COP=np.ones(len(x))
             for i in range(len(x)):
                 if  x[i] >= 0.25:
                     f_COP[i]=1;
                 else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    if source =="Water":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    elif source == "Air":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
             return f_COP
                 
         f_COP = lambda x : f_COP_fun(x)
@@ -932,10 +975,13 @@ def model_h08d02(df):
 
 #%% H08N-----------------------------------------------------------------------
 
-def model_h08n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
+    
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")  
         
     
     "Divide between part load and full load operative points"
@@ -980,15 +1026,19 @@ def model_h08n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
+       
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
-                x = np.array([x])
+                x = np.array(x)
             f_COP=np.ones(len(x))
             for i in range(len(x)):
                 if  x[i] >= 0.25:
                     f_COP[i]=1;
                 else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    if source =="Water":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    elif source == "Air":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
             return f_COP
                 
         f_COP = lambda x : f_COP_fun(x)
@@ -1075,11 +1125,13 @@ def model_h09d02(df):
 
 #%% H09N-----------------------------------------------------------------------
 
-def model_h09n(df, curve, indirect_model = "ISO 13612-2 mod A"):
+def model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
+     
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")  
     
     "Divide between part load and full load operative points"
     df_FL = df[df['PLF']==1]
@@ -1120,15 +1172,19 @@ def model_h09n(df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
+       
         def f_COP_fun(x):
             if not isinstance(x,np.ndarray):
-                x = np.array([x])
+                x = np.array(x)
             f_COP=np.ones(len(x))
             for i in range(len(x)):
                 if  x[i] >= 0.25:
                     f_COP[i]=1;
                 else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    if source =="Water":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    elif source == "Air":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
             return f_COP
                 
         f_COP = lambda x : f_COP_fun(x)
@@ -1167,11 +1223,13 @@ def model_h09n(df, curve, indirect_model = "ISO 13612-2 mod A"):
 
 #%% H10N-----------------------------------------------------------------------
 
-def model_h10n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h10n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
+
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")  
     
     "Divide between part load and full load operative points"
     df_PL= df[df['PLF']!=1]
@@ -1219,18 +1277,22 @@ def model_h10n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
+      
         def f_COP_fun(x):
-            
             if not isinstance(x,np.ndarray):
-                x = np.array([x])
+                x = np.array(x)
             f_COP=np.ones(len(x))
-            
             for i in range(len(x)):
                 if  x[i] >= 0.25:
                     f_COP[i]=1;
                 else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    if source =="Water":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    elif source == "Air":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
             return f_COP
+            
+           
                 
         f_COP = lambda x : f_COP_fun(x)
         
@@ -1270,11 +1332,13 @@ def model_h10n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2
 
 #%% H11N-----------------------------------------------------------------------
 
-def model_h11n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h11n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
+    
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")  
     
     "Divide between part load and full load operative points"
     df_PL= df[df['PLF']!=1]
@@ -1316,17 +1380,19 @@ def model_h11n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"       
+       
         def f_COP_fun(x):
-            
             if not isinstance(x,np.ndarray):
-                x = np.array([x])
+                x = np.array(x)
             f_COP=np.ones(len(x))
-            
             for i in range(len(x)):
                 if  x[i] >= 0.25:
                     f_COP[i]=1;
                 else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    if source =="Water":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    elif source == "Air":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
             return f_COP
                 
         f_COP = lambda x : f_COP_fun(x)
@@ -1366,11 +1432,13 @@ def model_h11n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2
 
 #%% H12N-----------------------------------------------------------------------
 
-def model_h12n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h12n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
-        
+    
+    if source not in ["Air","Water"]:
+        raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")      
     
     "Divide between part load and full load operative points"
     df_PL= df[df['PLF']!=1]
@@ -1426,17 +1494,19 @@ def model_h12n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
+       
         def f_COP_fun(x):
-            
             if not isinstance(x,np.ndarray):
-                x = np.array([x])
+                x = np.array(x)
             f_COP=np.ones(len(x))
-            
             for i in range(len(x)):
                 if  x[i] >= 0.25:
                     f_COP[i]=1;
                 else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    if source =="Water":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                    elif source == "Air":
+                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)*(1-0.25*(1-x[i]*4))
             return f_COP
                 
         f_COP = lambda x : f_COP_fun(x)
@@ -1473,12 +1543,11 @@ def model_h12n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2
         "COP_Carnot": COP_carnot,
         "COP_pred_FL": COP_pred_FL,
         "F_COP": f_COP,
-        "Debug": f_COP(PLF_PL),
         }
 
 #%% Load Models----------------------------------------------------------------
 
-def load_models(df, curve):
+def load_models(df, curve, source):
     
     Model={}
     
@@ -1492,9 +1561,9 @@ def load_models(df, curve):
     
     #%% H10N-------------------------------------------------------------------
     
-    Model['H01N - mod A'] = model_h01n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H01N - mod B'] = model_h01n(df, curve, indirect_model = "ISO 13612-2 mod B")
-    Model['H01N - mod C'] = model_h01n(df, curve, indirect_model = "C method")
+    Model['H01N - mod A'] = model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H01N - mod B'] = model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod B")
+    Model['H01N - mod C'] = model_h01n(df, curve, source, indirect_model = "C method")
      
     #%% H02D01-----------------------------------------------------------------
     
@@ -1506,9 +1575,9 @@ def load_models(df, curve):
     
     #%% H02N-------------------------------------------------------------------
     
-    Model['H02N - mod A'] = model_h02n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H02N - mod B'] = model_h02n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H02N - mod C'] = model_h02n(df, curve, indirect_model = "C method")
+    Model['H02N - mod A'] = model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod A" )
+    Model['H02N - mod B'] = model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H02N - mod C'] = model_h02n(df, curve, source, indirect_model = "C method")
      
     #%% H03D01-----------------------------------------------------------------
     
@@ -1520,9 +1589,9 @@ def load_models(df, curve):
     
     #%% H03N-------------------------------------------------------------------
     
-    Model['H03N - mod A'] = model_h03n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H03N - mod B'] = model_h03n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H03N - mod C'] = model_h03n(df, curve, indirect_model = "C method")
+    Model['H03N - mod A'] = model_h03n(df, curve, source,  indirect_model = "ISO 13612-2 mod A")
+    Model['H03N - mod B'] = model_h03n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H03N - mod C'] = model_h03n(df, curve, source, indirect_model = "C method")
     
     #%% H04D01-----------------------------------------------------------------
     
@@ -1534,9 +1603,9 @@ def load_models(df, curve):
     
     #%% H04N-------------------------------------------------------------------
     
-    Model['H04N - mod A'] = model_h04n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H04N - mod B'] = model_h04n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H04N - mod C'] = model_h04n(df, curve, indirect_model = "C method")
+    Model['H04N - mod A'] = model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H04N - mod B'] = model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H04N - mod C'] = model_h04n(df, curve, source, indirect_model = "C method")
     
     #%% H05D01-----------------------------------------------------------------
     
@@ -1548,9 +1617,9 @@ def load_models(df, curve):
     
     #%% H05N-------------------------------------------------------------------
     
-    Model['H05N - mod A'] = model_h05n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H05N - mod B'] = model_h05n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H05N - mod C'] = model_h05n(df, curve, indirect_model = "C method")
+    Model['H05N - mod A'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H05N - mod B'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H05N - mod C'] = model_h05n(df, curve, source, indirect_model = "C method")
     
     #%% H06D01-----------------------------------------------------------------
     
@@ -1562,17 +1631,17 @@ def load_models(df, curve):
     
     #%% H05N-------------------------------------------------------------------
     
-    Model['H05N - mod A'] = model_h05n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H05N - mod B'] = model_h05n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H05N - mod C'] = model_h05n(df, curve, indirect_model = "C method")
+    Model['H05N - mod A'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H05N - mod B'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H05N - mod C'] = model_h05n(df, curve, source, indirect_model = "C method")
     
     
     
     #%% H06N-------------------------------------------------------------------
     
-    Model['H06N - mod A'] = model_h06n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H06N - mod B'] = model_h06n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H06N - mod C'] = model_h06n(df, curve, indirect_model = "C method")
+    Model['H06N - mod A'] = model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H06N - mod B'] = model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H06N - mod C'] = model_h06n(df, curve, source, indirect_model = "C method")
     
     #%% H07D01-----------------------------------------------------------------
     
@@ -1584,9 +1653,9 @@ def load_models(df, curve):
     
     #%% H07N-------------------------------------------------------------------
     
-    Model['H07N - mod A'] = model_h07n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H07N - mod B'] = model_h07n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H07N - mod C'] = model_h07n(df, curve, indirect_model = "C method")
+    Model['H07N - mod A'] = model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H07N - mod B'] = model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H07N - mod C'] = model_h07n(df, curve, source, indirect_model = "C method")
     
     #%% H08D01-----------------------------------------------------------------
     
@@ -1598,9 +1667,9 @@ def load_models(df, curve):
     
     #%% H08N-------------------------------------------------------------------
     
-    Model['H08N - mod A'] = model_h08n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H08N - mod B'] = model_h08n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H08N - mod C'] = model_h08n(df, curve, indirect_model = "C method")
+    Model['H08N - mod A'] = model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H08N - mod B'] = model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H08N - mod C'] = model_h08n(df, curve, source, indirect_model = "C method")
     
     #%% H09D01-----------------------------------------------------------------
     
@@ -1612,27 +1681,27 @@ def load_models(df, curve):
     
     #%% H09N-------------------------------------------------------------------
     
-    Model['H09N - mod A'] = model_h09n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H09N - mod B'] = model_h09n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H09N - mod C'] = model_h09n(df, curve, indirect_model = "C method")
+    Model['H09N - mod A'] = model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H09N - mod B'] = model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H09N - mod C'] = model_h09n(df, curve, source, indirect_model = "C method")
     
     #%% H10N-------------------------------------------------------------------
     
-    Model['H10N - mod A'] = model_h10n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H10N - mod B'] = model_h10n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H10N - mod C'] = model_h10n(df, curve, indirect_model = "C method")
+    Model['H10N - mod A'] = model_h10n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H10N - mod B'] = model_h10n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H10N - mod C'] = model_h10n(df, curve, source, indirect_model = "C method")
     
     #%% H11N-------------------------------------------------------------------
     
-    Model['H11N - mod A'] = model_h11n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H11N - mod B'] = model_h11n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H11N - mod C'] = model_h11n(df, curve, indirect_model = "C method")
+    Model['H11N - mod A'] = model_h11n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H11N - mod B'] = model_h11n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H11N - mod C'] = model_h11n(df, curve, source, indirect_model = "C method")
     
     #%% H12N-------------------------------------------------------------------
     
-    Model['H12N - mod A'] = model_h12n(df, curve, indirect_model = "ISO 13612-2 mod A")
-    Model['H12N - mod B'] = model_h12n(df, curve, indirect_model = "ISO 13612-2 mod B")  
-    Model['H12N - mod C'] = model_h12n(df, curve, indirect_model = "C method")
+    Model['H12N - mod A'] = model_h12n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H12N - mod B'] = model_h12n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H12N - mod C'] = model_h12n(df, curve, source, indirect_model = "C method")
     
     return Model
 
