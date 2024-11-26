@@ -84,6 +84,24 @@ class model_hp():
             f_COP_model_FL = self.COP_PL/COP_FL_pred
             self.calculate_f_cop(f_COP_model_FL)
         
+    def train_COP_model(self, df, Source_T = 7, Load_T = 35, COP = None):
+        
+        COP_carnot = (Load_T + 273.15 )/ (Load_T - Source_T)
+        
+        if hasattr(self, "curve"):
+            curve = copy.deepcopy(self.curve)
+            curve = curve.set_index(curve['SET'])  
+            COP = curve.loc[Source_T, 'COP_fl'] 
+            self.eta_design = COP / COP_carnot # second principle efficency for full load data point
+        else:
+            self.eta_design = COP / COP_carnot     
+        
+        df["COP"]        
+        
+        self.calculate_f_cop(f_COP_model_FL)
+        
+        
+        
     def calculate_f_cop(self, f_COP_model_FL):
         if self.plf_method == "ISO 13612-2 mod A":
             
@@ -447,6 +465,14 @@ class model_h09(model_hp):
     
     def train_model(self,df):
         self.train_exp_model(df)
+        
+    def calc_with_data(self,df):
+        return self.calc_with_data_exp(df)
+    
+class model_h10(model_hp):
+        
+    def train_model(self,*args):
+        self.train_COP_model()
         
     def calc_with_data(self,df):
         return self.calc_with_data_exp(df)

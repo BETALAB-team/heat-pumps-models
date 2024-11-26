@@ -49,7 +49,7 @@ for dev in devices:
             mod = model(plf_method=m)
             mod.set_curve_df(curve)
             mod.train_model(df)
-            
+                        
             results = mod.test_with_catalogue()
             for op in dfs_levels:
                 res.loc[model_tag,m,op,"MAE"][dev] = results[op]["MAE_"+op]
