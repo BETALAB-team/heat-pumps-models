@@ -3,8 +3,8 @@ import os
 from models import *
 from kpi import *
 import numpy as np
-# import seaborn as sns
-#import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 #%%----------------------------------------------------------------------------
 
@@ -15,12 +15,6 @@ curve = pd.read_excel(os.path.join('..', 'Data', 'Galletti MLI 18 kW.xlsx'), she
 Models = load_models(df, curve, "Water")
 KPI = load_test(Models, df, curve)
 load_graph(KPI, df)
-
-
-
-
-
-
 
 
 

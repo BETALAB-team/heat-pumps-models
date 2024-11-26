@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-import seaborn as so
+import seaborn as sns
 from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score
 from models import *
@@ -2997,63 +2997,287 @@ def load_test(Models, df, curve):
 
     return Test
 
-#%% Graph 
+#%% Graph_COP_pred-------------------------------------------------------------
 
 def load_graph(KPI, df):
     
     for g in KPI.keys():
         COP = np.array(df["COP"])
         COP_pred = KPI[g]["df_tot"]["COP_pred"]
-         
-        plt.plot(COP,COP_pred,"o", markeredgecolor = "black")
-        plt.plot([0, 10], [0, 10], "k--")
-        plt.plot([0, 10], [0, 13], "k--")
-        plt.plot([0, 10], [0, 7], "k--")
+        
+        
+        plt.plot(COP,COP_pred,"o", color = "orange", markeredgecolor = "black", label = "COP_pred")
+        plt.plot([0, 10], [0, 10], "k--", label = "Bisector")
+       
+        plt.plot([0, 10], [0, 12], "k--", label = "Error +20%")
+        plt.text( 6, 4.5, "+20%")
+        
+        plt.plot([0, 10], [0, 8], "k--", label = "Error -20%")
+        plt.text( 6, 7.7, "-20%")
+
         plt.xlabel("COP")
         plt.xlim(0,10)
         plt.ylim(0,10)
-        plt.ylabel("COP_pred")
+        plt.ylabel('$COP_{pred}$')
+        plt.legend()
+        plt.title(f"{g}")
+        sns.set_theme(rc={'figure.figsize':(19,9.5)})
         plt.tight_layout()
-        plt.savefig(os.path.join('..',"Pictures", f"Plot_{g}.svg"))
-        
+        plt.savefig(os.path.join('..',"Pictures", f"Plot_{g}.png")) #To modify to svg when whitched 
         plt.close()
 
-
     
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        Direct_Models = {}
+        Indirect_Models = {}
+        Linear_Dir = {}
+        Linear_Ind = {}
+        Exponential_Dir = {}
+        Exponential_Ind = {}
+        Carnot = {}
+        
+        " Divide the results in different dictionaries"
+        for g in KPI.keys():
+            list(g)
+            if 'D' is g[3]:
+                Direct_Models[g] = KPI[g]
+                for m in Direct_Models.keys():
+                    list(m)
+                    if int(m[2]) < 6:
+                        Linear_Dir[m] = Direct_Models[m]
+                    else:
+                        Exponential_Dir[m] = Direct_Models[m]
+            else:
+                Indirect_Models[g] = KPI[g]
+                for m in Indirect_Models.keys():
+                    list(m)
+                    if int(m[1]+m[2]) <6:
+                        Linear_Ind[m] = Indirect_Models[m]
+                    elif int(m[1]+m[2]) >= 6 and int(m[1]+m[2]) <= 9:
+                        Exponential_Ind[m] = Indirect_Models[m]
+                    elif int(m[1]+m[2]) >9 :
+                        Carnot[m] = Indirect_Models[m]
+        
+        "Extract the KPI parameters for FL, PL and TOT "
+        r2_LD_TOT = []
+        r2_LI_TOT = []
+        r2_ED_TOT = []
+        r2_EI_TOT = []
+        r2_C_TOT = []
+        
+        r2_LD_FL = []
+        r2_LI_FL = []
+        r2_ED_FL = []
+        r2_EI_FL = []
+        r2_C_FL = []
+        
+        r2_LD_PL = []
+        r2_LI_PL = []
+        r2_ED_PL = []
+        r2_EI_PL = []
+        r2_C_PL = []
+        
+        for g in Linear_Dir.keys():
+            r2_LD_TOT.append(Linear_Dir[f'{g}']['KPI_TOT']['r2_TOT'])
+            r2_LD_FL.append(Linear_Dir[f'{g}']['KPI_FL']['r2_FL'])
+            r2_LD_PL.append(Linear_Dir[f'{g}']['KPI_PL']['r2_PL'])
+        for g in Linear_Ind.keys():
+            r2_LI_TOT.append(Linear_Ind[f'{g}']['KPI_TOT']['r2_TOT'])
+            r2_LI_FL.append(Linear_Ind[f'{g}']['KPI_FL']['r2_FL'])
+            r2_LI_PL.append(Linear_Ind[f'{g}']['KPI_PL']['r2_PL'])
+        for g in Exponential_Dir.keys():
+            r2_ED_TOT.append(Exponential_Dir[f'{g}']['KPI_TOT']['r2_TOT'])
+            r2_ED_FL.append(Exponential_Dir[f'{g}']['KPI_FL']['r2_FL'])
+            r2_ED_PL.append(Exponential_Dir[f'{g}']['KPI_PL']['r2_PL'])
+        for g in Exponential_Ind.keys():
+            r2_EI_TOT.append(Exponential_Ind[f'{g}']['KPI_TOT']['r2_TOT']) 
+            r2_EI_FL.append(Exponential_Ind[f'{g}']['KPI_FL']['r2_FL']) 
+            r2_EI_PL.append(Exponential_Ind[f'{g}']['KPI_PL']['r2_PL']) 
+        for g in Carnot.keys():
+            r2_C_TOT.append(Carnot[f'{g}']['KPI_TOT']['r2_TOT'])
+            r2_C_FL.append(Carnot[f'{g}']['KPI_FL']['r2_FL'])
+            r2_C_PL.append(Carnot[f'{g}']['KPI_PL']['r2_PL'])
+        
+        MAE_LD_TOT = []
+        MAE_LI_TOT = []
+        MAE_ED_TOT = []
+        MAE_EI_TOT = []
+        MAE_C_TOT = []
+        
+        MAE_LD_FL = []
+        MAE_LI_FL = []
+        MAE_ED_FL = []
+        MAE_EI_FL = []
+        MAE_C_FL = []
+        
+        MAE_LD_PL = []
+        MAE_LI_PL = []
+        MAE_ED_PL = []
+        MAE_EI_PL = []
+        MAE_C_PL = []
+        
+        for g in Linear_Dir.keys():
+            MAE_LD_TOT.append(Linear_Dir[f'{g}']['KPI_TOT']['MAE_TOT'])
+            MAE_LD_FL.append(Linear_Dir[f'{g}']['KPI_FL']['MAE_FL'])
+            MAE_LD_PL.append(Linear_Dir[f'{g}']['KPI_PL']['MAE_PL'])
+        for g in Linear_Ind.keys():
+            MAE_LI_TOT.append(Linear_Ind[f'{g}']['KPI_TOT']['MAE_TOT'])
+            MAE_LI_FL.append(Linear_Ind[f'{g}']['KPI_FL']['MAE_FL'])
+            MAE_LI_PL.append(Linear_Ind[f'{g}']['KPI_PL']['MAE_PL'])
+        for g in Exponential_Dir.keys():
+            MAE_ED_TOT.append(Exponential_Dir[f'{g}']['KPI_TOT']['MAE_TOT'])
+            MAE_ED_FL.append(Exponential_Dir[f'{g}']['KPI_FL']['MAE_FL'])
+            MAE_ED_PL.append(Exponential_Dir[f'{g}']['KPI_PL']['MAE_PL'])
+        for g in Exponential_Ind.keys():
+            MAE_EI_TOT.append(Exponential_Ind[f'{g}']['KPI_TOT']['MAE_TOT']) 
+            MAE_EI_FL.append(Exponential_Ind[f'{g}']['KPI_FL']['MAE_FL']) 
+            MAE_EI_PL.append(Exponential_Ind[f'{g}']['KPI_PL']['MAE_PL']) 
+        for g in Carnot.keys():
+            MAE_C_TOT.append(Carnot[f'{g}']['KPI_TOT']['MAE_TOT'])
+            MAE_C_FL.append(Carnot[f'{g}']['KPI_FL']['MAE_FL'])
+            MAE_C_PL.append(Carnot[f'{g}']['KPI_PL']['MAE_PL'])  
+        
+        RMSE_LD_TOT = []
+        RMSE_LI_TOT = []
+        RMSE_ED_TOT = []
+        RMSE_EI_TOT = []
+        RMSE_C_TOT = []
+        
+        RMSE_LD_FL = []
+        RMSE_LI_FL = []
+        RMSE_ED_FL = []
+        RMSE_EI_FL = []
+        RMSE_C_FL = []
+        
+        RMSE_LD_PL = []
+        RMSE_LI_PL = []
+        RMSE_ED_PL = []
+        RMSE_EI_PL = []
+        RMSE_C_PL = []
+        
+        for g in Linear_Dir.keys():
+            RMSE_LD_TOT.append(Linear_Dir[f'{g}']['KPI_TOT']['RMSE_TOT'])
+            RMSE_LD_FL.append(Linear_Dir[f'{g}']['KPI_FL']['RMSE_FL'])
+            RMSE_LD_PL.append(Linear_Dir[f'{g}']['KPI_PL']['RMSE_PL'])
+        for g in Linear_Ind.keys():
+            RMSE_LI_TOT.append(Linear_Ind[f'{g}']['KPI_TOT']['RMSE_TOT'])
+            RMSE_LI_FL.append(Linear_Ind[f'{g}']['KPI_FL']['RMSE_FL'])
+            RMSE_LI_PL.append(Linear_Ind[f'{g}']['KPI_PL']['RMSE_PL'])
+        for g in Exponential_Dir.keys():
+            RMSE_ED_TOT.append(Exponential_Dir[f'{g}']['KPI_TOT']['RMSE_TOT'])
+            RMSE_ED_FL.append(Exponential_Dir[f'{g}']['KPI_FL']['RMSE_FL'])
+            RMSE_ED_PL.append(Exponential_Dir[f'{g}']['KPI_PL']['RMSE_PL'])
+        for g in Exponential_Ind.keys():
+            RMSE_EI_TOT.append(Exponential_Ind[f'{g}']['KPI_TOT']['RMSE_TOT']) 
+            RMSE_EI_FL.append(Exponential_Ind[f'{g}']['KPI_FL']['RMSE_FL']) 
+            RMSE_EI_PL.append(Exponential_Ind[f'{g}']['KPI_PL']['RMSE_PL']) 
+        for g in Carnot.keys():
+            RMSE_C_TOT.append(Carnot[f'{g}']['KPI_TOT']['RMSE_TOT'])
+            RMSE_C_FL.append(Carnot[f'{g}']['KPI_FL']['MAE_FL'])
+            RMSE_C_PL.append(Carnot[f'{g}']['KPI_PL']['MAE_PL'])  
+        
+        "Plot TOT"
+        figure1, axs1 = plt.subplots(3,figsize = (19,9.5))
+        figure1.suptitle('$KPI_{TOT}$',fontsize = 15)
+        
+        axs1[0].boxplot([r2_LD_TOT, r2_LI_TOT, r2_ED_TOT, r2_EI_TOT, r2_C_TOT])
+        axs1[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs1[0].set_title('$R2_{TOT}$')   
+        
+        axs1[1].boxplot([MAE_LD_TOT, MAE_LI_TOT, MAE_ED_TOT, MAE_EI_TOT, MAE_C_TOT])
+        axs1[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs1[1].set_title('$MAE_{TOT}$')
+        
+        axs1[2].boxplot([RMSE_LD_TOT, RMSE_LI_TOT, RMSE_ED_TOT, RMSE_EI_TOT, RMSE_C_TOT])
+        axs1[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs1[2].set_title('$RMSE_{TOT}$')
+        
+        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        plt.tight_layout()
+        figure1.savefig(os.path.join('..',"Pictures", "KPI_TOT.png")) #To modify to svg when whitched 
+        plt.close()
+        
+        "Plot FL"
+        figure2, axs2 = plt.subplots(3,figsize = (19,9.5))
+        figure2.suptitle('$KPI_{FL}$',fontsize = 15)
+        
+        axs2[0].boxplot([r2_LD_FL, r2_LI_FL, r2_ED_FL, r2_EI_FL, r2_C_FL])
+        axs2[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs2[0].set_title('$R2_{FL}$')   
+        
+        axs2[1].boxplot([MAE_LD_FL, MAE_LI_FL, MAE_ED_FL, MAE_EI_FL, MAE_C_FL])
+        axs2[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs2[1].set_title('$MAE_{FL}$')
+        
+        axs2[2].boxplot([RMSE_LD_FL, RMSE_LI_FL, RMSE_ED_FL, RMSE_EI_FL, RMSE_C_FL])
+        axs2[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs2[2].set_title('$RMSE_{FL}$')
+        
+        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        plt.tight_layout()
+        figure2.savefig(os.path.join('..',"Pictures", "KPI_FL.png")) #To modify to svg when whitched 
+        plt.close()
+        
+        "Plot PL"
+        figure3, axs3 = plt.subplots(3,figsize = (19,9.5))
+        figure3.suptitle('$KPI_{PL}$',fontsize = 15)
+        
+        axs3[0].boxplot([r2_LD_PL, r2_LI_PL, r2_ED_PL, r2_EI_PL, r2_C_PL])
+        axs3[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs3[0].set_title('$R2_{PL}$')   
+        
+        axs3[1].boxplot([MAE_LD_PL, MAE_LI_PL, MAE_ED_PL, MAE_EI_PL, MAE_C_PL])
+        axs3[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs3[1].set_title('$MAE_{PL}$')
+        
+        axs3[2].boxplot([RMSE_LD_PL, RMSE_LI_PL, RMSE_ED_PL, RMSE_EI_PL, RMSE_C_PL])
+        axs3[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs3[2].set_title('$RMSE_{PL}$')
+        
+        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        plt.tight_layout()
+        figure3.savefig(os.path.join('..',"Pictures", "KPI_PL.png")) #To modify to svg when whitched 
+        plt.close()
+        
+            
+            
+            
+            
+                    
+                    
+                
+                
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
 
 
 
