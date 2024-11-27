@@ -6,7 +6,6 @@ from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score
 from models import *
 
-
 #%% Test H01D01----------------------------------------------------------------
 
 def kpi_h01d01(Models, df, curve):
@@ -53,16 +52,19 @@ def kpi_h01d01(Models, df, curve):
     x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"]=COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"]=COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"]=COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -134,16 +136,19 @@ def kpi_h01d02(Models, df, curve):
     x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"]=COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"]=COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"]=COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -261,17 +266,20 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     df_model_FL=df_FL.copy()
     x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
-    df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL["COP_pred"]=COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
     df_model_PL = df_model_PL[x_variables]
-    df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL["COP_pred"]=COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
     df_model_TOT = df_model_TOT[x_variables]
-    df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT["COP_pred"]=COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -342,14 +350,17 @@ def kpi_h02d01(Models, df, curve):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -420,14 +431,17 @@ def kpi_h02d02(Models, df, curve):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -540,14 +554,17 @@ def kpi_h02n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -617,14 +634,17 @@ def kpi_h03d01(Models, df, curve):
     x_variables=["SET [°C]","SFR [l/s]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -727,6 +747,88 @@ def kpi_h03d02(Models, df, curve):
            "KPI_FL": KPI_FL,
            "KPI_PL": KPI_PL,
            "KPI_TOT": KPI_TOT}
+
+
+#%% Test H03D02----------------------------------------------------------------
+
+def kpi_h03d02(Models, df, curve):
+   
+    "Divide between part load and full load operative points"
+    df_FL = df[df['PLF']==1]
+    df_PL= df[df['PLF']!=1] 
+    
+    "Import data as Arrays - Full Load"
+    SET_FL = np.array(df_FL["SET [°C]"])
+    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
+    PLF_FL = np.array(df_FL["PLF"])
+    COP_FL = np.array(df_FL["COP"])
+    
+    "Import data as Arrays - Part Load"
+    SET_PL = np.array(df_PL["SET [°C]"])
+    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
+    PLF_PL = np.array(df_PL["PLF"])
+    COP_PL = np.array(df_PL["COP"])
+    
+    "Import data as Arrays - TOT"
+    SET = np.array(df["SET [°C]"])
+    Sfr = np.array(df["SFR [l/s]"])
+    HC = np.array(df["Heat Abs EVA [kW[]"])
+    PLF = np.array(df["PLF"])
+    COP_TOT = np.array(df["COP"])
+
+    "Create matrix and calculations"
+    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,Sfr_FL, SET_FL**2,PLF_FL, PLF_FL**2])
+    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,Sfr_PL, SET_PL**2,PLF_PL, PLF_PL**2])
+    X_TOT = np.column_stack([np.ones(len(HC)),SET,Sfr, SET**2,PLF, PLF**2])
+    
+    COP_pred_FL = Models['H03D02']['scikit model'].predict(X_FL)
+    COP_pred_PL = Models['H03D02']['scikit model'].predict(X_PL)
+    COP_pred_TOT = Models['H03D02']['scikit model'].predict(X_TOT)
+    
+    "Create output table"
+    df_model_FL=df_FL.copy()
+    x_variables=["SET [°C]","SFR [l/s]","PLF"]
+    df_model_FL = df_model_FL[x_variables]
+    df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
+    
+    df_model_PL=df_PL.copy()
+    df_model_PL = df_model_PL[x_variables]
+    df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
+    
+    df_model_TOT=df.copy()
+    df_model_TOT = df_model_TOT[x_variables]
+    df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
+    
+    "Evaluation of performance"
+    
+    KPI_FL = {}
+    KPI_PL = {}
+    KPI_TOT = {}
+    
+    KPI_FL["MAE_FL"]  = mean_absolute_error(COP_FL, COP_pred_FL)
+    KPI_FL["RMSE_FL"]  = root_mean_squared_error(COP_FL, COP_pred_FL)
+    KPI_FL["r2_FL"] = r2_score(COP_FL, COP_pred_FL)
+    
+    KPI_PL["MAE_PL"]= mean_absolute_error(COP_PL, COP_pred_PL)
+    KPI_PL["RMSE_PL"] = root_mean_squared_error(COP_PL, COP_pred_PL)
+    KPI_PL["r2_PL"] = r2_score(COP_PL, COP_pred_PL)
+    
+    KPI_TOT["MAE_TOT"] = mean_absolute_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["RMSE_TOT"] = root_mean_squared_error(COP_TOT, COP_pred_TOT)
+    KPI_TOT["r2_TOT"] = r2_score(COP_TOT, COP_pred_TOT)
+    
+    return {"df_FL":df_model_FL,
+            "df_PL":df_model_PL,
+            "df_tot":df_model_TOT,
+           "KPI_FL": KPI_FL,
+           "KPI_PL": KPI_PL,
+
+           "KPI_TOT": KPI_TOT}
 #%% Test H03N------------------------------------------------------------------
 
 def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
@@ -814,14 +916,17 @@ def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     x_variables=["SET [°C]","SFR [l/s]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -889,14 +994,17 @@ def kpi_h04d01(Models, df, curve):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -966,14 +1074,18 @@ def kpi_h04d02(Models, df, curve):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
+    
     
     "Evaluation of performance"
     
@@ -1087,14 +1199,18 @@ def kpi_h04n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
+    
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -1163,14 +1279,17 @@ def kpi_h05d01(Models, df, curve):
     x_variables=["SET [°C]","LET [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT= df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -1240,14 +1359,17 @@ def kpi_h05d02(Models, df, curve):
     x_variables=["SET [°C]","LET [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT= df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -1363,17 +1485,20 @@ def kpi_h05n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LET [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT= df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -1440,14 +1565,17 @@ def kpi_h06d01(Models, df, curve):
     x_variables=["SET [°C]","LET [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -1515,14 +1643,17 @@ def kpi_h06d02(Models, df, curve):
     x_variables=["SET [°C]","LET [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -1637,14 +1768,17 @@ def kpi_h06n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     x_variables=["SET [°C]","LET [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -1712,14 +1846,17 @@ def kpi_h07d01(Models, df, curve):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -1787,14 +1924,17 @@ def kpi_h07d02(Models, df, curve):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -1908,14 +2048,17 @@ def kpi_h07n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -1983,14 +2126,17 @@ def kpi_h08d01(Models, df, curve):
     x_variables=["SExT [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -2058,14 +2204,17 @@ def kpi_h08d02(Models, df, curve):
     x_variables=["SExT [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -2179,14 +2328,17 @@ def kpi_h08n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     x_variables=["SExT [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -2254,14 +2406,17 @@ def kpi_h09d01(Models, df, curve):
     x_variables=["SExT [°C]","LET [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -2329,14 +2484,17 @@ def kpi_h09d02(Models, df, curve):
     x_variables=["SExT [°C]","LET [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     
@@ -2450,14 +2608,17 @@ def kpi_h09n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     x_variables=["SExT [°C]","LET [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -2572,14 +2733,17 @@ def kpi_h10n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -2695,14 +2859,17 @@ def kpi_h11n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -2811,14 +2978,17 @@ def kpi_h12n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     x_variables=["SET [°C]","LExT [°C]","PLF"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
+    df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"] = COP_pred_PL
+    df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"] = COP_pred_TOT
+    df_model_TOT = df_model_TOT.to_dict()
     
     "Evaluation of performance"
     KPI_FL = {}
@@ -2848,8 +3018,16 @@ def kpi_h12n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
 
 #%% Load Tests-----------------------------------------------------------------
 
-def load_test(Models, df, curve):
+def load_test(Models, df, curve, Name):
+    
     Test = {}
+    import json
+    
+    "Create Folder"
+    if not os.path.exists(os.path.join('..',"Results",f"{Name}")):
+        os.mkdir(os.path.join('..',"Results",f"{Name}"))
+    else:
+        pass
     
 #%% Test H01D01----------------------------------------------------------------
         
@@ -2994,19 +3172,31 @@ def load_test(Models, df, curve):
     Test['H12N - mod A'] = kpi_h12n(Models, df, curve, indirect_model = "ISO 13612-2 mod A")
     Test['H12N - mod B'] = kpi_h12n(Models, df, curve, indirect_model = "ISO 13612-2 mod B")
     Test['H12N - mod C'] = kpi_h12n(Models, df, curve, indirect_model = "C method")
-
+    
+#%% Save as Jason file --------------------------------------------------------
+    
+    with open(os.path.join('..',"Results",f"{Name}",f'{Name}_KPI.json'), 'w') as f:
+     json.dump(Test, f)
+    
+    # with open(os.path.join('..',"Results",f"{Name}",f'{Name}_KPI.json'), 'r') as file:
+    #     Test = json.load(file)
+     
     return Test
 
 #%% Graph_COP_pred-------------------------------------------------------------
 
-def load_graph(KPI, df):
+def load_graph(KPI, df, Name):
+    
+    "Set plot theme"
+    sns.set_theme(rc={'figure.figsize':(19,9.5)})
+    plt.tight_layout()
+    
     
     for g in KPI.keys():
         COP = np.array(df["COP"])
         COP_pred = KPI[g]["df_tot"]["COP_pred"]
         
-        
-        plt.plot(COP,COP_pred,"o", color = "orange", markeredgecolor = "black", label = "COP_pred")
+        plt.plot(COP,COP_pred.values(),"o", color = "orange", markeredgecolor = "black", label = "COP_pred")
         plt.plot([0, 10], [0, 10], "k--", label = "Bisector")
        
         plt.plot([0, 10], [0, 12], "k--", label = "Error +20%")
@@ -3023,7 +3213,7 @@ def load_graph(KPI, df):
         plt.title(f"{g}")
         sns.set_theme(rc={'figure.figsize':(19,9.5)})
         plt.tight_layout()
-        plt.savefig(os.path.join('..',"Pictures", f"Plot_{g}.png")) #To modify to svg when whitched 
+        plt.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_Plot_{g}.png")) #To modify to svg when defined 
         plt.close()
 
     
@@ -3193,7 +3383,7 @@ def load_graph(KPI, df):
         
         sns.set_theme(rc={'figure.figsize':(19,9.5)})
         plt.tight_layout()
-        figure1.savefig(os.path.join('..',"Pictures", "KPI_TOT.png")) #To modify to svg when whitched 
+        figure1.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_KPI_TOT.png")) #To modify to svg when defined
         plt.close()
         
         "Plot FL"
@@ -3214,7 +3404,7 @@ def load_graph(KPI, df):
         
         sns.set_theme(rc={'figure.figsize':(19,9.5)})
         plt.tight_layout()
-        figure2.savefig(os.path.join('..',"Pictures", "KPI_FL.png")) #To modify to svg when whitched 
+        figure2.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_KPI_FL.png")) #To modify to svg when whitched 
         plt.close()
         
         "Plot PL"
@@ -3233,9 +3423,8 @@ def load_graph(KPI, df):
         axs3[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
         axs3[2].set_title('$RMSE_{PL}$')
         
-        sns.set_theme(rc={'figure.figsize':(19,9.5)})
-        plt.tight_layout()
-        figure3.savefig(os.path.join('..',"Pictures", "KPI_PL.png")) #To modify to svg when whitched 
+        
+        figure3.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_KPI_PL.png")) #To modify to svg when defined 
         plt.close()
         
             
