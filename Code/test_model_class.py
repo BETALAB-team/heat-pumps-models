@@ -44,8 +44,15 @@ for dev in devices:
             ["07",model_h07],
             ["08",model_h08],
             ["09",model_h09],
+            ["10",model_h10],
+            ["11",model_h11],
+            ["12",model_h12],
             ]:
         for m in plf_models:
+            
+            if model_tag in ["10","11","12"] and m in ["direct_linear","direct_quadratic",]:
+                continue
+            
             mod = model(plf_method=m)
             mod.set_curve_df(curve)
             mod.train_model(df)

@@ -7,15 +7,17 @@ from scipy.optimize import minimize
 
 class model_hp():
     
+    allowed_plf_methods = [
+            "direct_linear",
+            "direct_quadratic",
+            "ISO 13612-2 mod A",
+            "ISO 13612-2 mod B",
+            "C method"
+            ]
+    
     def __init__(self, plf_method = "direct_linear"):
-        if plf_method not in [
-                "direct_linear",
-                "direct_quadratic",
-                "ISO 13612-2 mod A",
-                "ISO 13612-2 mod B",
-                "C method"
-                ]:
-            raise TypeError("plf_method must be chosen from the following list: \"direct_linear\",\"direct_quadratic\", \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
+        if plf_method not in self.allowed_plf_methods:
+            raise TypeError(f"plf_method must be chosen from the following list: {self.allowed_plf_methods}")
             
         self.plf_method = plf_method
         
@@ -85,6 +87,11 @@ class model_hp():
             self.calculate_f_cop(f_COP_model_FL)
         
     def train_COP_model(self, df, Source_T = 7, Load_T = 35, COP = None):
+        self.df = df
+        self.df_FL = df[df['PLF']==1]
+        self.df_PL = df[df['PLF']!=1]
+        
+        self.PLF_PL = np.array(self.df_PL["PLF"])
         
         COP_carnot = (Load_T + 273.15 )/ (Load_T - Source_T)
         
@@ -94,13 +101,19 @@ class model_hp():
             COP = curve.loc[Source_T, 'COP_fl'] 
             self.eta_design = COP / COP_carnot # second principle efficency for full load data point
         else:
+            if COP == None:
+                raise ValueError("If no design points curve df has been set, COP at design load must be provided")
             self.eta_design = COP / COP_carnot     
         
-        df["COP"]        
+        SET_PL = np.array(self.df_PL["SET [°C]"])
+        LExT_PL = np.array(self.df_PL["LExT [°C]"])
+        COP_PL = np.array(self.df_PL["COP"])
+                
+        COP_pred_PL = self.calc_COP_FL(LExT_PL, SET_PL)
+        
+        f_COP_model_FL = COP_PL/COP_pred_PL
         
         self.calculate_f_cop(f_COP_model_FL)
-        
-        
         
     def calculate_f_cop(self, f_COP_model_FL):
         if self.plf_method == "ISO 13612-2 mod A":
@@ -194,6 +207,19 @@ class model_hp():
         else:
             COP_pred = self.f_method_n(self.model_reg['x'], X) * self.f_COP(PLF)
                 
+        return COP_pred
+    
+    def calc_with_data_COP(self, df):
+        
+                
+        SET = np.array(df["SET [°C]"])
+        LExT = np.array(df["LExT [°C]"])
+        PLF = np.array(df["PLF"])
+                
+        COP_pred_FL = self.calc_COP_FL(LExT,SET)
+        
+        COP_pred = COP_pred_FL * self.f_COP(PLF)
+        
         return COP_pred
     
     def test_with_catalogue(self):
@@ -471,115 +497,84 @@ class model_h09(model_hp):
     
 class model_h10(model_hp):
         
-    def train_model(self,*args):
-        self.train_COP_model()
+    allowed_plf_methods = [
+            "ISO 13612-2 mod A",
+            "ISO 13612-2 mod B",
+            "C method"
+            ]
+    
+    def __init__(self, plf_method = "ISO 13612-2 mod A"):
+        super().__init__(plf_method = plf_method)
+        
+    def calc_COP_FL(self, LExT, SET):
+        COP_carnot = (273+ LExT)/(LExT - SET)
+        COP_carnot[LExT <= SET] = 50
+        return COP_carnot * self.eta_design
+    
+    def train_model(self,df,*args,**kwargs):
+        self.train_COP_model(df,*args,**kwargs)
         
     def calc_with_data(self,df):
-        return self.calc_with_data_exp(df)
-
-
-#%% H10N-----------------------------------------------------------------------
-
-def model_h10n(df, curve, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
+        return self.calc_with_data_COP(df)
     
-    if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
-        raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
+class model_h11(model_hp):
         
+    allowed_plf_methods = [
+            "ISO 13612-2 mod A",
+            "ISO 13612-2 mod B",
+            "C method"
+            ]
     
-    "Divide between part load and full load operative points"
-    df_PL= df[df['PLF']!=1]
-
-
-    "Carnot efficency full load calculations"     
-    SET_data = design_point_T[0] #[°C]
-    LExT_data = design_point_T[1] #[°C]
-    curve = curve.set_index(curve['SET'])
-    COP_data = curve.loc[SET_data, 'COP_fl']
-    COP_carnot = (LExT_data + 273.15 )/ (LExT_data - SET_data)
-    eta_FL = COP_data / COP_carnot # second principle efficency for full load data point
-       
-    "Import data as Arrays - Part Load"
-    SET_PL = np.array(df_PL["SET [°C]"])
-    LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
-    COP_PL = np.array(df_PL["COP"])
-  
-    "Create function to calculate COP_FL_pred" 
+    def __init__(self, plf_method = "ISO 13612-2 mod A"):
+        super().__init__(plf_method = plf_method)
+        
+    def calc_COP_FL(self, LExT, SET):
+        den = np.maximum((LExT - SET),18)
+        COP_carnot = (273+ LExT)/den
+        return COP_carnot * self.eta_design
     
-    X=np.column_stack([SET_PL, LExT_PL, COP_PL])
+    def train_model(self,df,*args,**kwargs):
+        self.train_COP_model(df,*args,**kwargs)
+        
+    def calc_with_data(self,df):
+        return self.calc_with_data_COP(df)
     
-    def COP_fun(x, y):
+class model_h12(model_hp):
         
-        SET_PL = x[:, 0]
-        LExT_PL = x[:, 1]
-        COP_carnot_PL=np.ones(len(SET_PL))
-        COP_FL_pred=np.ones(len(SET_PL))
-        
-        for i in range(len(LExT_PL)):
-        
-            if LExT_PL[i] <= SET_PL[i]:
-                COP_carnot_PL[i]=50;
-            else:
-                COP_carnot_PL[i] = (273+ LExT_PL[i])/(LExT_PL[i] - SET_PL[i])
-        
-            COP_FL_pred[i] = COP_carnot_PL[i] * eta_FL
-
-        return COP_FL_pred
+    allowed_plf_methods = [
+            "ISO 13612-2 mod A",
+            "ISO 13612-2 mod B",
+            "C method"
+            ]
     
-    COP_pred_FL= lambda x, y:  COP_fun(x, y) 
-    f_COP_model_FL = COP_PL/ COP_pred_FL(X,eta_FL) 
-   
-    if indirect_model == "ISO 13612-2 mod A":
+    def __init__(self, plf_method = "ISO 13612-2 mod A"):
+        super().__init__(plf_method = plf_method)
         
-        "Method 1: f_cop by linear regression"
-        def f_COP_fun(x):
-            
-            if not isinstance(x,np.ndarray):
-                x = np.array([x])
-            f_COP=np.ones(len(x))
-            
-            for i in range(len(x)):
-                if  x[i] >= 0.25:
-                    f_COP[i]=1;
-                else:
-                    f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
-            return f_COP
-                
-        f_COP = lambda x : f_COP_fun(x)
+    def calc_COP_FL(self, LExT, SET):
         
-            
-    elif indirect_model == "ISO 13612-2 mod B":
         
-        "Method 2: f_cop derived by curves"
+        den_1 = np.maximum((LExT - SET),1)
+        COP_carnot_1 = (273+ LExT)/den_1
+        COP_carnot_2 = (273+ LExT)/den_1
         
-        curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
-        f_COP_curve = np.array(curve["f_cop"])
-        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
+        COP_carnot_non_filt = (273+ LExT)/(LExT - SET)
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
-
+        COP_carnot_2[LExT > SET] = COP_carnot_non_filt[LExT > SET]
+        
+        COP_carnot = np.minimum(COP_carnot_1, COP_carnot_2)
+        
+        eta = self.eta_design / (
+            self.eta_design*(1-COP_carnot/COP_carnot_non_filt)\
+            + COP_carnot/COP_carnot_non_filt 
+            )
+        
+        return COP_carnot * eta
     
-    elif indirect_model == "C method":
+    def train_model(self,df,*args,**kwargs):
+        self.train_COP_model(df,*args,**kwargs)
         
-        "Method 3: f_cop calculated"
-        
-        a=1/PLF_PL-1
-        b=PLF_PL-1
-        c=1/f_COP_model_FL-1
-        X3=np.column_stack([a,b])
-        
-        model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)
-        coeff_3 = model_reg_3.coef_
-        coeff_0 = 1-coeff_3[0] -coeff_3[1]
-            
-        f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
-        
-    return {
-        "Carnot efficency": eta_FL,
-        "COP_pred_FL": COP_pred_FL,
-        "F_COP": f_COP,
-        }
+    def calc_with_data(self,df):
+        return self.calc_with_data_COP(df)
 
 #%% H11N-----------------------------------------------------------------------
 
