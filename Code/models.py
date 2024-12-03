@@ -10,12 +10,11 @@ def model_h01d01(df):
     SET = np.array(df["SET [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
     LExT = np.array(df["LExT [°C]"])
-    HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF])
+    X = np.column_stack([np.ones(len(PLF)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF])
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
        
@@ -29,12 +28,11 @@ def model_h01d02(df):
     SET = np.array(df["SET [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
     LExT = np.array(df["LExT [°C]"])
-    HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF, PLF**2])   
+    X = np.column_stack([np.ones(len(PLF)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF, PLF**2])   
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -60,11 +58,10 @@ def model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     SET_FL = np.array(df_FL["SET [°C]"])
     Sfr_FL = np.array(df_FL["SFR [l/s]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,Sfr_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2])
+    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL,Sfr_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2])
     model_reg_FL = linear_model.LinearRegression().fit(X_FL, COP_FL)
     
     
@@ -72,12 +69,11 @@ def model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     SET_PL = np.array(df_PL["SET [°C]"])
     Sfr_PL = np.array(df_PL["SFR [l/s]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
     PLF_PL = np.array(df_PL["PLF"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,Sfr_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2])
+    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,Sfr_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2])
     COP_FL_pred = model_reg_FL.predict(X_PL)
     f_COP_model_FL = COP_PL/COP_FL_pred
     
@@ -108,7 +104,6 @@ def model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         curve.sort_values("X", inplace = True)
         PLF_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
-        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
         
         f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
 
@@ -139,12 +134,11 @@ def model_h02d01(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)),SET,LExT-SET,(LExT-SET)**2,PLF])   
+    X = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2,PLF])   
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -157,12 +151,11 @@ def model_h02d02(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)),SET,LExT-SET,(LExT-SET)**2,PLF,PLF**2])
+    X = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2,PLF,PLF**2])
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -186,23 +179,21 @@ def model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2])
+    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2])
     model_reg_FL = linear_model.LinearRegression().fit(X_FL, COP_FL)
     
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
     PLF_PL = np.array(df_PL["PLF"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL,LExT_PL-SET_PL, (LExT_PL-SET_PL)**2])
+    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,LExT_PL-SET_PL, (LExT_PL-SET_PL)**2])
     COP_FL_pred = model_reg_FL.predict(X_PL)
     f_COP_model_FL = COP_PL/COP_FL_pred
     
@@ -262,12 +253,11 @@ def model_h03d01(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
-    HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)),SET,Sfr,SET**2,PLF])
+    X = np.column_stack([np.ones(len(SET)),SET,Sfr,SET**2,PLF])
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -279,12 +269,11 @@ def model_h03d02(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     Sfr = np.array(df["SFR [l/s]"])
-    HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)),SET,Sfr,SET**2,PLF, PLF**2])
+    X = np.column_stack([np.ones(len(SET)),SET,Sfr,SET**2,PLF, PLF**2])
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -308,23 +297,21 @@ def model_h03n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     Sfr_FL = np.array(df_FL["SFR [l/s]"])
-    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    X_FL = np.column_stack([np.ones(len(HC_FL)),SET_FL, Sfr_FL,  SET_FL**2])    
+    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL, Sfr_FL,  SET_FL**2])    
     model_reg_FL = linear_model.LinearRegression().fit(X_FL, COP_FL)
     
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     Sfr_PL = np.array(df_PL["SFR [l/s]"])
-    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
     PLF_PL = np.array(df_PL["PLF"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    X_PL = np.column_stack([np.ones(len(HC_PL)), SET_PL, Sfr_PL, SET_PL**2])   
+    X_PL = np.column_stack([np.ones(len(SET_PL)), SET_PL, Sfr_PL, SET_PL**2])   
     COP_FL_pred = model_reg_FL.predict(X_PL)
     f_COP_model_FL = COP_PL/COP_FL_pred
     
@@ -386,12 +373,11 @@ def model_h04d01(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)), SET, LExT, LExT * SET, PLF])   
+    X = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET, PLF])   
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -403,12 +389,11 @@ def model_h04d02(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)), SET, LExT, LExT * SET, PLF, PLF**2])
+    X = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET, PLF, PLF**2])
     model_reg = linear_model.LinearRegression().fit(X,  COP)
     
     return {"scikit model": model_reg}
@@ -432,23 +417,21 @@ def model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    X_FL = np.column_stack([np.ones(len(HC_FL)), SET_FL, LExT_FL, SET_FL*LExT_FL])   
+    X_FL = np.column_stack([np.ones(len(SET_FL)), SET_FL, LExT_FL, SET_FL*LExT_FL])   
     model_reg_FL = linear_model.LinearRegression().fit(X_FL, COP_FL)
     
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
     PLF_PL = np.array(df_PL["PLF"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    X_PL = np.column_stack([np.ones(len(HC_PL)),SET_PL, LExT_PL, SET_PL*LExT_PL])
+    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL, LExT_PL, SET_PL*LExT_PL])
     
     COP_FL_pred = model_reg_FL.predict(X_PL)
     
@@ -511,12 +494,11 @@ def model_h05d01(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)), SET, LET, LET * SET, PLF])
+    X = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET, PLF])
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -528,12 +510,11 @@ def model_h05d02(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    HC = np.array(df["Heat Abs EVA [kW[]"])
     PLF = np.array(df["PLF"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(HC)), SET, LET, LET * SET, PLF, PLF**2])
+    X = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET, PLF, PLF**2])
     model_reg = linear_model.LinearRegression().fit(X,COP)
     
     return {"scikit model": model_reg}
@@ -557,23 +538,21 @@ def model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LET_FL = np.array(df_FL["LET [°C]"])
-    HC_FL = np.array(df_FL["Heat Abs EVA [kW[]"])
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
-    X_FL = np.column_stack([np.ones(len(HC_FL)), SET_FL, LET_FL, SET_FL*LET_FL])
+    X_FL = np.column_stack([np.ones(len(SET_FL)), SET_FL, LET_FL, SET_FL*LET_FL])
     model_reg_FL = linear_model.LinearRegression().fit(X_FL, COP_FL)
     
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    HC_PL = np.array(df_PL["Heat Abs EVA [kW[]"])
     PLF_PL = np.array(df_PL["PLF"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
-    X_PL = np.column_stack([np.ones(len(HC_PL)), SET_PL, LET_PL, SET_PL*LET_PL]) 
+    X_PL = np.column_stack([np.ones(len(SET_PL)), SET_PL, LET_PL, SET_PL*LET_PL]) 
     COP_FL_pred = model_reg_FL.predict(X_PL)
     f_COP_model_FL = COP_PL/COP_FL_pred
     
@@ -1223,7 +1202,7 @@ def model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
 
 #%% H10N-----------------------------------------------------------------------
 
-def model_h10n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h10n(df, curve, source, design_point_T = (-7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1304,7 +1283,6 @@ def model_h10n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO
         curve.sort_values("X", inplace = True)
         PLF_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
-        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
         
         f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
 
@@ -1332,7 +1310,7 @@ def model_h10n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO
 
 #%% H11N-----------------------------------------------------------------------
 
-def model_h11n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h11n(df, curve, source, design_point_T = (-7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1404,7 +1382,6 @@ def model_h11n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO
         curve.sort_values("X", inplace = True)
         PLF_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
-        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
         
         f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
 
@@ -1432,7 +1409,7 @@ def model_h11n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO
 
 #%% H12N-----------------------------------------------------------------------
 
-def model_h12n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h12n(df, curve, source, design_point_T = (-7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1629,14 +1606,6 @@ def load_models(df, curve, source):
     
     Model['H06D02'] = model_h06d02(df)
     
-    #%% H05N-------------------------------------------------------------------
-    
-    Model['H05N - mod A'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    Model['H05N - mod B'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
-    Model['H05N - mod C'] = model_h05n(df, curve, source, indirect_model = "C method")
-    
-    
-    
     #%% H06N-------------------------------------------------------------------
     
     Model['H06N - mod A'] = model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
@@ -1701,6 +1670,159 @@ def load_models(df, curve, source):
     
     Model['H12N - mod A'] = model_h12n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
     Model['H12N - mod B'] = model_h12n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H12N - mod C'] = model_h12n(df, curve, source, indirect_model = "C method")
+    
+    return Model
+
+#%% Load Models----------------------------------------------------------------
+
+def load_models2(df, curve, source):
+    
+    Model={}
+    
+    #%% H01D01-----------------------------------------------------------------
+    
+    #Model['H01D01']  = model_h01d01(df)
+     
+    #%% H01D02-----------------------------------------------------------------
+    
+    #Model['H01D02'] = model_h01d02(df)
+    
+    #%% H10N-------------------------------------------------------------------
+    
+    #Model['H01N - mod A'] = model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    #Model['H01N - mod B'] = model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod B")
+    #Model['H01N - mod C'] = model_h01n(df, curve, source, indirect_model = "C method")
+     
+    #%% H02D01-----------------------------------------------------------------
+    
+    # Model['H02D01'] = model_h02d01(df)
+    
+    #%% H02D02-----------------------------------------------------------------
+    
+    # Model['H02D02'] = model_h02d02(df)
+    
+    #%% H02N-------------------------------------------------------------------
+    
+    Model['H02N - mod A'] = model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod A" )
+    # #Model['H02N - mod B'] = model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H02N - mod C'] = model_h02n(df, curve, source, indirect_model = "C method")
+     
+    #%% H03D01-----------------------------------------------------------------
+    
+    #Model['H03D01'] = model_h03d01(df)
+    
+    #%% H03D02-----------------------------------------------------------------
+    
+    #Model['H03D02'] = model_h03d02(df)
+    
+    #%% H03N-------------------------------------------------------------------
+    
+    #Model['H03N - mod A'] = model_h03n(df, curve, source,  indirect_model = "ISO 13612-2 mod A")
+    #Model['H03N - mod B'] = model_h03n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    #Model['H03N - mod C'] = model_h03n(df, curve, source, indirect_model = "C method")
+    
+    #%% H04D01-----------------------------------------------------------------
+    
+    # Model['H04D01'] = model_h04d01(df)
+    
+    #%% H04D02-----------------------------------------------------------------
+    
+    # Model['H04D02'] = model_h04d02(df)
+    
+    #%% H04N-------------------------------------------------------------------
+    
+    Model['H04N - mod A'] = model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    # #Model['H04N - mod B'] = model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H04N - mod C'] = model_h04n(df, curve, source, indirect_model = "C method")
+    
+    #%% H05D01-----------------------------------------------------------------
+    
+    # Model['H05D01'] = model_h05d01(df)
+    
+    #%% H05D02-----------------------------------------------------------------
+    
+    # Model['H05D02'] = model_h05d02(df)
+    
+    #%% H05N-------------------------------------------------------------------
+    
+    Model['H05N - mod A'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    # #Model['H05N - mod B'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H05N - mod C'] = model_h05n(df, curve, source, indirect_model = "C method")
+    
+    #%% H06D01-----------------------------------------------------------------
+    
+    # Model['H06D01'] = model_h06d01(df)
+    
+    #%% H06D02-----------------------------------------------------------------
+    
+    # Model['H06D02'] = model_h06d02(df)
+    
+
+    #%% H06N-------------------------------------------------------------------
+    
+    Model['H06N - mod A'] = model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    # #Model['H06N - mod B'] = model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H06N - mod C'] = model_h06n(df, curve, source, indirect_model = "C method")
+    
+    #%% H07D01-----------------------------------------------------------------
+    
+    # Model['H07D01'] = model_h07d01(df)
+    
+    #%% H07D02-----------------------------------------------------------------
+    
+    # Model['H07D02'] = model_h07d02(df)
+    
+    #%% H07N-------------------------------------------------------------------
+    
+    Model['H07N - mod A'] = model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    # #Model['H07N - mod B'] = model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H07N - mod C'] = model_h07n(df, curve, source, indirect_model = "C method")
+    
+    #%% H08D01-----------------------------------------------------------------
+    
+    #Model['H08D01'] = model_h08d01(df)
+    
+    #%% H08D02-----------------------------------------------------------------
+    
+    #Model['H08D02'] = model_h08d02(df)
+    
+    #%% H08N-------------------------------------------------------------------
+    
+    #Model['H08N - mod A'] = model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    #Model['H08N - mod B'] = model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    #Model['H08N - mod C'] = model_h08n(df, curve, source, indirect_model = "C method")
+    
+    #%% H09D01-----------------------------------------------------------------
+    
+    #Model['H09D01'] = model_h09d01(df)
+    
+    #%% H09D02-----------------------------------------------------------------
+    
+    #Model['H09D02'] = model_h09d02(df)
+    
+    #%% H09N-------------------------------------------------------------------
+    
+    #Model['H09N - mod A'] = model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    #Model['H09N - mod B'] = model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    #Model['H09N - mod C'] = model_h09n(df, curve, source, indirect_model = "C method")
+    
+    #%% H10N-------------------------------------------------------------------
+    
+    Model['H10N - mod A'] = model_h10n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    #Model['H10N - mod B'] = model_h10n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H10N - mod C'] = model_h10n(df, curve, source, indirect_model = "C method")
+    
+    #%% H11N-------------------------------------------------------------------
+    
+    Model['H11N - mod A'] = model_h11n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    #Model['H11N - mod B'] = model_h11n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H11N - mod C'] = model_h11n(df, curve, source, indirect_model = "C method")
+    
+    #%% H12N-------------------------------------------------------------------
+    
+    Model['H12N - mod A'] = model_h12n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    #Model['H12N - mod B'] = model_h12n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
     Model['H12N - mod C'] = model_h12n(df, curve, source, indirect_model = "C method")
     
     return Model
