@@ -11,34 +11,34 @@ from models import *
 def kpi_h01d01(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
-    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    Sfr_FL = np.array(df_FL["SFR [kg/s]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
-    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    Sfr_PL = np.array(df_PL["SFR [kg/s]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
-    Sfr = np.array(df["SFR [l/s]"])
+    Sfr = np.array(df["SFR [kg/s]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X_FL= np.column_stack([np.ones(len(SET_FL)),SET_FL,Sfr_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2,PLF_FL])
-    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,Sfr_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2,PLF_PL])
-    X_TOT = np.column_stack([np.ones(len(SET)),SET,Sfr, LExT-SET,(LExT-SET)**2,PLF])
+    X_FL= np.column_stack([np.ones(len(SET_FL)),SET_FL,Sfr_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2,PLR_FL])
+    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,Sfr_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2,PLR_PL])
+    X_TOT = np.column_stack([np.ones(len(SET)),SET,Sfr, LExT-SET,(LExT-SET)**2,PLR])
     
     COP_pred_FL = Models['H01D01']['scikit model'].predict(X_FL)
     COP_pred_PL = Models['H01D01']['scikit model'].predict(X_PL)
@@ -46,19 +46,19 @@ def kpi_h01d01(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"]=COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
-    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","LExT [°C]","PLR"]
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"]=COP_pred_PL
     df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
-    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","LExT [°C]","PLR"]
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"]=COP_pred_TOT
     df_model_TOT = df_model_TOT.to_dict()
@@ -92,34 +92,34 @@ def kpi_h01d01(Models, df, curve):
 def kpi_h01d02(Models, df, curve):
       
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
-    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    Sfr_FL = np.array(df_FL["SFR [kg/s]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
-    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    Sfr_PL = np.array(df_PL["SFR [kg/s]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
-    Sfr = np.array(df["SFR [l/s]"])
+    Sfr = np.array(df["SFR [kg/s]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X_FL= np.column_stack([np.ones(len(SET_FL)),SET_FL,Sfr_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2,PLF_FL, PLF_FL**2])
-    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,Sfr_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2,PLF_PL, PLF_PL**2])
-    X_TOT = np.column_stack([np.ones(len(SET)),SET,Sfr, LExT-SET,(LExT-SET)**2,PLF, PLF**2])
+    X_FL= np.column_stack([np.ones(len(SET_FL)),SET_FL,Sfr_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2,PLR_FL, PLR_FL**2])
+    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,Sfr_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2,PLR_PL, PLR_PL**2])
+    X_TOT = np.column_stack([np.ones(len(SET)),SET,Sfr, LExT-SET,(LExT-SET)**2,PLR, PLR**2])
     
     COP_pred_FL = Models['H01D02']['scikit model'].predict(X_FL)
     COP_pred_PL = Models['H01D02']['scikit model'].predict(X_PL)
@@ -127,19 +127,19 @@ def kpi_h01d02(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"]=COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
-    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","LExT [°C]","PLR"]
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"]=COP_pred_PL
     df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
-    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","LExT [°C]","PLR"]
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"]=COP_pred_TOT
     df_model_TOT = df_model_TOT.to_dict()
@@ -177,14 +177,14 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
 
     # FULL load calculation
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
-    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    Sfr_FL = np.array(df_FL["SFR [kg/s]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
     COP_FL = np.array(df_FL["COP"])
 
@@ -196,9 +196,9 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     
     "Import data as Array - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
-    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    Sfr_PL = np.array(df_PL["SFR [kg/s]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -208,26 +208,26 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H01N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H01N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H01N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H01N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H01N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H01N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
-    Sfr = np.array(df["SFR [l/s]"])
+    Sfr = np.array(df["SFR [kg/s]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -237,37 +237,37 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H01N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H01N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H01N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H01N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H01N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H01N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"]=COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
     
     df_model_PL=df_PL.copy()
-    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","LExT [°C]","PLR"]
     df_model_PL = df_model_PL[x_variables]
     df_model_PL["COP_pred"]=COP_pred_PL
     df_model_PL = df_model_PL.to_dict()
     
     df_model_TOT=df.copy()
-    x_variables=["SET [°C]","SFR [l/s]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","LExT [°C]","PLR"]
     df_model_TOT = df_model_TOT[x_variables]
     df_model_TOT["COP_pred"]=COP_pred_TOT
     df_model_TOT = df_model_TOT.to_dict()
@@ -302,31 +302,31 @@ def kpi_h01n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
 def kpi_h02d01(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
        
     "Create matrix and calculations"
-    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2,PLF_FL])
-    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2,PLF_PL])
-    X_TOT = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2,PLF])
+    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2,PLR_FL])
+    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2,PLR_PL])
+    X_TOT = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2,PLR])
     
     COP_pred_FL = Models['H02D01']['scikit model'].predict(X_FL)
     COP_pred_PL = Models['H02D01']['scikit model'].predict(X_PL)
@@ -335,7 +335,7 @@ def kpi_h02d01(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -380,31 +380,31 @@ def kpi_h02d01(Models, df, curve):
 def kpi_h02d02(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
        
     "Create matrix and calculations"
-    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2,PLF_FL,PLF_FL**2])
-    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2,PLF_PL, PLF_PL**2])
-    X_TOT = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2,PLF,PLF**2])
+    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL,LExT_FL-SET_FL,(LExT_FL-SET_FL)**2,PLR_FL,PLR_FL**2])
+    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,LExT_PL-SET_PL,(LExT_PL-SET_PL)**2,PLR_PL, PLR_PL**2])
+    X_TOT = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2,PLR,PLR**2])
     
     COP_pred_FL = Models['H02D02']['scikit model'].predict(X_FL)
     COP_pred_PL = Models['H02D02']['scikit model'].predict(X_PL)
@@ -413,7 +413,7 @@ def kpi_h02d02(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -461,8 +461,8 @@ def kpi_h02n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
@@ -476,7 +476,7 @@ def kpi_h02n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -487,25 +487,25 @@ def kpi_h02n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H02N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H02N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H02N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H02N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H02N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H02N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
         
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -515,25 +515,25 @@ def kpi_h02n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H02N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H02N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H02N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H02N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H02N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H02N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -578,31 +578,31 @@ def kpi_h03d01(Models, df, curve):
     
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
-    Sfr_FL = np.array(df_FL["SFR [l/s]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    Sfr_FL = np.array(df_FL["SFR [kg/s]"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
-    Sfr_PL = np.array(df_PL["SFR [l/s]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    Sfr_PL = np.array(df_PL["SFR [kg/s]"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
-    Sfr = np.array(df["SFR [l/s]"])
-    PLF = np.array(df["PLF"])
+    Sfr = np.array(df["SFR [kg/s]"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL,Sfr_FL,SET_FL**2,PLF_FL])
-    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,Sfr_PL,SET_PL**2,PLF_PL])
-    X_TOT = np.column_stack([np.ones(len(SET)),SET,Sfr,SET**2,PLF])
+    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL,Sfr_FL,SET_FL**2,PLR_FL])
+    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,Sfr_PL,SET_PL**2,PLR_PL])
+    X_TOT = np.column_stack([np.ones(len(SET)),SET,Sfr,SET**2,PLR])
     
     COP_pred_FL = Models['H03D01']['scikit model'].predict(X_FL)
     COP_pred_PL = Models['H03D01']['scikit model'].predict(X_PL)
@@ -610,7 +610,7 @@ def kpi_h03d01(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","SFR [l/s]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -655,31 +655,31 @@ def kpi_h03d01(Models, df, curve):
 def kpi_h03d02(Models, df, curve):
    
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
-    Sfr_FL = np.array(df_FL["SFR [l/s]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    Sfr_FL = np.array(df_FL["SFR [kg/s]"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
-    Sfr_PL = np.array(df_PL["SFR [l/s]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    Sfr_PL = np.array(df_PL["SFR [kg/s]"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
-    Sfr = np.array(df["SFR [l/s]"])
-    PLF = np.array(df["PLF"])
+    Sfr = np.array(df["SFR [kg/s]"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL,Sfr_FL, SET_FL**2,PLF_FL, PLF_FL**2])
-    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,Sfr_PL, SET_PL**2,PLF_PL, PLF_PL**2])
-    X_TOT = np.column_stack([np.ones(len(SET)),SET,Sfr, SET**2,PLF, PLF**2])
+    X_FL = np.column_stack([np.ones(len(SET_FL)),SET_FL,Sfr_FL, SET_FL**2,PLR_FL, PLR_FL**2])
+    X_PL = np.column_stack([np.ones(len(SET_PL)),SET_PL,Sfr_PL, SET_PL**2,PLR_PL, PLR_PL**2])
+    X_TOT = np.column_stack([np.ones(len(SET)),SET,Sfr, SET**2,PLR, PLR**2])
     
     COP_pred_FL = Models['H03D02']['scikit model'].predict(X_FL)
     COP_pred_PL = Models['H03D02']['scikit model'].predict(X_PL)
@@ -687,7 +687,7 @@ def kpi_h03d02(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","SFR [l/s]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -737,12 +737,12 @@ def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
-    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    Sfr_FL = np.array(df_FL["SFR [kg/s]"])
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
@@ -751,8 +751,8 @@ def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
-    Sfr_PL = np.array(df_PL["SFR [l/s]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    Sfr_PL = np.array(df_PL["SFR [kg/s]"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -763,25 +763,25 @@ def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H03N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H03N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H03N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H03N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H03N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H03N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
         
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
-    Sfr = np.array(df["SFR [l/s]"])
-    PLF = np.array(df["PLF"])
+    Sfr = np.array(df["SFR [kg/s]"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -791,25 +791,25 @@ def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H03N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H03N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H03N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H03N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H03N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H03N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","SFR [l/s]","PLF"]
+    x_variables=["SET [°C]","SFR [kg/s]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -852,31 +852,31 @@ def kpi_h03n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
 def kpi_h04d01(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X_FL = np.column_stack([np.ones(len(SET_FL)), SET_FL, LExT_FL, LExT_FL * SET_FL, PLF_FL])
-    X_PL = np.column_stack([np.ones(len(SET_PL)), SET_PL, LExT_PL, LExT_PL * SET_PL, PLF_PL])
-    X_TOT = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET, PLF]) 
+    X_FL = np.column_stack([np.ones(len(SET_FL)), SET_FL, LExT_FL, LExT_FL * SET_FL, PLR_FL])
+    X_PL = np.column_stack([np.ones(len(SET_PL)), SET_PL, LExT_PL, LExT_PL * SET_PL, PLR_PL])
+    X_TOT = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET, PLR]) 
     
     COP_pred_FL = Models['H04D01']['scikit model'].predict(X_FL)
     COP_pred_PL = Models['H04D01']['scikit model'].predict(X_PL)
@@ -884,7 +884,7 @@ def kpi_h04d01(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -929,31 +929,31 @@ def kpi_h04d01(Models, df, curve):
 def kpi_h04d02(Models, df, curve):
    
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X_FL = np.column_stack([np.ones(len(SET_FL)), SET_FL, LExT_FL, LExT_FL * SET_FL, PLF_FL, PLF_FL**2])
-    X_PL = np.column_stack([np.ones(len(SET_PL)), SET_PL, LExT_PL, LExT_PL * SET_PL, PLF_PL, PLF_PL**2])
-    X_TOT = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET, PLF, PLF**2]) 
+    X_FL = np.column_stack([np.ones(len(SET_FL)), SET_FL, LExT_FL, LExT_FL * SET_FL, PLR_FL, PLR_FL**2])
+    X_PL = np.column_stack([np.ones(len(SET_PL)), SET_PL, LExT_PL, LExT_PL * SET_PL, PLR_PL, PLR_PL**2])
+    X_TOT = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET, PLR, PLR**2]) 
     
     COP_pred_FL = Models['H04D02']['scikit model'].predict(X_FL)
     COP_pred_PL = Models['H04D02']['scikit model'].predict(X_PL)
@@ -961,7 +961,7 @@ def kpi_h04d02(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1011,8 +1011,8 @@ def kpi_h04n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
@@ -1026,7 +1026,7 @@ def kpi_h04n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -1037,25 +1037,25 @@ def kpi_h04n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H04N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H04N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H04N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H04N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H04N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H04N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
         
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -1065,25 +1065,25 @@ def kpi_h04n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H04N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H04N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H04N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H04N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H04N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H04N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1128,31 +1128,31 @@ def kpi_h04n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
 def kpi_h05d01(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LET_FL = np.array(df_FL["LET [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X_FL = np.column_stack([np.ones(len(SET_FL)), SET_FL, LET_FL, LET_FL * SET_FL, PLF_FL])
-    X_PL = np.column_stack([np.ones(len(SET_PL)), SET_PL, LET_PL, LET_PL * SET_PL, PLF_PL])
-    X_TOT = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET, PLF]) 
+    X_FL = np.column_stack([np.ones(len(SET_FL)), SET_FL, LET_FL, LET_FL * SET_FL, PLR_FL])
+    X_PL = np.column_stack([np.ones(len(SET_PL)), SET_PL, LET_PL, LET_PL * SET_PL, PLR_PL])
+    X_TOT = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET, PLR]) 
     
     COP_pred_FL = Models['H05D01']['scikit model'].predict(X_FL)
     COP_pred_PL = Models['H05D01']['scikit model'].predict(X_PL)
@@ -1160,7 +1160,7 @@ def kpi_h05d01(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LET [°C]","PLF"]
+    x_variables=["SET [°C]","LET [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1205,31 +1205,31 @@ def kpi_h05d01(Models, df, curve):
 def kpi_h05d02(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LET_FL = np.array(df_FL["LET [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X_FL = np.column_stack([np.ones(len(SET_FL)), SET_FL, LET_FL, LET_FL * SET_FL, PLF_FL, PLF_FL**2])
-    X_PL = np.column_stack([np.ones(len(SET_PL)), SET_PL, LET_PL, LET_PL * SET_PL, PLF_PL, PLF_PL**2])
-    X_TOT = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET, PLF, PLF**2]) 
+    X_FL = np.column_stack([np.ones(len(SET_FL)), SET_FL, LET_FL, LET_FL * SET_FL, PLR_FL, PLR_FL**2])
+    X_PL = np.column_stack([np.ones(len(SET_PL)), SET_PL, LET_PL, LET_PL * SET_PL, PLR_PL, PLR_PL**2])
+    X_TOT = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET, PLR, PLR**2]) 
     
     COP_pred_FL = Models['H05D02']['scikit model'].predict(X_FL)
     COP_pred_PL = Models['H05D02']['scikit model'].predict(X_PL)
@@ -1237,7 +1237,7 @@ def kpi_h05d02(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LET [°C]","PLF"]
+    x_variables=["SET [°C]","LET [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1291,8 +1291,8 @@ def kpi_h05n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
@@ -1306,7 +1306,7 @@ def kpi_h05n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -1317,25 +1317,25 @@ def kpi_h05n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H05N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H05N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H05N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H05N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H05N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H05N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
         
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -1345,25 +1345,25 @@ def kpi_h05n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H05N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H05N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H05N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H05N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H05N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H05N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LET [°C]","PLF"]
+    x_variables=["SET [°C]","LET [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1407,31 +1407,31 @@ def kpi_h05n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
 def kpi_h06d01(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LET_FL = np.array(df_FL["LET [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X_FL = np.column_stack([SET_FL, LET_FL, PLF_FL])
-    X_PL = np.column_stack([SET_PL, LET_PL, PLF_PL])
-    X_TOT = np.column_stack([SET, LET, PLF])
+    X_FL = np.column_stack([SET_FL, LET_FL, PLR_FL])
+    X_PL = np.column_stack([SET_PL, LET_PL, PLR_PL])
+    X_TOT = np.column_stack([SET, LET, PLR])
     A = Models['H06D01']['scipy model']['x']
     
     COP_pred_FL =  A[0]*np.exp(A[1]*X_FL[:,0] + A[2]*X_FL[:,1]) + A[3]*X_FL[:,0]/X_FL[:,1] + A[4] *X_FL[:,2] +A[5]
@@ -1440,7 +1440,7 @@ def kpi_h06d01(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LET [°C]","PLF"]
+    x_variables=["SET [°C]","LET [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1485,31 +1485,31 @@ def kpi_h06d01(Models, df, curve):
 def kpi_h06d02(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LET_FL = np.array(df_FL["LET [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X_FL = np.column_stack([SET_FL, LET_FL, PLF_FL])
-    X_PL = np.column_stack([SET_PL, LET_PL, PLF_PL])
-    X_TOT = np.column_stack([SET, LET, PLF])
+    X_FL = np.column_stack([SET_FL, LET_FL, PLR_FL])
+    X_PL = np.column_stack([SET_PL, LET_PL, PLR_PL])
+    X_TOT = np.column_stack([SET, LET, PLR])
     A = Models['H06D02']['scipy model']['x']
     
     COP_pred_FL =  A[0]*np.exp(A[1]*X_FL[:,0] + A[2]*X_FL[:,1]) + A[3]*X_FL[:,0]/X_FL[:,1] + A[4] *X_FL[:,2] +A[5]*X_FL[:,2]**2+A[6]
@@ -1518,7 +1518,7 @@ def kpi_h06d02(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LET [°C]","PLF"]
+    x_variables=["SET [°C]","LET [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1567,8 +1567,8 @@ def kpi_h06n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     "Import data as Arrays - Full Load"
@@ -1584,7 +1584,7 @@ def kpi_h06n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -1596,26 +1596,26 @@ def kpi_h06n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H06N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H06N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
         
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H06N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H06N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
         
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H06N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H06N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
         
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -1625,25 +1625,25 @@ def kpi_h06n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H06N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H06N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H06N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H06N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H06N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H06N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LET [°C]","PLF"]
+    x_variables=["SET [°C]","LET [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1688,31 +1688,31 @@ def kpi_h06n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
 def kpi_h07d01(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X_FL = np.column_stack([SET_FL, LExT_FL, PLF_FL])
-    X_PL = np.column_stack([SET_PL, LExT_PL, PLF_PL])
-    X_TOT = np.column_stack([SET, LExT, PLF])
+    X_FL = np.column_stack([SET_FL, LExT_FL, PLR_FL])
+    X_PL = np.column_stack([SET_PL, LExT_PL, PLR_PL])
+    X_TOT = np.column_stack([SET, LExT, PLR])
     A = Models['H07D01']['scipy model']['x']
     
     COP_pred_FL =  A[0]*np.exp(A[1]*X_FL[:,0] + A[2]*X_FL[:,1]) + A[3]*X_FL[:,0]/X_FL[:,1] + A[4] *X_FL[:,2] +A[5]
@@ -1721,7 +1721,7 @@ def kpi_h07d01(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1766,31 +1766,31 @@ def kpi_h07d01(Models, df, curve):
 def kpi_h07d02(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X_FL = np.column_stack([SET_FL, LExT_FL, PLF_FL])
-    X_PL = np.column_stack([SET_PL, LExT_PL, PLF_PL])
-    X_TOT = np.column_stack([SET, LExT, PLF])
+    X_FL = np.column_stack([SET_FL, LExT_FL, PLR_FL])
+    X_PL = np.column_stack([SET_PL, LExT_PL, PLR_PL])
+    X_TOT = np.column_stack([SET, LExT, PLR])
     A = Models['H07D02']['scipy model']['x']
     
     COP_pred_FL =  A[0]*np.exp(A[1]*X_FL[:,0] + A[2]*X_FL[:,1]) + A[3]*X_FL[:,0]/X_FL[:,1] + A[4] *X_FL[:,2] +A[5]*X_FL[:,2]**2+A[6]
@@ -1799,7 +1799,7 @@ def kpi_h07d02(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1847,8 +1847,8 @@ def kpi_h07n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     "Import data as Arrays - Full Load"
@@ -1864,7 +1864,7 @@ def kpi_h07n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -1876,26 +1876,26 @@ def kpi_h07n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H07N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H07N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
         
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H07N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H07N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
         
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H07N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H07N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
         
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -1905,25 +1905,25 @@ def kpi_h07n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H07N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H07N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H07N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H07N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H07N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H07N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -1968,31 +1968,31 @@ def kpi_h07n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
 def kpi_h08d01(Models, df, curve):
         
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SExT_FL = np.array(df_FL["SExT [°C]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SExT_PL = np.array(df_PL["SExT [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SExT = np.array(df["SExT [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X_FL = np.column_stack([SExT_FL, LExT_FL, PLF_FL])
-    X_PL = np.column_stack([SExT_PL, LExT_PL, PLF_PL])
-    X_TOT = np.column_stack([SExT, LExT, PLF])
+    X_FL = np.column_stack([SExT_FL, LExT_FL, PLR_FL])
+    X_PL = np.column_stack([SExT_PL, LExT_PL, PLR_PL])
+    X_TOT = np.column_stack([SExT, LExT, PLR])
     A = Models['H08D01']['scipy model']['x']
     
     COP_pred_FL =  A[0]*np.exp(A[1]*X_FL[:,0] + A[2]*X_FL[:,1]) + A[3]*X_FL[:,0]/X_FL[:,1] + A[4] *X_FL[:,2] +A[5]
@@ -2001,7 +2001,7 @@ def kpi_h08d01(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SExT [°C]","LExT [°C]","PLF"]
+    x_variables=["SExT [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -2046,31 +2046,31 @@ def kpi_h08d01(Models, df, curve):
 def kpi_h08d02(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SExT_FL = np.array(df_FL["SExT [°C]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SExT_PL = np.array(df_PL["SExT [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SExT = np.array(df["SExT [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X_FL = np.column_stack([SExT_FL, LExT_FL, PLF_FL])
-    X_PL = np.column_stack([SExT_PL, LExT_PL, PLF_PL])
-    X_TOT = np.column_stack([SExT, LExT, PLF])
+    X_FL = np.column_stack([SExT_FL, LExT_FL, PLR_FL])
+    X_PL = np.column_stack([SExT_PL, LExT_PL, PLR_PL])
+    X_TOT = np.column_stack([SExT, LExT, PLR])
     A = Models['H08D02']['scipy model']['x']
     
     COP_pred_FL =  A[0]*np.exp(A[1]*X_FL[:,0] + A[2]*X_FL[:,1]) + A[3]*X_FL[:,0]/X_FL[:,1] + A[4] *X_FL[:,2] +A[5]*X_FL[:,2]**2+A[6]
@@ -2079,7 +2079,7 @@ def kpi_h08d02(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SExT [°C]","LExT [°C]","PLF"]
+    x_variables=["SExT [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -2127,8 +2127,8 @@ def kpi_h08n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     "Import data as Arrays - Full Load"
@@ -2144,7 +2144,7 @@ def kpi_h08n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SExT_PL = np.array(df_PL["SExT [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -2156,26 +2156,26 @@ def kpi_h08n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H08N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H08N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
         
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H08N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H08N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
         
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H08N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H08N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
         
     "Import data as Arrays - TOT"
     SExT = np.array(df["SExT [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -2185,25 +2185,25 @@ def kpi_h08n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H08N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H08N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H08N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H08N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H08N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H08N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SExT [°C]","LExT [°C]","PLF"]
+    x_variables=["SExT [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -2248,31 +2248,31 @@ def kpi_h08n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
 def kpi_h09d01(Models, df, curve):
         
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SExT_FL = np.array(df_FL["SExT [°C]"])
     LET_FL = np.array(df_FL["LET [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SExT_PL = np.array(df_PL["SExT [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SExT = np.array(df["SExT [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X_FL = np.column_stack([SExT_FL, LET_FL, PLF_FL])
-    X_PL = np.column_stack([SExT_PL, LET_PL, PLF_PL])
-    X_TOT = np.column_stack([SExT, LET, PLF])
+    X_FL = np.column_stack([SExT_FL, LET_FL, PLR_FL])
+    X_PL = np.column_stack([SExT_PL, LET_PL, PLR_PL])
+    X_TOT = np.column_stack([SExT, LET, PLR])
     A = Models['H09D01']['scipy model']['x']
     
     COP_pred_FL =  A[0]*np.exp(A[1]*X_FL[:,0] + A[2]*X_FL[:,1]) + A[3]*X_FL[:,0]/X_FL[:,1] + A[4] *X_FL[:,2] +A[5]
@@ -2281,7 +2281,7 @@ def kpi_h09d01(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SExT [°C]","LET [°C]","PLF"]
+    x_variables=["SExT [°C]","LET [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -2326,31 +2326,31 @@ def kpi_h09d01(Models, df, curve):
 def kpi_h09d02(Models, df, curve):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1] 
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1] 
     
     "Import data as Arrays - Full Load"
     SExT_FL = np.array(df_FL["SExT [°C]"])
     LET_FL = np.array(df_FL["LET [°C]"])
-    PLF_FL = np.array(df_FL["PLF"])
+    PLR_FL = np.array(df_FL["PLR"])
     COP_FL = np.array(df_FL["COP"])
     
     "Import data as Arrays - Part Load"
     SExT_PL = np.array(df_PL["SExT [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Import data as Arrays - TOT"
     SExT = np.array(df["SExT [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X_FL = np.column_stack([SExT_FL, LET_FL, PLF_FL])
-    X_PL = np.column_stack([SExT_PL, LET_PL, PLF_PL])
-    X_TOT = np.column_stack([SExT, LET, PLF])
+    X_FL = np.column_stack([SExT_FL, LET_FL, PLR_FL])
+    X_PL = np.column_stack([SExT_PL, LET_PL, PLR_PL])
+    X_TOT = np.column_stack([SExT, LET, PLR])
     A = Models['H09D02']['scipy model']['x']
     
     COP_pred_FL =  A[0]*np.exp(A[1]*X_FL[:,0] + A[2]*X_FL[:,1]) + A[3]*X_FL[:,0]/X_FL[:,1] + A[4] *X_FL[:,2] +A[5]*X_FL[:,2]**2+A[6]
@@ -2359,7 +2359,7 @@ def kpi_h09d02(Models, df, curve):
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SExT [°C]","LET [°C]","PLF"]
+    x_variables=["SExT [°C]","LET [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -2407,8 +2407,8 @@ def kpi_h09n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
         
     
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     "Import data as Arrays - Full Load"
@@ -2424,7 +2424,7 @@ def kpi_h09n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SExT_PL = np.array(df_PL["SExT [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -2436,26 +2436,26 @@ def kpi_h09n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H09N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H09N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
         
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H09N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H09N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
         
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H09N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H09N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
         
     "Import data as Arrays - TOT"
     SExT = np.array(df["SExT [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -2465,25 +2465,25 @@ def kpi_h09n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H09N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H09N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H09N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H09N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H09N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H09N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SExT [°C]","LET [°C]","PLF"]
+    x_variables=["SExT [°C]","LET [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -2531,8 +2531,8 @@ def kpi_h10n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
           
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     "Import data as Arrays - Full Load"
@@ -2550,7 +2550,7 @@ def kpi_h10n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Create matrix and full load calculations-PL"
@@ -2560,19 +2560,19 @@ def kpi_h10n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H10N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H10N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H10N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H10N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H10N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H10N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
         
 
@@ -2580,7 +2580,7 @@ def kpi_h10n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -2590,25 +2590,25 @@ def kpi_h10n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H10N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H10N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H10N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H10N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H10N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H10N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -2657,8 +2657,8 @@ def kpi_h11n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
         
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     "Import data as Arrays - Full Load"
@@ -2676,7 +2676,7 @@ def kpi_h11n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Create matrix and full load calculations-PL"
@@ -2686,19 +2686,19 @@ def kpi_h11n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H11N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H11N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H11N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H11N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H11N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H11N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
         
 
@@ -2706,7 +2706,7 @@ def kpi_h11n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -2716,25 +2716,25 @@ def kpi_h11n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H11N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H11N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H11N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H11N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H11N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H11N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -2779,8 +2779,8 @@ def kpi_h11n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
 def kpi_h12n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     "Import data as Arrays - Full Load"
@@ -2797,7 +2797,7 @@ def kpi_h12n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
     
     "Create matrix and full load calculations-PL"
@@ -2807,25 +2807,25 @@ def kpi_h12n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H12N - mod A']['F_COP'](PLF_PL)
+        f_COP =  Models['H12N - mod A']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H12N - mod B']['F_COP'](PLF_PL)
+        f_COP =  Models['H12N - mod B']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H12N - mod C']['F_COP'](PLF_PL)
+        f_COP =  Models['H12N - mod C']['F_COP'](PLR_PL)
         COP_pred_PL = f_COP * COP_FL_pred_PL
          
     "Import data as Arrays - TOT"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP_TOT = np.array(df["COP"])
       
     "Create matrix and calculations-TOT"
@@ -2835,25 +2835,25 @@ def kpi_h12n(Models, df, curve, indirect_model = "ISO 13612-2 mod A"):
     if indirect_model == "ISO 13612-2 mod A":
         
         "Method 1: f_cop by linear regression"
-        f_COP =  Models['H12N - mod A']['F_COP'](PLF)
+        f_COP =  Models['H12N - mod A']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT      
             
     elif indirect_model == "ISO 13612-2 mod B":
         
         "Method 2: f_cop derived by curves"
-        f_COP =  Models['H12N - mod B']['F_COP'](PLF)
+        f_COP =  Models['H12N - mod B']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        f_COP =  Models['H12N - mod C']['F_COP'](PLF)
+        f_COP =  Models['H12N - mod C']['F_COP'](PLR)
         COP_pred_TOT = f_COP * COP_FL_pred_TOT
     
     
     "Create output table"
     df_model_FL=df_FL.copy()
-    x_variables=["SET [°C]","LExT [°C]","PLF"]
+    x_variables=["SET [°C]","LExT [°C]","PLR"]
     df_model_FL = df_model_FL[x_variables]
     df_model_FL["COP_pred"] = COP_pred_FL
     df_model_FL = df_model_FL.to_dict()
@@ -3299,6 +3299,8 @@ def load_graph(KPI, df, Name):
         axs3[2].set_title('$RMSE_{PL}$')
         
         
+        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        plt.tight_layout()
         figure3.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_KPI_PL.png")) #To modify to svg when defined 
         plt.close()
         

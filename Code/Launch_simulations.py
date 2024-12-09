@@ -13,8 +13,8 @@ def launch(MachineName, source):
     df_test = pd.read_excel(os.path.join('..', 'Data', f'{MachineName}.xlsx'), sheet_name="Test")
     curve = pd.read_excel(os.path.join('..', 'Data',  f'{MachineName}.xlsx'), sheet_name="curve")
      
-    Models = load_models2(df_set, curve, source)
-    KPI = load_test2(Models, df_test, curve, f'{MachineName}')
+    Models = load_models(df_set, curve, source)
+    KPI = load_test(Models, df_test, curve, f'{MachineName}')
     global Simulation_Results
     Simulation_Results = {"Models": Models, "KPI": KPI}
     load_graph(KPI, df_test,  f'{MachineName}')
@@ -23,11 +23,15 @@ def launch(MachineName, source):
  
 #%% Galletti ML1 18kW----------------------------------------------------------
    
-#launch('Galletti MLI 18 kW','Water')
+launch('Galletti MLI 18 kW','Water')
+
+#%% Galletti ML1 22kW----------------------------------------------------------
+   
+launch('Galletti MLI 22 kW','Water')
 
 #%% WPL_A_HK 07 Premium----------------------------------------------------------
    
-launch('WPL_A_HK 07 Premium','Water')
+#launch('WPL_A_HK 07 Premium','Water')
 
 
 

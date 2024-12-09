@@ -8,13 +8,13 @@ def model_h01d01(df):
     
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
-    Sfr = np.array(df["SFR [l/s]"])
+    Sfr = np.array(df["SFR [kg/s]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(PLF)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF])
+    X = np.column_stack([np.ones(len(PLR)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLR])
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
        
@@ -26,13 +26,13 @@ def model_h01d02(df):
     
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
-    Sfr = np.array(df["SFR [l/s]"])
+    Sfr = np.array(df["SFR [kg/s]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(PLF)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLF, PLF**2])   
+    X = np.column_stack([np.ones(len(PLR)),SET,Sfr,LExT-SET,(LExT-SET)**2,PLR, PLR**2])   
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -49,14 +49,14 @@ def model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
-    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    Sfr_FL = np.array(df_FL["SFR [kg/s]"])
     LExT_FL = np.array(df_FL["LExT [°C]"])
     COP_FL = np.array(df_FL["COP"])
 
@@ -67,9 +67,9 @@ def model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
-    Sfr_PL = np.array(df_PL["SFR [l/s]"])
+    Sfr_PL = np.array(df_PL["SFR [kg/s]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -102,17 +102,17 @@ def model_h01n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         
         "Method 2: f_cop derived by curves"
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -134,11 +134,11 @@ def model_h02d01(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2,PLF])   
+    X = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2,PLR])   
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -151,11 +151,11 @@ def model_h02d02(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2,PLF,PLF**2])
+    X = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2,PLR,PLR**2])
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -171,8 +171,8 @@ def model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     
@@ -189,7 +189,7 @@ def model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -222,17 +222,17 @@ def model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         
         "Method 2: f_cop derived by curves"       
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -252,12 +252,12 @@ def model_h03d01(df):
        
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
-    Sfr = np.array(df["SFR [l/s]"])
-    PLF = np.array(df["PLF"])
+    Sfr = np.array(df["SFR [kg/s]"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(SET)),SET,Sfr,SET**2,PLF])
+    X = np.column_stack([np.ones(len(SET)),SET,Sfr,SET**2,PLR])
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -268,12 +268,12 @@ def model_h03d02(df):
        
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
-    Sfr = np.array(df["SFR [l/s]"])
-    PLF = np.array(df["PLF"])
+    Sfr = np.array(df["SFR [kg/s]"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(SET)),SET,Sfr,SET**2,PLF, PLF**2])
+    X = np.column_stack([np.ones(len(SET)),SET,Sfr,SET**2,PLR, PLR**2])
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -289,14 +289,14 @@ def model_h03n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     
     "Import data as Arrays - Full Load"
     SET_FL = np.array(df_FL["SET [°C]"])
-    Sfr_FL = np.array(df_FL["SFR [l/s]"])
+    Sfr_FL = np.array(df_FL["SFR [kg/s]"])
     COP_FL = np.array(df_FL["COP"])
 
     "Create matrix and full load calculations"
@@ -306,8 +306,8 @@ def model_h03n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
-    Sfr_PL = np.array(df_PL["SFR [l/s]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    Sfr_PL = np.array(df_PL["SFR [kg/s]"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -340,18 +340,18 @@ def model_h03n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         
         "Method 2: f_cop derived by curves"     
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
 
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"     
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -373,11 +373,11 @@ def model_h04d01(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET, PLF])   
+    X = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET, PLR])   
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -389,11 +389,11 @@ def model_h04d02(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET, PLF, PLF**2])
+    X = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET, PLR, PLR**2])
     model_reg = linear_model.LinearRegression().fit(X,  COP)
     
     return {"scikit model": model_reg}
@@ -409,8 +409,8 @@ def model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     
@@ -427,7 +427,7 @@ def model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -462,17 +462,17 @@ def model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         
         "Method 2: f_cop derived by curves"    
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -494,11 +494,11 @@ def model_h05d01(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET, PLF])
+    X = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET, PLR])
     model_reg = linear_model.LinearRegression().fit(X, COP)
     
     return {"scikit model": model_reg}
@@ -510,11 +510,11 @@ def model_h05d02(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
 
     "Create matrix and calculations"
-    X = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET, PLF, PLF**2])
+    X = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET, PLR, PLR**2])
     model_reg = linear_model.LinearRegression().fit(X,COP)
     
     return {"scikit model": model_reg}
@@ -530,8 +530,8 @@ def model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     
@@ -548,7 +548,7 @@ def model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -581,17 +581,17 @@ def model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         
         "Method 2: f_cop derived by curves"      
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -612,11 +612,11 @@ def model_h06d01(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([SET, LET, PLF])
+    X = np.column_stack([SET, LET, PLR])
     A0 = np.zeros(6)
     
     def fun(x0, xdata, ydata):
@@ -636,11 +636,11 @@ def model_h06d02(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([SET, LET, PLF])
+    X = np.column_stack([SET, LET, PLR])
 
     A0 = np.zeros(7)
     
@@ -666,8 +666,8 @@ def model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     
@@ -693,7 +693,7 @@ def model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -727,18 +727,18 @@ def model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         
         "Method 2: f_cop derived by curves"       
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -760,11 +760,11 @@ def model_h07d01(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([SET, LExT, PLF])
+    X = np.column_stack([SET, LExT, PLR])
     A0 = np.zeros(6)
     
     def fun(x0, xdata, ydata):
@@ -785,11 +785,11 @@ def model_h07d02(df):
     "Import data as Arrays"
     SET = np.array(df["SET [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([SET, LExT, PLF])
+    X = np.column_stack([SET, LExT, PLR])
     A0 = np.zeros(7)
     
     def fun(x0, xdata, ydata):
@@ -814,8 +814,8 @@ def model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")    
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     
@@ -841,7 +841,7 @@ def model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -875,19 +875,19 @@ def model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         
         "Method 2: f_cop derived by curves"      
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
-        # f_COP = np.interp(PLF_PL, PLF_curve, f_COP_curve)
+        # f_COP = np.interp(PLR_PL, PLR_curve, f_COP_curve)
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -909,11 +909,11 @@ def model_h08d01(df):
     "Import data as Arrays"
     SExT = np.array(df["SExT [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([SExT, LExT, PLF])
+    X = np.column_stack([SExT, LExT, PLR])
     A0 = np.zeros(6)
     
     def fun(x0, xdata, ydata):
@@ -934,11 +934,11 @@ def model_h08d02(df):
     "Import data as Arrays"
     SExT = np.array(df["SExT [°C]"])
     LExT = np.array(df["LExT [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([SExT, LExT, PLF])
+    X = np.column_stack([SExT, LExT, PLR])
     A0 = np.zeros(7)
     
     def fun(x0, xdata, ydata):
@@ -964,8 +964,8 @@ def model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
     
     
     
@@ -991,7 +991,7 @@ def model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SExT_PL = np.array(df_PL["SExT [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -1027,17 +1027,17 @@ def model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         
         "Method 2: f_cop derived by curves"      
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -1059,11 +1059,11 @@ def model_h09d01(df):
     "Import data as Arrays"
     SExT = np.array(df["SExT [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([SExT, LET, PLF])
+    X = np.column_stack([SExT, LET, PLR])
     A0 = np.zeros(6)
     
     def fun(x0, xdata, ydata):
@@ -1084,11 +1084,11 @@ def model_h09d02(df):
     "Import data as Arrays"
     SExT = np.array(df["SExT [°C]"])
     LET = np.array(df["LET [°C]"])
-    PLF = np.array(df["PLF"])
+    PLR = np.array(df["PLR"])
     COP = np.array(df["COP"])
     
     "Create matrix and calculations"
-    X = np.column_stack([SExT, LET, PLF])
+    X = np.column_stack([SExT, LET, PLR])
     A0 = np.zeros(7)
     
     def fun(x0, xdata, ydata):
@@ -1113,8 +1113,8 @@ def model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")  
     
     "Divide between part load and full load operative points"
-    df_FL = df[df['PLF']==1]
-    df_PL= df[df['PLF']!=1]
+    df_FL = df[df['PLR']==1]
+    df_PL= df[df['PLR']!=1]
    
     
     "Import data as Arrays - Full Load"
@@ -1139,7 +1139,7 @@ def model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
     "Import data as Arrays - Part Load"
     SExT_PL = np.array(df_PL["SExT [°C]"])
     LET_PL = np.array(df_PL["LET [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create matrix and part load calculations"
@@ -1174,18 +1174,18 @@ def model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
         "Method 2: f_cop derived by curves"
         
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -1211,7 +1211,7 @@ def model_h10n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
         raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")  
     
     "Divide between part load and full load operative points"
-    df_PL= df[df['PLF']!=1]
+    df_PL= df[df['PLR']!=1]
 
 
     "Carnot efficency full load calculations"     
@@ -1225,7 +1225,7 @@ def model_h10n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create function to calculate COP_FL_pred" 
@@ -1281,18 +1281,18 @@ def model_h10n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
         "Method 2: f_cop derived by curves"
         
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -1319,7 +1319,7 @@ def model_h11n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
         raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")  
     
     "Divide between part load and full load operative points"
-    df_PL= df[df['PLF']!=1]
+    df_PL= df[df['PLR']!=1]
     
 
     "Carnot efficency full load calculations" 
@@ -1333,7 +1333,7 @@ def model_h11n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create function to calculate COP_FL_pred" 
@@ -1380,18 +1380,18 @@ def model_h11n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
         
         "Method 2: f_cop derived by curves"       
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
@@ -1418,7 +1418,7 @@ def model_h12n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
         raise TypeError("source must be chosen from the following list: \"Water\", \"Air\"")      
     
     "Divide between part load and full load operative points"
-    df_PL= df[df['PLF']!=1]
+    df_PL= df[df['PLR']!=1]
     
 
     "Carnot efficency full load calculations"
@@ -1433,7 +1433,7 @@ def model_h12n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
     "Import data as Arrays - Part Load"
     SET_PL = np.array(df_PL["SET [°C]"])
     LExT_PL = np.array(df_PL["LExT [°C]"])
-    PLF_PL = np.array(df_PL["PLF"])
+    PLR_PL = np.array(df_PL["PLR"])
     COP_PL = np.array(df_PL["COP"])
   
     "Create function to calculate COP_FL_pred" 
@@ -1494,18 +1494,18 @@ def model_h12n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
         "Method 2: f_cop derived by curves"
         
         curve.sort_values("X", inplace = True)
-        PLF_curve = np.array(curve["X"])
+        PLR_curve = np.array(curve["X"])
         f_COP_curve = np.array(curve["f_cop"])
         
-        f_COP = lambda x : np.interp(x, PLF_curve, f_COP_curve)
+        f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
     
     elif indirect_model == "C method":
         
         "Method 3: f_cop calculated"
         
-        a=1/PLF_PL-1
-        b=PLF_PL-1
+        a=1/PLR_PL-1
+        b=PLR_PL-1
         c=1/f_COP_model_FL-1
         X3=np.column_stack([a,b])
         
