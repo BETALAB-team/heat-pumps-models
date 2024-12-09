@@ -15,7 +15,7 @@ devices = [
     ]
 
 models = ["0" + str(i) for i in range(1,10)] + ["10","11","12"]
-plf_models = ["direct_linear",
+plr_models = ["direct_linear",
               "direct_quadratic",
               "ISO 13612-2 mod A",
               "ISO 13612-2 mod B",
@@ -25,7 +25,7 @@ dfs_levels = ["TOT","PL","FL"]
 kpis = ["RMSE","MAE","R2"]
 
 res = pd.DataFrame(index=pd.MultiIndex.from_product([
-    models,plf_models,dfs_levels,kpis
+    models,plr_models,dfs_levels,kpis
     ],names=("model","plf_model","operation","kpi")), columns = devices)
 
 
@@ -48,12 +48,12 @@ for dev in devices:
             ["11",model_h11],
             ["12",model_h12],
             ]:
-        for m in plf_models:
+        for m in plr_models:
             
             if model_tag in ["10","11","12"] and m in ["direct_linear","direct_quadratic",]:
                 continue
             
-            mod = model(plf_method=m)
+            mod = model(plr_method=m)
             mod.set_curve_df(curve)
             mod.train_model(df)
                         
