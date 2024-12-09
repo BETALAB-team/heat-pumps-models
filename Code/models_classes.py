@@ -15,15 +15,15 @@ class model_hp():
             "C method"
             ]
     
-    def __init__(self, plf_method = "direct_linear"):
+    def __init__(self, plr_method = "direct_linear"):
         
         #INIT: Create object of class model_hp and create as
-        #an attribute plf_method
+        #an attribute plr_method
         
-        if plf_method not in self.allowed_plf_methods:
-            raise TypeError(f"plf_method must be chosen from the following list: {self.allowed_plf_methods}")
+        if plr_method not in self.allowed_plr_methods:
+            raise TypeError(f"plr_method must be chosen from the following list: {self.allowed_plr_methods}")
         
-        self.plf_method = plf_method
+        self.plr_method = plr_method
         
     def set_curve_df(self,curve):
         
@@ -34,17 +34,17 @@ class model_hp():
         
         #METHOD: train all the model of the linear model type
         self.df = df
-        df_FL = df[df['PLF']==1]
-        df_PL = df[df['PLF']!=1]
+        df_FL = df[df['PLR']==1]
+        df_PL = df[df['PLR']!=1]
         
         self.df_FL = df_FL
         self.df_PL = df_PL
         
 
         #Get_inputs_function is defined in each model class
-        self.PLF, self.COP, self.X = self.get_inputs_function(self.df)
-        self.PLF_PL, self.COP_PL, self.X_PL = self.get_inputs_function(self.df_PL)
-        self.PLF_FL, self.COP_FL, self.X_FL = self.get_inputs_function(self.df_FL)
+        self.PLR, self.COP, self.X = self.get_inputs_function(self.df)
+        self.PLR_PL, self.COP_PL, self.X_PL = self.get_inputs_function(self.df_PL)
+        self.PLR_FL, self.COP_FL, self.X_FL = self.get_inputs_function(self.df_FL)
       
         #Create matrix and full load calculations
         self.model_reg_FL = linear_model.LinearRegression().fit(self.X_FL, self.COP_FL)
@@ -55,8 +55,8 @@ class model_hp():
         
 
         #Create matrix and calculations
-        if self.plf_method == "direct_linear":
-            X_dir_lin = np.column_stack([self.X,self.PLF])
+        if self.plr_method == "direct_linear":
+            X_dir_lin = np.column_stack([self.X,self.PLR])
             self.model_reg = linear_model.LinearRegression().fit(X_dir_lin, self.COP)
             
         elif self.plr_method == "direct_quadratic":
@@ -73,11 +73,11 @@ class model_hp():
         self.df_PL = df[df['PLR']!=1]
         
         #Get_inputs_function is defined in each model class
-        self.PLF, self.X, self.COP, self.A0 = self.get_inputs(self.df)
-        self.PLF_PL, self.X_PL, self.COP_PL, self.A0_PL = self.get_inputs(self.df_PL)
-        self.PLF_FL, self.X_FL, self.COP_FL, self.A0_FL = self.get_inputs(self.df_FL)
+        self.PLR, self.X, self.COP, self.A0 = self.get_inputs(self.df)
+        self.PLR_PL, self.X_PL, self.COP_PL, self.A0_PL = self.get_inputs(self.df_PL)
+        self.PLR_FL, self.X_FL, self.COP_FL, self.A0_FL = self.get_inputs(self.df_FL)
         
-        #METHOD: define the residuals of a specific type of plf_method.
+        #METHOD: define the residuals of a specific type of plr_method.
         #The f_method is defined directly inside the class of the specifc model  
         def fun(x0,xdata,ydata):
             fun_m = {
@@ -91,8 +91,8 @@ class model_hp():
             return sum((Y_pred-ydata)**2)
         
 
-        #Select the minimization procedure depending on the type of plf_method.
-        if self.plf_method in ["direct_linear","direct_quadratic"]:
+        #Select the minimization procedure depending on the type of plr_method.
+        if self.plr_method in ["direct_linear","direct_quadratic"]:
             self.model_reg = minimize(fun, self.A0, args = (self.X, self.COP), method = 'L-BFGS-B')   
         else:
             self.model_reg = minimize(fun, self.A0, args = (self.X_FL, self.COP_FL), method = 'L-BFGS-B')
@@ -106,9 +106,9 @@ class model_hp():
         #METHOD: train all the model of the Carnot model type
         self.df = df
 
-        self.df_FL = df[df['PLF']==1]
-        self.df_PL = df[df['PLF']!=1]
-        self.PLF_PL = np.array(self.df_PL["PLF"])
+        self.df_FL = df[df['PLR']==1]
+        self.df_PL = df[df['PLR']!=1]
+        self.PLR_PL = np.array(self.df_PL["PLR"])
         
         COP_carnot = (Load_T + 273.15 )/ (Load_T - Source_T)
         
