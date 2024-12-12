@@ -3060,7 +3060,7 @@ def load_test(Models, df, curve, Name):
 
 #%% Graph_COP_pred-------------------------------------------------------------
 
-def load_graph(KPI, df, Name):
+def load_graph1(KPI, df, Name):
     
     "Set plot theme"
     sns.set_theme(rc={'figure.figsize':(19,9.5)})
@@ -3091,6 +3091,7 @@ def load_graph(KPI, df, Name):
         plt.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_Plot_{g}.png")) #To modify to svg when defined 
         plt.close()
 
+def load_graph2(KPI, df, Name):
     
         Direct_Models = {}
         Indirect_Models = {}
@@ -3099,6 +3100,7 @@ def load_graph(KPI, df, Name):
         Exponential_Dir = {}
         Exponential_Ind = {}
         Carnot = {}
+        Result_clust = {}
         
         " Divide the results in different dictionaries"
         for g in KPI.keys():
@@ -3121,6 +3123,15 @@ def load_graph(KPI, df, Name):
                         Exponential_Ind[m] = Indirect_Models[m]
                     elif int(m[1]+m[2]) >9 :
                         Carnot[m] = Indirect_Models[m]
+
+        Res_clust = {"Linear_Dir": Linear_Dir,
+                     "Linear_Ind": Linear_Ind,
+                      "Exponential_Dir": Exponential_Dir,
+                      "Exponential_Ind": Exponential_Ind, 
+                      "Carnot": Carnot}
+        import json
+        with open(os.path.join('..',"Results",f"{Name}",f'{Name}_KPI_clust.json'), 'w') as f:
+         json.dump(Res_clust, f)
         
         "Extract the KPI parameters for FL, PL and TOT "
         r2_LD_TOT = []
@@ -3240,21 +3251,90 @@ def load_graph(KPI, df, Name):
             RMSE_C_FL.append(Carnot[f'{g}']['KPI_FL']['MAE_FL'])
             RMSE_C_PL.append(Carnot[f'{g}']['KPI_PL']['MAE_PL'])  
         
+        # "Plot TOT"
+        # figure1, axs1 = plt.subplots(3,figsize = (19,9.5))
+        # figure1.suptitle('$KPI_{TOT}$',fontsize = 15)
+        
+        # axs1[0].boxplot([r2_LD_TOT, r2_LI_TOT, r2_ED_TOT, r2_EI_TOT, r2_C_TOT], showfliers = False)
+        # axs1[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        # axs1[0].set_title('$R2_{TOT}$')   
+        
+        # axs1[1].boxplot([MAE_LD_TOT, MAE_LI_TOT, MAE_ED_TOT, MAE_EI_TOT, MAE_C_TOT], showfliers = False)
+        # axs1[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        # axs1[1].set_title('$MAE_{TOT}$')
+        
+        # axs1[2].boxplot([RMSE_LD_TOT, RMSE_LI_TOT, RMSE_ED_TOT, RMSE_EI_TOT, RMSE_C_TOT], showfliers = False)
+        # axs1[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        # axs1[2].set_title('$RMSE_{TOT}$')
+        
+        # sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        # plt.tight_layout()
+        # figure1.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_KPI_TOT.png")) #To modify to svg when defined
+        # plt.close()
+        
+        # "Plot FL"
+        # figure2, axs2 = plt.subplots(3,figsize = (19,9.5))
+        # figure2.suptitle('$KPI_{FL}$',fontsize = 15)
+        
+        # axs2[0].boxplot([r2_LD_FL, r2_LI_FL, r2_ED_FL, r2_EI_FL, r2_C_FL], showfliers = False)
+        # axs2[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        # axs2[0].set_title('$R2_{FL}$')   
+        
+        # axs2[1].boxplot([MAE_LD_FL, MAE_LI_FL, MAE_ED_FL, MAE_EI_FL, MAE_C_FL], showfliers = False)
+        # axs2[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        # axs2[1].set_title('$MAE_{FL}$')
+        
+        # axs2[2].boxplot([RMSE_LD_FL, RMSE_LI_FL, RMSE_ED_FL, RMSE_EI_FL, RMSE_C_FL], showfliers = False)
+        # axs2[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        # axs2[2].set_title('$RMSE_{FL}$')
+        
+        # sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        # plt.tight_layout()
+        # figure2.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_KPI_FL.png")) #To modify to svg when whitched 
+        # plt.close()
+        
+        # "Plot PL"
+        # figure3, axs3 = plt.subplots(3,figsize = (19,9.5))
+        # figure3.suptitle('$KPI_{PL}$',fontsize = 15)
+        
+        # axs3[0].boxplot([r2_LD_PL, r2_LI_PL, r2_ED_PL, r2_EI_PL, r2_C_PL], showfliers = False)
+        # axs3[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        # axs3[0].set_title('$R2_{PL}$')   
+        
+        # axs3[1].boxplot([MAE_LD_PL, MAE_LI_PL, MAE_ED_PL, MAE_EI_PL, MAE_C_PL], showfliers = False)
+        # axs3[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        # axs3[1].set_title('$MAE_{PL}$')
+        
+        # axs3[2].boxplot([RMSE_LD_PL, RMSE_LI_PL, RMSE_ED_PL, RMSE_EI_PL, RMSE_C_PL], showfliers = False)
+        # axs3[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        # axs3[2].set_title('$RMSE_{PL}$')
+        
+        
+        # sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        # plt.tight_layout()
+        # figure3.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_KPI_PL.png")) #To modify to svg when defined 
+        # plt.close()
+        
+        #Remove Carnot
+        
         "Plot TOT"
         figure1, axs1 = plt.subplots(3,figsize = (19,9.5))
         figure1.suptitle('$KPI_{TOT}$',fontsize = 15)
         
-        axs1[0].boxplot([r2_LD_TOT, r2_LI_TOT, r2_ED_TOT, r2_EI_TOT, r2_C_TOT])
-        axs1[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs1[0].boxplot([r2_LD_TOT, r2_LI_TOT, r2_ED_TOT, r2_EI_TOT],showfliers = False)
+        axs1[0].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
         axs1[0].set_title('$R2_{TOT}$')   
+        #axs1[0].set_ylim(0.5,1) 
         
-        axs1[1].boxplot([MAE_LD_TOT, MAE_LI_TOT, MAE_ED_TOT, MAE_EI_TOT, MAE_C_TOT])
-        axs1[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs1[1].boxplot([MAE_LD_TOT, MAE_LI_TOT, MAE_ED_TOT, MAE_EI_TOT],showfliers = False)
+        axs1[1].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
         axs1[1].set_title('$MAE_{TOT}$')
+        #axs1[1].set_ylim(0,0.5)
         
-        axs1[2].boxplot([RMSE_LD_TOT, RMSE_LI_TOT, RMSE_ED_TOT, RMSE_EI_TOT, RMSE_C_TOT])
-        axs1[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs1[2].boxplot([RMSE_LD_TOT, RMSE_LI_TOT, RMSE_ED_TOT, RMSE_EI_TOT], showfliers = False)
+        axs1[2].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
         axs1[2].set_title('$RMSE_{TOT}$')
+        #axs1[2].set_ylim(0.2,0.8) 
         
         sns.set_theme(rc={'figure.figsize':(19,9.5)})
         plt.tight_layout()
@@ -3265,17 +3345,20 @@ def load_graph(KPI, df, Name):
         figure2, axs2 = plt.subplots(3,figsize = (19,9.5))
         figure2.suptitle('$KPI_{FL}$',fontsize = 15)
         
-        axs2[0].boxplot([r2_LD_FL, r2_LI_FL, r2_ED_FL, r2_EI_FL, r2_C_FL])
-        axs2[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs2[0].boxplot([r2_LD_FL, r2_LI_FL, r2_ED_FL, r2_EI_FL], showfliers = False)
+        axs2[0].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
         axs2[0].set_title('$R2_{FL}$')   
+        #axs2[0].set_ylim(0.9,0.95) 
         
-        axs2[1].boxplot([MAE_LD_FL, MAE_LI_FL, MAE_ED_FL, MAE_EI_FL, MAE_C_FL])
-        axs2[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs2[1].boxplot([MAE_LD_FL, MAE_LI_FL, MAE_ED_FL, MAE_EI_FL], showfliers = False)
+        axs2[1].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
         axs2[1].set_title('$MAE_{FL}$')
+        #axs2[1].set_ylim(0.20,0.3) 
         
-        axs2[2].boxplot([RMSE_LD_FL, RMSE_LI_FL, RMSE_ED_FL, RMSE_EI_FL, RMSE_C_FL])
-        axs2[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs2[2].boxplot([RMSE_LD_FL, RMSE_LI_FL, RMSE_ED_FL, RMSE_EI_FL], showfliers = False)
+        axs2[2].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
         axs2[2].set_title('$RMSE_{FL}$')
+        #axs2[2].set_ylim(0.30,0.35) 
         
         sns.set_theme(rc={'figure.figsize':(19,9.5)})
         plt.tight_layout()
@@ -3286,23 +3369,38 @@ def load_graph(KPI, df, Name):
         figure3, axs3 = plt.subplots(3,figsize = (19,9.5))
         figure3.suptitle('$KPI_{PL}$',fontsize = 15)
         
-        axs3[0].boxplot([r2_LD_PL, r2_LI_PL, r2_ED_PL, r2_EI_PL, r2_C_PL])
-        axs3[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
-        axs3[0].set_title('$R2_{PL}$')   
+        axs3[0].boxplot([r2_LD_PL, r2_LI_PL, r2_ED_PL, r2_EI_PL], showfliers = False)
+        axs3[0].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
+        axs3[0].set_title('$R2_{PL}$')
+        #axs3[0].set_ylim(0.5,1) 
         
-        axs3[1].boxplot([MAE_LD_PL, MAE_LI_PL, MAE_ED_PL, MAE_EI_PL, MAE_C_PL])
-        axs3[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs3[1].boxplot([MAE_LD_PL, MAE_LI_PL, MAE_ED_PL, MAE_EI_PL], showfliers = False)
+        axs3[1].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
         axs3[1].set_title('$MAE_{PL}$')
+        #axs3[1].set_ylim(0,0.6)
         
-        axs3[2].boxplot([RMSE_LD_PL, RMSE_LI_PL, RMSE_ED_PL, RMSE_EI_PL, RMSE_C_PL])
-        axs3[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect","Carnot"])
+        axs3[2].boxplot([RMSE_LD_PL, RMSE_LI_PL, RMSE_ED_PL, RMSE_EI_PL], showfliers = False)
+        axs3[2].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
         axs3[2].set_title('$RMSE_{PL}$')
-        
+        #axs3[2].set_ylim(0.2,0.8) 
         
         sns.set_theme(rc={'figure.figsize':(19,9.5)})
         plt.tight_layout()
         figure3.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_KPI_PL.png")) #To modify to svg when defined 
         plt.close()
+        
+def import_json(MachineName):
+        import json
+        with open(os.path.join('..',"Results",f"{MachineName}",f"{MachineName}_KPI_clust.json")) as file:
+            file = json.load(file)
+        return file
+            
+            
+            
+
+    
+    
+    
         
 
 #%% Load Tests-----------------------------------------------------------------

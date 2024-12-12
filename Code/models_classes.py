@@ -110,18 +110,18 @@ class model_hp():
         self.df_PL = df[df['PLR']!=1]
         self.PLR_PL = np.array(self.df_PL["PLR"])
         
-        COP_carnot = (Load_T + 273.15 )/ (Load_T - Source_T)
+        self.COP_carnot = (Load_T + 273.15 )/ (Load_T - Source_T)
         
         #Check if model has the required curve uploaded
         if hasattr(self, "curve"):
             curve = copy.deepcopy(self.curve)
             curve = curve.set_index(curve['SET'])  
             COP = curve.loc[Source_T, 'COP_fl'] 
-            self.eta_design = COP / COP_carnot # second principle efficency for full load data point
+            self.eta_design = COP / self.COP_carnot # second principle efficency for full load data point
         else:
             if COP == None:
                 raise ValueError("If no design points curve df has been set, COP at design load must be provided")
-            self.eta_design = COP / COP_carnot     
+            self.eta_design = COP / self.COP_carnot     
         
         SET_PL = np.array(self.df_PL["SET [°C]"])
         LExT_PL = np.array(self.df_PL["LExT [°C]"])
@@ -582,8 +582,8 @@ class model_h12(model_hp):
         COP_carnot = np.minimum(COP_carnot_1, COP_carnot_2)
         
         eta = self.eta_design / (
-            self.eta_design*(1-COP_carnot/COP_carnot_non_filt)\
-            + COP_carnot/COP_carnot_non_filt 
+            self.eta_design*(1-COP_carnot/self.COP_carnot)\
+            + COP_carnot/self.COP_carnot
             )
         
         return COP_carnot * eta

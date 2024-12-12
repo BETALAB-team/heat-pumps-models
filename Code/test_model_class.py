@@ -35,17 +35,17 @@ for dev in devices:
     curve=pd.read_excel(os.path.join('..', 'Data', dev + '.xlsx'), sheet_name="curve")
     
     for model_tag, model in [
-            ["01",model_h01],
-            ["02",model_h02],
-            ["03",model_h03],
-            ["04",model_h04],
-            ["05",model_h05],
-            ["06",model_h06],
-            ["07",model_h07],
-            ["08",model_h08],
-            ["09",model_h09],
-            ["10",model_h10],
-            ["11",model_h11],
+            # ["01",model_h01],
+            # ["02",model_h02],
+            # ["03",model_h03],
+            # ["04",model_h04],
+            # ["05",model_h05],
+            # ["06",model_h06],
+            # ["07",model_h07],
+            # ["08",model_h08],
+            # ["09",model_h09],
+            # ["10",model_h10],
+            # ["11",model_h11],
             ["12",model_h12],
             ]:
         for m in plr_models:
@@ -63,8 +63,8 @@ for dev in devices:
                 res.loc[model_tag,m,op,"RMSE"][dev] = results[op]["RMSE_"+op]
                 res.loc[model_tag,m,op,"R2"][dev] = results[op]["r2_"+op]
 
-b = res.loc[:,:,"TOT","RMSE"]
-a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]
+# b = res.loc[:,:,"TOT","RMSE"]
+# a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]
 
 
 #%%

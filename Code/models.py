@@ -1202,7 +1202,7 @@ def model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
 
 #%% H10N-----------------------------------------------------------------------
 
-def model_h10n(df, curve, source, design_point_T = (-7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h10n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1310,7 +1310,7 @@ def model_h10n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
 
 #%% H11N-----------------------------------------------------------------------
 
-def model_h11n(df, curve, source, design_point_T = (-7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h11n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1409,7 +1409,7 @@ def model_h11n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
 
 #%% H12N-----------------------------------------------------------------------
 
-def model_h12n(df, curve, source, design_point_T = (-7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h12n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
