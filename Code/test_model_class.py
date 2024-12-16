@@ -26,7 +26,7 @@ kpis = ["RMSE","MAE","R2"]
 
 res = pd.DataFrame(index=pd.MultiIndex.from_product([
     models,plr_models,dfs_levels,kpis
-    ],names=("model","plf_model","operation","kpi")), columns = devices)
+    ],names=("model","plr_model","operation","kpi")), columns = devices)
 
 
 for dev in devices:
@@ -35,17 +35,17 @@ for dev in devices:
     curve=pd.read_excel(os.path.join('..', 'Data', dev + '.xlsx'), sheet_name="curve")
     
     for model_tag, model in [
-            # ["01",model_h01],
-            # ["02",model_h02],
-            # ["03",model_h03],
-            # ["04",model_h04],
-            # ["05",model_h05],
-            # ["06",model_h06],
-            # ["07",model_h07],
-            # ["08",model_h08],
-            # ["09",model_h09],
-            # ["10",model_h10],
-            # ["11",model_h11],
+            ["01",model_h01],
+            ["02",model_h02],
+            ["03",model_h03],
+            ["04",model_h04],
+            ["05",model_h05],
+            ["06",model_h06],
+            ["07",model_h07],
+            ["08",model_h08],
+            ["09",model_h09],
+            ["10",model_h10],
+            ["11",model_h11],
             ["12",model_h12],
             ]:
         for m in plr_models:
@@ -68,11 +68,11 @@ for dev in devices:
 
 
 #%%
-
-
+# Reverting multi-index by removing level 0 and level 2
+ref_si_level = res.reset_index(level=["model","plr_model","operation","kpi"])
+direct_linear = ref_si_level[ref_si_level["plr_model"] == "direct_linear"]
 # fig1, axs1 = plt.subplots(3, figsize = (19,9.5))
 # fig1.suptitle("Models Performance")
-
 
 # sns.set_theme(rc={'figure.figsize':(19,9.5)})
 # fig1.tight_layout()
