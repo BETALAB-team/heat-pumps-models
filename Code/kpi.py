@@ -3432,11 +3432,11 @@ def load_test2(Models, df, curve, Name):
     
 #%% Test H02D01----------------------------------------------------------------
         
-    # Test['H02D01'] = kpi_h02d01(Models, df, curve)
+    Test['H02D01'] = kpi_h02d01(Models, df, curve)
     
 #%% Test H02D02----------------------------------------------------------------
         
-    # Test['H02D02'] = kpi_h02d02(Models, df, curve)
+    Test['H02D02'] = kpi_h02d02(Models, df, curve)
     
 #%% Test H02N------------------------------------------------------------------
         
@@ -3460,11 +3460,11 @@ def load_test2(Models, df, curve, Name):
     
 #%% Test H04D01----------------------------------------------------------------
         
-    # Test['H04D01'] = kpi_h04d01(Models, df, curve)
+    Test['H04D01'] = kpi_h04d01(Models, df, curve)
     
 #%% Test H04D02----------------------------------------------------------------
         
-    # Test['H04D02'] = kpi_h04d02(Models, df, curve)
+    Test['H04D02'] = kpi_h04d02(Models, df, curve)
     
 #%% Test H04N------------------------------------------------------------------
         
@@ -3474,11 +3474,11 @@ def load_test2(Models, df, curve, Name):
     
 #%% Test H05D01----------------------------------------------------------------
         
-    # Test['H05D01'] = kpi_h05d01(Models, df, curve)
+    Test['H05D01'] = kpi_h05d01(Models, df, curve)
     
 #%% Test H05D02----------------------------------------------------------------
         
-    # Test['H05D02'] = kpi_h05d02(Models, df, curve)
+    Test['H05D02'] = kpi_h05d02(Models, df, curve)
     
 #%% Test H05N------------------------------------------------------------------
         
@@ -3488,11 +3488,11 @@ def load_test2(Models, df, curve, Name):
     
 #%% Test H06D01----------------------------------------------------------------
     
-    # Test['H06D01'] = kpi_h06d01(Models, df, curve)
+    Test['H06D01'] = kpi_h06d01(Models, df, curve)
     
 #%% Test H06D02----------------------------------------------------------------
         
-    # Test['H06D02'] = kpi_h06d02(Models, df, curve)
+    Test['H06D02'] = kpi_h06d02(Models, df, curve)
     
 #%% Test H06N------------------------------------------------------------------
         
@@ -3502,11 +3502,11 @@ def load_test2(Models, df, curve, Name):
     
 #%% Test H07D01----------------------------------------------------------------
         
-    # Test['H07D01'] = kpi_h07d01(Models, df, curve)
+    Test['H07D01'] = kpi_h07d01(Models, df, curve)
     
 #%% Test H07D02----------------------------------------------------------------
         
-    # Test['H07D02'] = kpi_h07d02(Models, df, curve)
+    Test['H07D02'] = kpi_h07d02(Models, df, curve)
     
 #%% Test H07N------------------------------------------------------------------
         
@@ -3516,31 +3516,31 @@ def load_test2(Models, df, curve, Name):
     
 #%% Test H08D01----------------------------------------------------------------
         
-    # Test['H08D01'] = kpi_h08d01(Models, df, curve)
+    Test['H08D01'] = kpi_h08d01(Models, df, curve)
     
 #%% Test H08D02----------------------------------------------------------------
         
-    # Test['H08D02'] = kpi_h08d02(Models, df, curve)
+    Test['H08D02'] = kpi_h08d02(Models, df, curve)
     
 #%% Test H08N------------------------------------------------------------------
         
-    # Test['H08N - mod A'] = kpi_h08n(Models, df, curve, indirect_model = "ISO 13612-2 mod A")
-    # Test['H08N - mod B'] = kpi_h08n(Models, df, curve, indirect_model = "ISO 13612-2 mod B")
-    # Test['H08N - mod C'] = kpi_h08n(Models, df, curve, indirect_model = "C method")
+    Test['H08N - mod A'] = kpi_h08n(Models, df, curve, indirect_model = "ISO 13612-2 mod A")
+    Test['H08N - mod B'] = kpi_h08n(Models, df, curve, indirect_model = "ISO 13612-2 mod B")
+    Test['H08N - mod C'] = kpi_h08n(Models, df, curve, indirect_model = "C method")
     
 #%% Test H09D01----------------------------------------------------------------
         
-    # Test['H09D01'] = kpi_h09d01(Models, df, curve)
+    Test['H09D01'] = kpi_h09d01(Models, df, curve)
     
 #%% Test H09D02----------------------------------------------------------------
         
-    # Test['H09D02'] = kpi_h09d02(Models, df, curve)
+    Test['H09D02'] = kpi_h09d02(Models, df, curve)
     
 #%% Test H09N------------------------------------------------------------------
         
-    # Test['H09N - mod A'] = kpi_h09n(Models, df, curve, indirect_model = "ISO 13612-2 mod A")
-    # Test['H09N - mod B'] = kpi_h09n(Models, df, curve, indirect_model = "ISO 13612-2 mod B")
-    # Test['H09N - mod C'] = kpi_h09n(Models, df, curve, indirect_model = "C method")
+    Test['H09N - mod A'] = kpi_h09n(Models, df, curve, indirect_model = "ISO 13612-2 mod A")
+    Test['H09N - mod B'] = kpi_h09n(Models, df, curve, indirect_model = "ISO 13612-2 mod B")
+    Test['H09N - mod C'] = kpi_h09n(Models, df, curve, indirect_model = "C method")
         
 #%% Test H10N------------------------------------------------------------------
         

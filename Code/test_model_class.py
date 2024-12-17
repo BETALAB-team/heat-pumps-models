@@ -8,10 +8,12 @@ import numpy as np
 #%%----------------------------------------------------------------------------
 
 devices = [
-    "Galletti MLI 18 kW",
+      "Galletti MLI 18 kW",
     # "Galletti MLI 22 kW",
     # "Galletti MLI 26 kW",
     # "Galletti MLI 30 kW",
+    # "WPL_A_HK 07 Premium",
+     # "Eneren NAW 006"
     ]
 
 models = ["0" + str(i) for i in range(1,10)] + ["10","11","12"]
@@ -35,9 +37,9 @@ for dev in devices:
     curve=pd.read_excel(os.path.join('..', 'Data', dev + '.xlsx'), sheet_name="curve")
     
     for model_tag, model in [
-            ["01",model_h01],
+            # ["01",model_h01],
             ["02",model_h02],
-            ["03",model_h03],
+            # ["03",model_h03],
             ["04",model_h04],
             ["05",model_h05],
             ["06",model_h06],
@@ -68,50 +70,46 @@ for dev in devices:
 
 
 #%%
-# Reverting multi-index by removing level 0 and level 2
-ref_si_level = res.reset_index(level=["model","plr_model","operation","kpi"])
-direct_linear = ref_si_level[ref_si_level["plr_model"] == "direct_linear"]
-# fig1, axs1 = plt.subplots(3, figsize = (19,9.5))
-# fig1.suptitle("Models Performance")
+# import matplotlib.pyplot as plt
+# def boxplot(devices):
+    
+#     for dev
+    
+# #Split the models among data available 
+# ref_si_level = res.reset_index(level=["model","plr_model","operation","kpi"])
+# direct_linear = ref_si_level.loc[ref_si_level["plr_model"] == "direct_linear", ["model","plr_model","operation","kpi","Galletti MLI 18 kW" ]]
+# direct_quadratic = ref_si_level.loc[ref_si_level["plr_model"] == "direct_quadratic", ["model","plr_model","operation","kpi","Galletti MLI 18 kW" ]]
+# Mod_A = ref_si_level.loc[ref_si_level["plr_model"] == "ISO 13612-2 mod A", ["model","plr_model","operation","kpi","Galletti MLI 18 kW" ]]
+# Mod_B = ref_si_level.loc[ref_si_level["plr_model"] == "ISO 13612-2 mod B", ["model","plr_model","operation","kpi","Galletti MLI 18 kW" ]]
+# Mod_C = ref_si_level.loc[ref_si_level["plr_model"] == "C method", ["model","plr_model","operation","kpi","Galletti MLI 18 kW" ]]
+
+# figure1, axs1 = plt.subplots(3,figsize = (19,9.5))
+# figure1.suptitle('$KPI_{TOT}$',fontsize = 15)
+
+# axs1[0].boxplot([direct_linear[(direct_linear["kpi"] == "R2" ) & (direct_linear["operation"] == "TOT"), ["Galletti MLI 18 kW"]],
+#                 direct_quadrqatic[(direct_quadratic["kpi"] == "R2" ) & (direct_quadratic["operation"] == "TOT"), ["Galletti MLI 18 kW"]],
+#                 Mod_A[(Mod_A["kpi"] == "R2" ) & (Mod_A["operation"] == "TOT"), ["Galletti MLI 18 kW"]], 
+#                 Mod_B[(Mod_A["kpi"] == "R2" ) & (Mod_B["operation"] == "TOT"), ["Galletti MLI 18 kW"]],
+#                 Mod_C[(Mod_A["kpi"] == "R2" ) & (Mod_C["operation"] == "TOT"), ["Galletti MLI 18 kW"]]],showfliers = False)
+# axs1[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B", ])
+# axs1[0].set_title('$R2_{TOT}$')   
+# #axs1[0].set_ylim(0.5,1) 
+
+# axs1[1].boxplot([MAE_LD_TOT, MAE_LI_TOT, MAE_ED_TOT, MAE_EI_TOT],showfliers = False)
+# axs1[1].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
+# axs1[1].set_title('$MAE_{TOT}$')
+# #axs1[1].set_ylim(0,0.5)
+
+# axs1[2].boxplot([RMSE_LD_TOT, RMSE_LI_TOT, RMSE_ED_TOT, RMSE_EI_TOT], showfliers = False)
+# axs1[2].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
+# axs1[2].set_title('$RMSE_{TOT}$')
+# #axs1[2].set_ylim(0.2,0.8) 
 
 # sns.set_theme(rc={'figure.figsize':(19,9.5)})
-# fig1.tight_layout()
+# plt.tight_layout()
+# figure1.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_KPI_TOT.png")) #To modify to svg when defined
+# plt.close()
 
-
-
-# #R2_ranges = ('[0;0.6[', '[0.6;0.7[', '[0.7;0.8[', '[0.8;0.9[', '[0.9;0.92[', '[0.92;0.94[', '[0.94;0.96[', '[0.96;0.98[', '[0.98;0.1]')
-# R2_ranges = [0, 0.6, 0.7, 0.8, 0.9, 0.92, 0.94, 0.96, 0.98, 1]
-# R2=[]
-# MAE = []
-# RMSE =  []
-# for i in KPI:
-#     R2.append(KPI[i]['r2'])
-#     MAE.append(KPI[i]['MAE'])
-#     RMSE.append(KPI[i]['RMSE'])
-    
-# axs1[0].hist(R2, bins= R2_ranges)
-# axs1[1].hist(MAE)
-# axs1[2].hist(RMSE)    
-
-# # Add some text for labels, title and custom x-axis tick labels, etc.
-# # axs1[0].set_xlabel('Intervallo di errore relativo')
-# # axs1[0].set_ylabel('% edifici')
-# # axs1[0].set_xticks(x + width, error_ranges)
-# # axs1[0].set_ylim([0, 30])
-# # axs1[0].legend()
-
-
-
-# import seaborn as sns
-# z=KPI["H01D01"]["COP_pred"]-COP
-
-
-
-# # plot
-# fig, ax = plt.subplots()
-# ax.hexbin(x=df["SET [°C]"],y=df["LET [°C]"],C=z,cmap="copper")
-
-# plt.show()
 
 
 

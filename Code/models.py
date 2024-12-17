@@ -1747,82 +1747,82 @@ def load_models2(df, curve, source):
     #%% H05N-------------------------------------------------------------------
     
     Model['H05N - mod A'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    #Model['H05N - mod B'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H05N - mod B'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
     Model['H05N - mod C'] = model_h05n(df, curve, source, indirect_model = "C method")
     
     #%% H06D01-----------------------------------------------------------------
     
-    # Model['H06D01'] = model_h06d01(df)
+    Model['H06D01'] = model_h06d01(df)
     
     #%% H06D02-----------------------------------------------------------------
     
-    # Model['H06D02'] = model_h06d02(df)
+    Model['H06D02'] = model_h06d02(df)
     
 
     #%% H06N-------------------------------------------------------------------
     
     Model['H06N - mod A'] = model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    # #Model['H06N - mod B'] = model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H06N - mod B'] = model_h06n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
     Model['H06N - mod C'] = model_h06n(df, curve, source, indirect_model = "C method")
     
     #%% H07D01-----------------------------------------------------------------
     
-    # Model['H07D01'] = model_h07d01(df)
+    Model['H07D01'] = model_h07d01(df)
     
     #%% H07D02-----------------------------------------------------------------
     
-    # Model['H07D02'] = model_h07d02(df)
+    Model['H07D02'] = model_h07d02(df)
     
     #%% H07N-------------------------------------------------------------------
     
     Model['H07N - mod A'] = model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    # #Model['H07N - mod B'] = model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H07N - mod B'] = model_h07n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
     Model['H07N - mod C'] = model_h07n(df, curve, source, indirect_model = "C method")
     
     #%% H08D01-----------------------------------------------------------------
     
-    #Model['H08D01'] = model_h08d01(df)
+    Model['H08D01'] = model_h08d01(df)
     
     #%% H08D02-----------------------------------------------------------------
     
-    #Model['H08D02'] = model_h08d02(df)
+    Model['H08D02'] = model_h08d02(df)
     
     #%% H08N-------------------------------------------------------------------
     
-    #Model['H08N - mod A'] = model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    #Model['H08N - mod B'] = model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
-    #Model['H08N - mod C'] = model_h08n(df, curve, source, indirect_model = "C method")
+    Model['H08N - mod A'] = model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H08N - mod B'] = model_h08n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H08N - mod C'] = model_h08n(df, curve, source, indirect_model = "C method")
     
     #%% H09D01-----------------------------------------------------------------
     
-    #Model['H09D01'] = model_h09d01(df)
+    Model['H09D01'] = model_h09d01(df)
     
     #%% H09D02-----------------------------------------------------------------
     
-    #Model['H09D02'] = model_h09d02(df)
+    Model['H09D02'] = model_h09d02(df)
     
     #%% H09N-------------------------------------------------------------------
     
-    #Model['H09N - mod A'] = model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    #Model['H09N - mod B'] = model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
-    #Model['H09N - mod C'] = model_h09n(df, curve, source, indirect_model = "C method")
+    Model['H09N - mod A'] = model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
+    Model['H09N - mod B'] = model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H09N - mod C'] = model_h09n(df, curve, source, indirect_model = "C method")
     
     #%% H10N-------------------------------------------------------------------
     
     Model['H10N - mod A'] = model_h10n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    #Model['H10N - mod B'] = model_h10n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H10N - mod B'] = model_h10n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
     Model['H10N - mod C'] = model_h10n(df, curve, source, indirect_model = "C method")
     
     #%% H11N-------------------------------------------------------------------
     
     Model['H11N - mod A'] = model_h11n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    #Model['H11N - mod B'] = model_h11n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H11N - mod B'] = model_h11n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
     Model['H11N - mod C'] = model_h11n(df, curve, source, indirect_model = "C method")
     
     #%% H12N-------------------------------------------------------------------
     
     Model['H12N - mod A'] = model_h12n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    #Model['H12N - mod B'] = model_h12n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H12N - mod B'] = model_h12n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
     Model['H12N - mod C'] = model_h12n(df, curve, source, indirect_model = "C method")
     
     return Model

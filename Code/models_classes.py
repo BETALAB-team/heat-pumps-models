@@ -180,15 +180,7 @@ class model_hp():
             self.f_COP = lambda x : x/(coeff_3[0]+coeff_0*x+coeff_3[1]*x**2)
             
     def calc_with_data_linear(self, df):
-        
-        # "Import data as Arrays"
-        # SET = np.array(df["SET [°C]"])
-        # Sfr = np.array(df["SFR [kg/s]"])
-        # LExT = np.array(df["LExT [°C]"])
-        # HC = np.array(df["Heat Abs EVA [kW[]"])
-        # PLR = np.array(df["PLR"])
-        # X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2])
-        
+
         PLR, COP, X = self.get_inputs_function(df)
         
         "Create matrix and calculations"
@@ -206,14 +198,6 @@ class model_hp():
         return COP_pred
     
     def calc_with_data_exp(self, df):
-        
-        # "Import data as Arrays"
-        # SET = np.array(df["SET [°C]"])
-        # Sfr = np.array(df["SFR [kg/s]"])
-        # LExT = np.array(df["LExT [°C]"])
-        # HC = np.array(df["Heat Abs EVA [kW[]"])
-        # PLR = np.array(df["PLR"])
-        # X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2])
         
         PLR, X, COP, A0 = self.get_inputs(df)
         
@@ -271,11 +255,10 @@ class model_h01(model_hp):
         SET = np.array(df["SET [°C]"])
         Sfr = np.array(df["SFR [kg/s]"])
         LExT = np.array(df["LExT [°C]"])
-        HC = np.array(df["Heat Abs EVA [kW[]"])
         PLR = np.array(df["PLR"])
         COP = np.array(df["COP"])
         
-        X = np.column_stack([np.ones(len(HC)),SET,Sfr,LExT-SET,(LExT-SET)**2])
+        X = np.column_stack([np.ones(len(SET)),SET,Sfr,LExT-SET,(LExT-SET)**2])
 
         return PLR, COP, X
     
@@ -289,11 +272,10 @@ class model_h02(model_hp):
     def get_inputs_function(self, df):
         SET = np.array(df["SET [°C]"])
         LExT = np.array(df["LExT [°C]"])
-        HC = np.array(df["Heat Abs EVA [kW[]"])
         PLR = np.array(df["PLR"])
         COP = np.array(df["COP"])
         
-        X = np.column_stack([np.ones(len(HC)),SET,LExT-SET,(LExT-SET)**2])
+        X = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2])
 
         return PLR, COP, X
     
@@ -307,11 +289,10 @@ class model_h03(model_hp):
     def get_inputs_function(self, df):
         SET = np.array(df["SET [°C]"])
         Sfr = np.array(df["SFR [kg/s]"])
-        HC = np.array(df["Heat Abs EVA [kW[]"])
         PLR = np.array(df["PLR"])
         COP = np.array(df["COP"])
         
-        X = np.column_stack([np.ones(len(HC)),SET,Sfr,SET**2])
+        X = np.column_stack([np.ones(len(SET)),SET,Sfr,SET**2])
 
         return PLR, COP, X
     
@@ -325,11 +306,10 @@ class model_h04(model_hp):
     def get_inputs_function(self, df):
         SET = np.array(df["SET [°C]"])
         LExT = np.array(df["LExT [°C]"])
-        HC = np.array(df["Heat Abs EVA [kW[]"])
         PLR = np.array(df["PLR"])
         COP = np.array(df["COP"])
         
-        X = np.column_stack([np.ones(len(HC)), SET, LExT, LExT * SET])
+        X = np.column_stack([np.ones(len(SET)), SET, LExT, LExT * SET])
 
         return PLR, COP, X
     
@@ -343,11 +323,10 @@ class model_h05(model_hp):
     def get_inputs_function(self, df):
         SET = np.array(df["SET [°C]"])
         LET = np.array(df["LET [°C]"])
-        HC = np.array(df["Heat Abs EVA [kW[]"])
         PLR = np.array(df["PLR"])
         COP = np.array(df["COP"])
         
-        X = np.column_stack([np.ones(len(HC)), SET, LET, LET * SET])
+        X = np.column_stack([np.ones(len(SET)), SET, LET, LET * SET])
 
         return PLR, COP, X
     
