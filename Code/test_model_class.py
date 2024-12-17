@@ -30,10 +30,15 @@ res = pd.DataFrame(index=pd.MultiIndex.from_product([
     models,plr_models,dfs_levels,kpis
     ],names=("model","plr_model","operation","kpi")), columns = devices)
 
+res_real_data = pd.DataFrame(index=pd.MultiIndex.from_product([
+    models,plr_models,["TOT"],kpis
+    ],names=("model","plf_model","operation","kpi")), columns = devices)
+
 
 for dev in devices:
     "Import Data" 
     df = pd.read_excel(os.path.join('..', 'Data', dev + '.xlsx'), sheet_name="SetData")
+    df_dati_reali = pd.read_excel(os.path.join('..', 'Data', dev + '.xlsx'), sheet_name="TestData")
     curve=pd.read_excel(os.path.join('..', 'Data', dev + '.xlsx'), sheet_name="curve")
     
     for model_tag, model in [
@@ -64,6 +69,13 @@ for dev in devices:
                 res.loc[model_tag,m,op,"MAE"][dev] = results[op]["MAE_"+op]
                 res.loc[model_tag,m,op,"RMSE"][dev] = results[op]["RMSE_"+op]
                 res.loc[model_tag,m,op,"R2"][dev] = results[op]["r2_"+op]
+                
+            results_real_data = mod.test_with_data(df_dati_reali)
+            for op in ["TOT"]:
+                res_real_data.loc[model_tag,m,op,"MAE"][dev] = results_real_data[op]["MAE_"+op]
+                res_real_data.loc[model_tag,m,op,"RMSE"][dev] = results_real_data[op]["RMSE_"+op]
+                res_real_data.loc[model_tag,m,op,"R2"][dev] = results_real_data[op]["r2_"+op]
+            
 
 # b = res.loc[:,:,"TOT","RMSE"]
 # a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]
