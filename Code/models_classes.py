@@ -265,6 +265,19 @@ class model_hp():
         
         return KPI
     
+    def test_with_data(self, df_dati_reali):
+              
+        COP_pred = self.calc_with_data(self.df_dati_reali)
+        
+        KPI = {}
+        KPI["TOT"] = {}
+        
+        KPI["TOT"]["MAE_TOT"] = mean_absolute_error(self.df_dati_reali["COP"], COP_pred)
+        KPI["TOT"]["RMSE_TOT"] = root_mean_squared_error(self.df_dati_reali["COP"], COP_pred)
+        KPI["TOT"]["r2_TOT"] = r2_score(self.df_dati_reali["COP"], COP_pred)
+        
+        return KPI
+    
 
 class model_h01(model_hp):
     def get_inputs_function(self, df):
