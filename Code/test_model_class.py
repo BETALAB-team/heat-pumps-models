@@ -26,7 +26,7 @@ kpis = ["RMSE","MAE","R2"]
 
 res = pd.DataFrame(index=pd.MultiIndex.from_product([
     models,plr_models,dfs_levels,kpis
-    ],names=("model","plf_model","operation","kpi")), columns = devices)
+    ],names=("model","plr_model","operation","kpi")), columns = devices)
 
 res_real_data = pd.DataFrame(index=pd.MultiIndex.from_product([
     models,plr_models,["TOT"],kpis
@@ -75,16 +75,16 @@ for dev in devices:
                 res_real_data.loc[model_tag,m,op,"R2"][dev] = results_real_data[op]["r2_"+op]
             
 
-b = res.loc[:,:,"TOT","RMSE"]
-a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]
+# b = res.loc[:,:,"TOT","RMSE"]
+# a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]
 
 
 #%%
-
-
+# Reverting multi-index by removing level 0 and level 2
+ref_si_level = res.reset_index(level=["model","plr_model","operation","kpi"])
+direct_linear = ref_si_level[ref_si_level["plr_model"] == "direct_linear"]
 # fig1, axs1 = plt.subplots(3, figsize = (19,9.5))
 # fig1.suptitle("Models Performance")
-
 
 # sns.set_theme(rc={'figure.figsize':(19,9.5)})
 # fig1.tight_layout()

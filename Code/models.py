@@ -1202,7 +1202,7 @@ def model_h09n(df, curve, source, indirect_model = "ISO 13612-2 mod A"):
 
 #%% H10N-----------------------------------------------------------------------
 
-def model_h10n(df, curve, source, design_point_T = (-7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h10n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1310,7 +1310,7 @@ def model_h10n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
 
 #%% H11N-----------------------------------------------------------------------
 
-def model_h11n(df, curve, source, design_point_T = (-7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h11n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1409,7 +1409,7 @@ def model_h11n(df, curve, source, design_point_T = (-7,35), indirect_model = "IS
 
 #%% H12N-----------------------------------------------------------------------
 
-def model_h12n(df, curve, source, design_point_T = (-7,35), indirect_model = "ISO 13612-2 mod A"):
+def model_h12n(df, curve, source, design_point_T = (7,35), indirect_model = "ISO 13612-2 mod A"):
     
     if indirect_model not in ["ISO 13612-2 mod A", "ISO 13612-2 mod B", "C method"]:
         raise TypeError("indirect model must be chosen from the following list: \"ISO 13612-2 mod A\", \"ISO 13612-2 mod B\", \"C method\"")
@@ -1696,16 +1696,16 @@ def load_models2(df, curve, source):
      
     #%% H02D01-----------------------------------------------------------------
     
-    # Model['H02D01'] = model_h02d01(df)
+    Model['H02D01'] = model_h02d01(df)
     
     #%% H02D02-----------------------------------------------------------------
     
-    # Model['H02D02'] = model_h02d02(df)
+    Model['H02D02'] = model_h02d02(df)
     
     #%% H02N-------------------------------------------------------------------
     
     Model['H02N - mod A'] = model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod A" )
-    # #Model['H02N - mod B'] = model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H02N - mod B'] = model_h02n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
     Model['H02N - mod C'] = model_h02n(df, curve, source, indirect_model = "C method")
      
     #%% H03D01-----------------------------------------------------------------
@@ -1724,30 +1724,30 @@ def load_models2(df, curve, source):
     
     #%% H04D01-----------------------------------------------------------------
     
-    # Model['H04D01'] = model_h04d01(df)
+    Model['H04D01'] = model_h04d01(df)
     
     #%% H04D02-----------------------------------------------------------------
     
-    # Model['H04D02'] = model_h04d02(df)
+    Model['H04D02'] = model_h04d02(df)
     
     #%% H04N-------------------------------------------------------------------
     
     Model['H04N - mod A'] = model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    # #Model['H04N - mod B'] = model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    Model['H04N - mod B'] = model_h04n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
     Model['H04N - mod C'] = model_h04n(df, curve, source, indirect_model = "C method")
     
     #%% H05D01-----------------------------------------------------------------
     
-    # Model['H05D01'] = model_h05d01(df)
+    Model['H05D01'] = model_h05d01(df)
     
     #%% H05D02-----------------------------------------------------------------
     
-    # Model['H05D02'] = model_h05d02(df)
+    Model['H05D02'] = model_h05d02(df)
     
     #%% H05N-------------------------------------------------------------------
     
     Model['H05N - mod A'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod A")
-    # #Model['H05N - mod B'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
+    #Model['H05N - mod B'] = model_h05n(df, curve, source, indirect_model = "ISO 13612-2 mod B")  
     Model['H05N - mod C'] = model_h05n(df, curve, source, indirect_model = "C method")
     
     #%% H06D01-----------------------------------------------------------------
