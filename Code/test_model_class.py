@@ -2,18 +2,133 @@ import pandas as pd
 import os
 from Code.models_classes import *
 import numpy as np
-# import seaborn as sns
-#import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-#%%----------------------------------------------------------------------------
+#%% Definition of class for plots
+
+class plot():
+    
+    def __init__(self, device, plot_data,res_real_data, df_real_data):
+        
+        self.device = device
+        self.plot_data = plot_data
+        self.res_real_data = res_real_data
+        self.df_real_data = df_real_data
+        
+    def boxplot(self):
+        
+        #Create folder
+        if not os.path.exists(os.path.join('..',"Results",self.device)):
+            os.mkdir(os.path.join('..',"Results",self.device))
+        else:
+            pass
+    
+        #Set plot
+        figure1, axs1 = plt.subplots(3,figsize = (19,9.5))
+        figure1.suptitle('$KPI_{TOT}$',fontsize = 15)
+        
+        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        plt.tight_layout()
+        
+        
+        #Split the models among data available 
+        self.ref_si_level = self. plot_data.reset_index(level=["model","plr_model","operation","kpi"])
+        self.direct_linear = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "direct_linear", ["model","plr_model","operation","kpi", self.device ]]
+        self.direct_quadratic = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "direct_quadratic", ["model","plr_model","operation","kpi", self.device ]]
+        self.Mod_A = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "ISO 13612-2 mod A", ["model","plr_model","operation","kpi", self.device ]]
+        self.Mod_B = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "ISO 13612-2 mod B", ["model","plr_model","operation","kpi",self.device ]]
+        self.Mod_C = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "C method", ["model","plr_model","operation","kpi",self.device ]]
+
+
+        axs1[0].boxplot([self.direct_linear.loc[(self.direct_linear["kpi"] == "MAE"), self.device],
+             self.direct_quadratic.loc[(self.direct_quadratic["kpi"] == "MAE" ) , self.device ],
+             self.Mod_A.loc[(self.Mod_A["kpi"] == "MAE"), self.device ], 
+             self.Mod_B.loc[(self.Mod_B["kpi"] == "MAE" ), self.device ], 
+             self.Mod_C.loc[(self.Mod_C["kpi"] == "MAE" ), self.device ]],showfliers = False)
+        
+        axs1[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ])
+        axs1[0].set_title('$MAE_{TOT}$')   
+        
+        axs1[1].boxplot([self.direct_linear.loc[(self.direct_linear["kpi"] == "RMSE" ), self.device ],
+             self.direct_quadratic.loc[(self.direct_quadratic["kpi"] == "RMSE" ) , self.device ],
+             self.Mod_A.loc[(self.Mod_A["kpi"] == "RMSE"), self.device ], 
+             self.Mod_B.loc[(self.Mod_B["kpi"] == "RMSE" ), self.device ], 
+             self.Mod_C.loc[(self.Mod_C["kpi"] == "RMSE" ), self.device ]],showfliers = False)
+        
+        axs1[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method"])
+        axs1[1].set_title('$RMSE_{TOT}$')   
+        
+        axs1[2].boxplot([self.direct_linear.loc[(self.direct_linear["kpi"] == "R2" ), self.device ],
+             self.direct_quadratic.loc[(self.direct_quadratic["kpi"] == "R2" ) , self.device ],
+             self.Mod_A.loc[(self.Mod_A["kpi"] == "R2"), self.device ], 
+             self.Mod_B.loc[(self.Mod_B["kpi"] == "R2"), self.device ], 
+             self.Mod_C.loc[(self.Mod_C["kpi"] == "R2" ), self.device ]],showfliers = False)
+        
+        axs1[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ])
+        axs1[2].set_title('$R2_{TOT}$')   
+        
+        figure1.savefig(os.path.join('..',"Results",self.device, f"{self.device}_KPI_TOT.png")) #To modify to svg when defined
+        plt.close()
+       
+    def cop_pred_plot(self):
+        
+        if not os.path.exists(os.path.join('..',"Results",self.device)):
+            os.mkdir(os.path.join('..',"Results",self.device))
+        else:
+            pass
+    
+        #Set plot
+        figure1, axs1 = plt.subplots(3,figsize = (19,9.5))
+        figure1.suptitle('$KPI_{TOT}$',fontsize = 15)
+        
+        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        plt.tight_layout()
+        
+        
+        # self.ref_si_level = self. res_real_data.reset_index(level=["model","plr_model","operation","kpi"])
+        
+        for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
+            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ]:
+                
+                if model_tag in ["10","11","12"] and plr_model in ["direct_linear","direct_quadratic",]:
+                    continue
+                
+                try:
+                    self.COP_real = np.array(self.df_real_data["COP"])
+                    self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
+                    
+                    plt.plot(self.COP_real,self.COP_pred,"o", color = "orange", markeredgecolor = "black", label = "COP_pred")
+                    plt.plot([0, 10], [0, 10], "k--", label = "Bisector")
+                    plt.plot([0, 10], [0, 12], "k--", label = "Error +20%")
+                
+                    plt.text( 6, 4.5, "-20%")
+                    plt.plot([0, 10], [0, 8], "k--", label = "Error -20%")
+                    plt.text( 6, 7.7, "+20%")
+        
+                    plt.xlabel("COP")
+                    plt.xlim(0,10)
+                    plt.ylim(0,10)
+                    plt.ylabel('$COP_{pred}$')
+                    plt.legend()
+                
+                    plt.title(f"{model_tag}_{plr_model}")
+                    plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
+                    plt.close()
+                
+                except ValueError:
+                    pass
+    
+
+#%% Test models
 
 devices = [
-      "Galletti MLI 18 kW",
+      # "Galletti MLI 18 kW",
     # "Galletti MLI 22 kW",
     # "Galletti MLI 26 kW",
     # "Galletti MLI 30 kW",
-    # "WPL_A_HK 07 Premium",
-     # "Eneren NAW 006"
+     "WPL_A_HK 07 Premium",
+      # "Eneren NAW 006"
     ]
 
 models = ["0" + str(i) for i in range(1,10)] + ["10","11","12"]
@@ -23,22 +138,23 @@ plr_models = ["direct_linear",
               "ISO 13612-2 mod B",
               "C method"
               ]
+
 dfs_levels = ["TOT","PL","FL"]
 kpis = ["RMSE","MAE","R2"]
 
 res = pd.DataFrame(index=pd.MultiIndex.from_product([
     models,plr_models,dfs_levels,kpis
-    ],names=("model","plr_model","operation","kpi")), columns = devices)
+    ],names=("model","plr_model","operation","kpi")), columns = devices, dtype = float)
 
 res_real_data = pd.DataFrame(index=pd.MultiIndex.from_product([
-    models,plr_models,["TOT"],kpis
-    ],names=("model","plf_model","operation","kpi")), columns = devices)
+    models,plr_models,["TOT"],kpis + ["COP"]
+    ],names=("model","plr_model","operation","kpi")), columns = devices)
 
 
 for dev in devices:
     "Import Data" 
     df = pd.read_excel(os.path.join('..', 'Data', dev + '.xlsx'), sheet_name="SetData")
-    df_dati_reali = pd.read_excel(os.path.join('..', 'Data', dev + '.xlsx'), sheet_name="TestData")
+    df_real_data = pd.read_excel(os.path.join('..', 'Data', dev + '.xlsx'), sheet_name="Test")
     curve=pd.read_excel(os.path.join('..', 'Data', dev + '.xlsx'), sheet_name="curve")
     
     for model_tag, model in [
@@ -65,62 +181,35 @@ for dev in devices:
             mod.train_model(df)
                         
             results = mod.test_with_catalogue()
+            results_real_data = mod.test_with_data(df_real_data)
+            COP = mod.calc_with_data(df_real_data)
+            
             for op in dfs_levels:
                 res.loc[model_tag,m,op,"MAE"][dev] = results[op]["MAE_"+op]
                 res.loc[model_tag,m,op,"RMSE"][dev] = results[op]["RMSE_"+op]
                 res.loc[model_tag,m,op,"R2"][dev] = results[op]["r2_"+op]
                 
-            results_real_data = mod.test_with_data(df_dati_reali)
+            
             for op in ["TOT"]:
                 res_real_data.loc[model_tag,m,op,"MAE"][dev] = results_real_data[op]["MAE_"+op]
                 res_real_data.loc[model_tag,m,op,"RMSE"][dev] = results_real_data[op]["RMSE_"+op]
                 res_real_data.loc[model_tag,m,op,"R2"][dev] = results_real_data[op]["r2_"+op]
-            
+                res_real_data.loc[model_tag,m,op,"COP"][dev] = COP
+        
+        # boxplot(dev,res_real_data)
 
+for dev in devices:
+    plot_data = res_real_data.drop("COP", level = "kpi")
+    plot_data = plot_data.astype(float)
+    plot_data.dropna(inplace = True)
+    
+    dev = plot(dev, plot_data, res_real_data, df_real_data)    
+    dev.boxplot()
+    dev.cop_pred_plot()
+        
 # b = res.loc[:,:,"TOT","RMSE"]
 # a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]
 
-
-#%%
-# import matplotlib.pyplot as plt
-# def boxplot(devices):
-    
-#     for dev
-    
-# #Split the models among data available 
-# ref_si_level = res.reset_index(level=["model","plr_model","operation","kpi"])
-# direct_linear = ref_si_level.loc[ref_si_level["plr_model"] == "direct_linear", ["model","plr_model","operation","kpi","Galletti MLI 18 kW" ]]
-# direct_quadratic = ref_si_level.loc[ref_si_level["plr_model"] == "direct_quadratic", ["model","plr_model","operation","kpi","Galletti MLI 18 kW" ]]
-# Mod_A = ref_si_level.loc[ref_si_level["plr_model"] == "ISO 13612-2 mod A", ["model","plr_model","operation","kpi","Galletti MLI 18 kW" ]]
-# Mod_B = ref_si_level.loc[ref_si_level["plr_model"] == "ISO 13612-2 mod B", ["model","plr_model","operation","kpi","Galletti MLI 18 kW" ]]
-# Mod_C = ref_si_level.loc[ref_si_level["plr_model"] == "C method", ["model","plr_model","operation","kpi","Galletti MLI 18 kW" ]]
-
-# figure1, axs1 = plt.subplots(3,figsize = (19,9.5))
-# figure1.suptitle('$KPI_{TOT}$',fontsize = 15)
-
-# axs1[0].boxplot([direct_linear[(direct_linear["kpi"] == "R2" ) & (direct_linear["operation"] == "TOT"), ["Galletti MLI 18 kW"]],
-#                 direct_quadrqatic[(direct_quadratic["kpi"] == "R2" ) & (direct_quadratic["operation"] == "TOT"), ["Galletti MLI 18 kW"]],
-#                 Mod_A[(Mod_A["kpi"] == "R2" ) & (Mod_A["operation"] == "TOT"), ["Galletti MLI 18 kW"]], 
-#                 Mod_B[(Mod_A["kpi"] == "R2" ) & (Mod_B["operation"] == "TOT"), ["Galletti MLI 18 kW"]],
-#                 Mod_C[(Mod_A["kpi"] == "R2" ) & (Mod_C["operation"] == "TOT"), ["Galletti MLI 18 kW"]]],showfliers = False)
-# axs1[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B", ])
-# axs1[0].set_title('$R2_{TOT}$')   
-# #axs1[0].set_ylim(0.5,1) 
-
-# axs1[1].boxplot([MAE_LD_TOT, MAE_LI_TOT, MAE_ED_TOT, MAE_EI_TOT],showfliers = False)
-# axs1[1].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
-# axs1[1].set_title('$MAE_{TOT}$')
-# #axs1[1].set_ylim(0,0.5)
-
-# axs1[2].boxplot([RMSE_LD_TOT, RMSE_LI_TOT, RMSE_ED_TOT, RMSE_EI_TOT], showfliers = False)
-# axs1[2].set_xticks([1,2,3,4],["Linear Direct","Linear Indirect","Exponential Direct","Exponential Indirect"])
-# axs1[2].set_title('$RMSE_{TOT}$')
-# #axs1[2].set_ylim(0.2,0.8) 
-
-# sns.set_theme(rc={'figure.figsize':(19,9.5)})
-# plt.tight_layout()
-# figure1.savefig(os.path.join('..',"Results",f"{Name}", f"{Name}_KPI_TOT.png")) #To modify to svg when defined
-# plt.close()
 
 
 

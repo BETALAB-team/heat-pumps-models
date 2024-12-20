@@ -2,7 +2,7 @@ import copy
 
 import numpy as np
 from sklearn import linear_model
-from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score,mean_absolute_percentage_error
 from scipy.optimize import minimize
 
 class model_hp():
@@ -249,16 +249,16 @@ class model_hp():
         
         return KPI
     
-    def test_with_data(self, df_dati_reali):
-              
-        COP_pred = self.calc_with_data(self.df_dati_reali)
+    def test_with_data(self, df_real_data):
+        
+        COP_pred = self.calc_with_data(df_real_data)
         
         KPI = {}
         KPI["TOT"] = {}
         
-        KPI["TOT"]["MAE_TOT"] = mean_absolute_error(self.df_dati_reali["COP"], COP_pred)
-        KPI["TOT"]["RMSE_TOT"] = root_mean_squared_error(self.df_dati_reali["COP"], COP_pred)
-        KPI["TOT"]["r2_TOT"] = r2_score(self.df_dati_reali["COP"], COP_pred)
+        KPI["TOT"]["MAE_TOT"] = mean_absolute_error(df_real_data["COP"], COP_pred)
+        KPI["TOT"]["RMSE_TOT"] = root_mean_squared_error(df_real_data["COP"], COP_pred)
+        KPI["TOT"]["r2_TOT"] = r2_score(df_real_data["COP"], COP_pred)
         
         return KPI
     
