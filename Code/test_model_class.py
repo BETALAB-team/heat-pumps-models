@@ -41,11 +41,11 @@ class plot():
         self.Mod_C = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "C method", ["model","plr_model","operation","kpi",self.device ]]
 
 
-        axs1[0].boxplot([self.direct_linear.loc[(self.direct_linear["kpi"] == "MAE"), self.device],
-             self.direct_quadratic.loc[(self.direct_quadratic["kpi"] == "MAE" ) , self.device ],
-             self.Mod_A.loc[(self.Mod_A["kpi"] == "MAE"), self.device ], 
-             self.Mod_B.loc[(self.Mod_B["kpi"] == "MAE" ), self.device ], 
-             self.Mod_C.loc[(self.Mod_C["kpi"] == "MAE" ), self.device ]],showfliers = False)
+        axs1[0].boxplot([self.direct_linear.loc[(self.direct_linear["kpi"] == "MAPE"), self.device],
+             self.direct_quadratic.loc[(self.direct_quadratic["kpi"] == "MAPE" ) , self.device ],
+             self.Mod_A.loc[(self.Mod_A["kpi"] == "MAPE"), self.device ], 
+             self.Mod_B.loc[(self.Mod_B["kpi"] == "MAPE" ), self.device ], 
+             self.Mod_C.loc[(self.Mod_C["kpi"] == "MAPE" ), self.device ]],showfliers = False)
         
         axs1[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ])
         axs1[0].set_title('$MAE_{TOT}$')   
@@ -71,6 +71,22 @@ class plot():
         figure1.savefig(os.path.join('..',"Results",self.device, f"{self.device}_KPI_TOT.png")) #To modify to svg when defined
         plt.close()
        
+        
+        # #Set plot
+        # figure2, axs2 = plt.subplots(2,figsize = (19,9.5))
+        # figure2.suptitle('Direct Linear Plot',fontsize = 15)
+        
+        # sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        # plt.tight_layout()
+        
+        # axs2[0].stem( self.direct_linear.loc[(self.direct_linear["kpi"] == "MAPE"), self.device])
+        # axs2[0].set_title('MAPE')  
+        
+        # axs2[1].stem( self.direct_linear.loc[(self.direct_linear["kpi"] == "RMSE"), self.device])
+        # axs2[1].set_title('RMSE') 
+        # figure2.savefig(os.path.join('..',"Results",self.device, f"{self.device}_direct_linear_TOT.png")) #To modify to svg when defined
+        # plt.close()
+        
     def cop_pred_plot(self):
         
         if not os.path.exists(os.path.join('..',"Results",self.device)):
@@ -79,9 +95,7 @@ class plot():
             pass
     
         #Set plot
-        figure1, axs1 = plt.subplots(3,figsize = (19,9.5))
-        figure1.suptitle('$KPI_{TOT}$',fontsize = 15)
-        
+        figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
         sns.set_theme(rc={'figure.figsize':(19,9.5)})
         plt.tight_layout()
         
@@ -98,28 +112,111 @@ class plot():
                     self.COP_real = np.array(self.df_real_data["COP"])
                     self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
                     
-                    plt.plot(self.COP_real,self.COP_pred,"o", color = "orange", markeredgecolor = "black", label = "COP_pred")
-                    plt.plot([0, 10], [0, 10], "k--", label = "Bisector")
-                    plt.plot([0, 10], [0, 12], "k--", label = "Error +20%")
+                    try:
+                        plt.plot(self.COP_real,self.COP_pred,"o", color = "orange", markeredgecolor = "black", label = "COP_pred")
+                        plt.plot([0, 10], [0, 10], "k--", label = "Bisector")
+                        plt.plot([0, 10], [0, 12], "k--", label = "Error +20%")
+                    
+                        plt.text( 6, 4.5, "-20%")
+                        plt.plot([0, 10], [0, 8], "k--", label = "Error -20%")
+                        plt.text( 6, 7.7, "+20%")
+            
+                        plt.xlabel("COP")
+                        plt.xlim(0,10)
+                        plt.ylim(0,10)
+                        plt.ylabel('$COP_{pred}$')
+                        plt.legend()
+                    
+                        plt.title(f"H {model_tag} {plr_model}")
+                        plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_COP_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
+                        plt.close()
+                        
+                    except ValueError:
+                            pass
                 
-                    plt.text( 6, 4.5, "-20%")
-                    plt.plot([0, 10], [0, 8], "k--", label = "Error -20%")
-                    plt.text( 6, 7.7, "+20%")
-        
-                    plt.xlabel("COP")
-                    plt.xlim(0,10)
-                    plt.ylim(0,10)
-                    plt.ylabel('$COP_{pred}$')
-                    plt.legend()
-                
-                    plt.title(f"{model_tag}_{plr_model}")
-                    plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
-                    plt.close()
-                
-                except ValueError:
+                except ValueError and KeyError:
                     pass
     
+    def Err_plr_plot(self):
+        
+        if not os.path.exists(os.path.join('..',"Results",self.device)):
+            os.mkdir(os.path.join('..',"Results",self.device))
+        else:
+            pass
+    
+        #Set plot
+        figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
+        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        plt.tight_layout()
+        
+        for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
+            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ]:
+                
+                if model_tag in ["10","11","12"] and plr_model in ["direct_linear","direct_quadratic",]:
+                    continue
+                
+                try:
+                    self.COP_real = np.array(self.df_real_data["COP"])
+                    self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
+                    
+                    self.Err =  abs(self.COP_real-self.COP_pred)
+                    self.plr = self.df_real_data["PLR"]
+                    
 
+                    # if np.isnan(self.Err) is False:    
+                    plt.plot(self.plr,self.Err,"o", color = "blue", markeredgecolor = "black", label = "Error")
+                    plt.xlabel("PLR")
+                    plt.xlim(0.2,1.1)
+                    plt.ylabel('$Err_{cop}$')
+                    plt.legend()
+                
+                    plt.title(f"H {model_tag} {plr_model}")
+                    plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_ERR_vs_PLR_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
+                    plt.close()
+                    
+                except ValueError and KeyError:
+                    pass
+                    
+        
+    def Err_SET_plot(self):
+        
+        if not os.path.exists(os.path.join('..',"Results",self.device)):
+            os.mkdir(os.path.join('..',"Results",self.device))
+        else:
+            pass
+    
+        #Set plot
+        figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
+        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        plt.tight_layout()
+        
+        for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
+            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ]:
+                
+                if model_tag in ["10","11","12"] and plr_model in ["direct_linear","direct_quadratic",]:
+                    continue
+                
+                try:
+                    self.COP_real = np.array(self.df_real_data["COP"])
+                    self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
+                    
+                    self.Err =  abs(self.COP_real-self.COP_pred)
+                    self.SET= self.df_real_data["SET [°C]"]
+                    
+                    # if np.isnan(self.Err) is False: 
+                    plt.plot(self.SET,self.Err,"o", color = "green", markeredgecolor = "black", label = "Error")
+                    
+                    plt.xlabel("SET")
+                    plt.ylabel('$Err_{cop}$')
+                    plt.legend()
+                
+                    plt.title(f"H {model_tag} {plr_model}")
+                    plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_ERR_vs_SET_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
+                    plt.close()
+                    
+                except ValueError and KeyError:
+                    pass
+                    
 #%% Test models
 
 devices = [
@@ -130,17 +227,17 @@ devices = [
      "WPL_A_HK 07 Premium",
       # "Eneren NAW 006"
     ]
-
+ 
 models = ["0" + str(i) for i in range(1,10)] + ["10","11","12"]
-plr_models = ["direct_linear",
-              "direct_quadratic",
+plr_models = [#"direct_linear",
+              #"direct_quadratic",
               "ISO 13612-2 mod A",
               "ISO 13612-2 mod B",
-              "C method"
+              # "C method"
               ]
 
 dfs_levels = ["TOT","PL","FL"]
-kpis = ["RMSE","MAE","R2"]
+kpis = ["RMSE","MAPE","R2"]
 
 res = pd.DataFrame(index=pd.MultiIndex.from_product([
     models,plr_models,dfs_levels,kpis
@@ -167,9 +264,9 @@ for dev in devices:
             ["07",model_h07],
             ["08",model_h08],
             ["09",model_h09],
-            ["10",model_h10],
-            ["11",model_h11],
-            ["12",model_h12],
+            #["10",model_h10],
+            #["11",model_h11],
+            #["12",model_h12],
             ]:
         for m in plr_models:
             
@@ -185,13 +282,13 @@ for dev in devices:
             COP = mod.calc_with_data(df_real_data)
             
             for op in dfs_levels:
-                res.loc[model_tag,m,op,"MAE"][dev] = results[op]["MAE_"+op]
+                res.loc[model_tag,m,op,"MAPE"][dev] = results[op]["MAPE_"+op]
                 res.loc[model_tag,m,op,"RMSE"][dev] = results[op]["RMSE_"+op]
                 res.loc[model_tag,m,op,"R2"][dev] = results[op]["r2_"+op]
                 
             
             for op in ["TOT"]:
-                res_real_data.loc[model_tag,m,op,"MAE"][dev] = results_real_data[op]["MAE_"+op]
+                res_real_data.loc[model_tag,m,op,"MAPE"][dev] = results_real_data[op]["MAPE_"+op]
                 res_real_data.loc[model_tag,m,op,"RMSE"][dev] = results_real_data[op]["RMSE_"+op]
                 res_real_data.loc[model_tag,m,op,"R2"][dev] = results_real_data[op]["r2_"+op]
                 res_real_data.loc[model_tag,m,op,"COP"][dev] = COP
@@ -206,6 +303,8 @@ for dev in devices:
     dev = plot(dev, plot_data, res_real_data, df_real_data)    
     dev.boxplot()
     dev.cop_pred_plot()
+    dev.Err_plr_plot()
+    dev.Err_SET_plot()
         
 # b = res.loc[:,:,"TOT","RMSE"]
 # a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]

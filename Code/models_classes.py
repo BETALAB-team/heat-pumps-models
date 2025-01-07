@@ -235,15 +235,15 @@ class model_hp():
         KPI["PL"] = {}
         KPI["FL"] = {}
         
-        KPI["FL"]["MAE_FL"]  = mean_absolute_error(self.df_FL["COP"], COP_pred_FL)
+        KPI["FL"]["MAPE_FL"]  = mean_absolute_percentage_error(self.df_FL["COP"], COP_pred_FL)
         KPI["FL"]["RMSE_FL"]  = root_mean_squared_error(self.df_FL["COP"], COP_pred_FL)
         KPI["FL"]["r2_FL"] = r2_score(self.df_FL["COP"], COP_pred_FL)
         
-        KPI["PL"]["MAE_PL"]= mean_absolute_error(self.df_PL["COP"], COP_pred_PL)
+        KPI["PL"]["MAPE_PL"]= mean_absolute_percentage_error(self.df_PL["COP"], COP_pred_PL)
         KPI["PL"]["RMSE_PL"] = root_mean_squared_error(self.df_PL["COP"], COP_pred_PL)
         KPI["PL"]["r2_PL"] = r2_score(self.df_PL["COP"], COP_pred_PL)
         
-        KPI["TOT"]["MAE_TOT"] = mean_absolute_error(self.df["COP"], COP_pred_TOT)
+        KPI["TOT"]["MAPE_TOT"] = mean_absolute_percentage_error(self.df["COP"], COP_pred_TOT)
         KPI["TOT"]["RMSE_TOT"] = root_mean_squared_error(self.df["COP"], COP_pred_TOT)
         KPI["TOT"]["r2_TOT"] = r2_score(self.df["COP"], COP_pred_TOT)
         
@@ -256,7 +256,7 @@ class model_hp():
         KPI = {}
         KPI["TOT"] = {}
         
-        KPI["TOT"]["MAE_TOT"] = mean_absolute_error(df_real_data["COP"], COP_pred)
+        KPI["TOT"]["MAPE_TOT"] = mean_absolute_percentage_error(df_real_data["COP"], COP_pred)
         KPI["TOT"]["RMSE_TOT"] = root_mean_squared_error(df_real_data["COP"], COP_pred)
         KPI["TOT"]["r2_TOT"] = r2_score(df_real_data["COP"], COP_pred)
         
