@@ -262,6 +262,14 @@ class model_hp():
         
         return KPI
     
+    def calc_SCOP(self,df_real_data):
+        
+        COP_pred = self.calc_with_data(df_real_data)
+        SCOP = np.sum(np.multiply(COP_pred, df_real_data["Pow [kW]"]))/np.sum(df_real_data["Pow [kW]"])
+        
+        return SCOP
+
+    
 
 class model_h01(model_hp):
     def get_inputs_function(self, df):

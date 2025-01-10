@@ -159,20 +159,20 @@ class plot():
                     self.COP_real = np.array(self.df_real_data["COP"])
                     self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
                     
-                    self.Err =  abs(self.COP_real-self.COP_pred)
+                    self.Err =  self.COP_pred-self.COP_real
                     self.plr = self.df_real_data["PLR"]
                     
 
-                    # if np.isnan(self.Err) is False:    
-                    plt.plot(self.plr,self.Err,"o", color = "blue", markeredgecolor = "black", label = "Error")
-                    plt.xlabel("PLR")
-                    plt.xlim(0.2,1.1)
-                    plt.ylabel('$Err_{cop}$')
-                    plt.legend()
-                
-                    plt.title(f"H {model_tag} {plr_model}")
-                    plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_ERR_vs_PLR_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
-                    plt.close()
+                    if not np.isnan(self.Err).all():    
+                        plt.plot(self.plr,self.Err,"o", color = "blue", markeredgecolor = "black", label = "Error")
+                        plt.xlabel("PLR")
+                        plt.xlim(0.2,1.1)
+                        # plt.ylim(-4,1)
+                        plt.ylabel('$Err_{cop}$')
+                        plt.legend()
+                        plt.title(f"H {model_tag} {plr_model}")
+                        plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_ERR_vs_PLR_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
+                        plt.close()
                     
                 except ValueError and KeyError:
                     pass
@@ -200,19 +200,19 @@ class plot():
                     self.COP_real = np.array(self.df_real_data["COP"])
                     self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
                     
-                    self.Err =  abs(self.COP_real-self.COP_pred)
+                    self.Err =  self.COP_pred-self.COP_real
                     self.SET= self.df_real_data["SET [°C]"]
                     
-                    # if np.isnan(self.Err) is False: 
-                    plt.plot(self.SET,self.Err,"o", color = "green", markeredgecolor = "black", label = "Error")
+                    if not np.isnan(self.Err).all():   
+                        plt.plot(self.SET,self.Err,"o", color = "green", markeredgecolor = "black", label = "Error")
+                        # plt.ylim(-4,1)
+                        plt.xlabel("SET")
+                        plt.ylabel('$Err_{cop}$')
+                        plt.legend()
                     
-                    plt.xlabel("SET")
-                    plt.ylabel('$Err_{cop}$')
-                    plt.legend()
-                
-                    plt.title(f"H {model_tag} {plr_model}")
-                    plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_ERR_vs_SET_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
-                    plt.close()
+                        plt.title(f"H {model_tag} {plr_model}")
+                        plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_ERR_vs_SET_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
+                        plt.close()
                     
                 except ValueError and KeyError:
                     pass
@@ -221,19 +221,20 @@ class plot():
 
 devices = [
       # "Galletti MLI 18 kW",
-    # "Galletti MLI 22 kW",
-    # "Galletti MLI 26 kW",
-    # "Galletti MLI 30 kW",
-     "WPL_A_HK 07 Premium",
-      # "Eneren NAW 006"
+      # "Galletti MLI 22 kW",
+      # "Galletti MLI 26 kW",
+      # "Galletti MLI 30 kW",
+      # "WPL_A_HK 07 Premium",
+        "Eneren NAW 006"
     ]
  
 models = ["0" + str(i) for i in range(1,10)] + ["10","11","12"]
-plr_models = [#"direct_linear",
-              #"direct_quadratic",
-              "ISO 13612-2 mod A",
-              "ISO 13612-2 mod B",
-              # "C method"
+plr_models = [
+             "direct_linear",
+             "direct_quadratic",
+             "ISO 13612-2 mod A",
+             "ISO 13612-2 mod B",
+             "C method"
               ]
 
 dfs_levels = ["TOT","PL","FL"]
@@ -244,7 +245,7 @@ res = pd.DataFrame(index=pd.MultiIndex.from_product([
     ],names=("model","plr_model","operation","kpi")), columns = devices, dtype = float)
 
 res_real_data = pd.DataFrame(index=pd.MultiIndex.from_product([
-    models,plr_models,["TOT"],kpis + ["COP"]
+    models,plr_models,["TOT"],kpis + ["COP"] + ["SCOP"]
     ],names=("model","plr_model","operation","kpi")), columns = devices)
 
 
@@ -256,17 +257,17 @@ for dev in devices:
     
     for model_tag, model in [
             # ["01",model_h01],
-            ["02",model_h02],
+             ["02",model_h02],
             # ["03",model_h03],
-            ["04",model_h04],
-            ["05",model_h05],
-            ["06",model_h06],
-            ["07",model_h07],
-            ["08",model_h08],
-            ["09",model_h09],
-            #["10",model_h10],
-            #["11",model_h11],
-            #["12",model_h12],
+             ["04",model_h04],
+             ["05",model_h05],
+             ["06",model_h06],
+             ["07",model_h07],
+            # ["08",model_h08],
+            # ["09",model_h09],
+             ["10",model_h10],
+             ["11",model_h11],
+             ["12",model_h12],
             ]:
         for m in plr_models:
             
@@ -280,6 +281,7 @@ for dev in devices:
             results = mod.test_with_catalogue()
             results_real_data = mod.test_with_data(df_real_data)
             COP = mod.calc_with_data(df_real_data)
+            SCOP = mod.calc_SCOP(df_real_data)
             
             for op in dfs_levels:
                 res.loc[model_tag,m,op,"MAPE"][dev] = results[op]["MAPE_"+op]
@@ -292,19 +294,20 @@ for dev in devices:
                 res_real_data.loc[model_tag,m,op,"RMSE"][dev] = results_real_data[op]["RMSE_"+op]
                 res_real_data.loc[model_tag,m,op,"R2"][dev] = results_real_data[op]["r2_"+op]
                 res_real_data.loc[model_tag,m,op,"COP"][dev] = COP
+                res_real_data.loc[model_tag,m,op,"SCOP"][dev] = SCOP
         
         # boxplot(dev,res_real_data)
 
-for dev in devices:
-    plot_data = res_real_data.drop("COP", level = "kpi")
-    plot_data = plot_data.astype(float)
-    plot_data.dropna(inplace = True)
+# for dev in devices:
+#     plot_data = res_real_data.drop("COP", level = "kpi")
+#     plot_data = plot_data.astype(float)
+#     plot_data.dropna(inplace = True)
     
-    dev = plot(dev, plot_data, res_real_data, df_real_data)    
-    dev.boxplot()
-    dev.cop_pred_plot()
-    dev.Err_plr_plot()
-    dev.Err_SET_plot()
+#     dev = plot(dev, plot_data, res_real_data, df_real_data)    
+#     dev.boxplot()
+#     dev.cop_pred_plot()
+#     dev.Err_plr_plot()
+#     dev.Err_SET_plot()
         
 # b = res.loc[:,:,"TOT","RMSE"]
 # a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]
