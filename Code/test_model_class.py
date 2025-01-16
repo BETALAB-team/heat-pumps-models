@@ -72,21 +72,6 @@ class plot():
         plt.close()
        
         
-        # #Set plot
-        # figure2, axs2 = plt.subplots(2,figsize = (19,9.5))
-        # figure2.suptitle('Direct Linear Plot',fontsize = 15)
-        
-        # sns.set_theme(rc={'figure.figsize':(19,9.5)})
-        # plt.tight_layout()
-        
-        # axs2[0].stem( self.direct_linear.loc[(self.direct_linear["kpi"] == "MAPE"), self.device])
-        # axs2[0].set_title('MAPE')  
-        
-        # axs2[1].stem( self.direct_linear.loc[(self.direct_linear["kpi"] == "RMSE"), self.device])
-        # axs2[1].set_title('RMSE') 
-        # figure2.savefig(os.path.join('..',"Results",self.device, f"{self.device}_direct_linear_TOT.png")) #To modify to svg when defined
-        # plt.close()
-        
     def cop_pred_plot(self):
         
         if not os.path.exists(os.path.join('..',"Results",self.device)):
@@ -216,7 +201,46 @@ class plot():
                     
                 except ValueError and KeyError:
                     pass
+
+    def COP_time_plot(self):
+        
+        if not os.path.exists(os.path.join('..',"Results",self.device)):
+            os.mkdir(os.path.join('..',"Results",self.device))
+        else:
+            pass
+    
+        #Set plot
+        figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
+        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        plt.tight_layout()
+
+        for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
+            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ]:
+                
+                if model_tag in ["10","11","12"] and plr_model in ["direct_linear","direct_quadratic",]:
+                    continue
+                
+                try:
+                    self.COP_real = np.array(self.df_real_data["COP"])
+                    self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
+                    self.time = np.array(self.df_real_data["Time [min]"])
                     
+                    if not np.isnan(self.COP_pred).all():   
+                        plt.plot(self.time, self.COP_real, label = "COP actual")
+                        plt.plot(self.time, self.COP_pred, label = "COP pred")
+                        plt.xlabel("Time [min]")
+                        plt.xlim(0,2500)
+                        plt.ylabel("COP actual")
+                        plt.legend()
+                        
+                        plt.title('$COP_{act}$'+' vs  '+'$COP_{pred}$'+ ' '+ f"H {model_tag} {plr_model}")
+                        plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_COP_vs_Time_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
+                        plt.close()
+                
+                except ValueError:
+                    pass
+                    
+                        
 #%% Test models
 
 devices = [
@@ -225,16 +249,18 @@ devices = [
       # "Galletti MLI 26 kW",
       # "Galletti MLI 30 kW",
       # "WPL_A_HK 07 Premium",
-        "Eneren NAW 006"
-    ]
+      "Eneren NAW 006",
+      # "Eneren NAW 006  All Raw Data",
+      # "Eneren NAW 006  Filter on catalogue Data",     
+     ]
  
 models = ["0" + str(i) for i in range(1,10)] + ["10","11","12"]
 plr_models = [
-             "direct_linear",
-             "direct_quadratic",
-             "ISO 13612-2 mod A",
-             "ISO 13612-2 mod B",
-             "C method"
+              # "direct_linear",
+              # "direct_quadratic",
+              # "ISO 13612-2 mod A",
+              # "ISO 13612-2 mod B",
+              "C method"
               ]
 
 dfs_levels = ["TOT","PL","FL"]
@@ -259,16 +285,16 @@ for dev in devices:
             # ["01",model_h01],
              ["02",model_h02],
             # ["03",model_h03],
-             ["04",model_h04],
-             ["05",model_h05],
-             ["06",model_h06],
-             ["07",model_h07],
-            # ["08",model_h08],
-            # ["09",model_h09],
-             ["10",model_h10],
-             ["11",model_h11],
-             ["12",model_h12],
-            ]:
+             # ["04",model_h04],
+            #  ["05",model_h05],
+            #  ["06",model_h06],
+            #  ["07",model_h07],
+            # # ["08",model_h08],
+            # # ["09",model_h09],
+            #  ["10",model_h10],
+            #  ["11",model_h11],
+            #  ["12",model_h12],
+             ]:
         for m in plr_models:
             
             if model_tag in ["10","11","12"] and m in ["direct_linear","direct_quadratic",]:
@@ -296,18 +322,18 @@ for dev in devices:
                 res_real_data.loc[model_tag,m,op,"COP"][dev] = COP
                 res_real_data.loc[model_tag,m,op,"SCOP"][dev] = SCOP
         
-        # boxplot(dev,res_real_data)
 
-# for dev in devices:
-#     plot_data = res_real_data.drop("COP", level = "kpi")
-#     plot_data = plot_data.astype(float)
-#     plot_data.dropna(inplace = True)
+for dev in devices:
+    plot_data = res_real_data.drop("COP", level = "kpi")
+    plot_data = plot_data.astype(float)
+    plot_data.dropna(inplace = True)
     
-#     dev = plot(dev, plot_data, res_real_data, df_real_data)    
-#     dev.boxplot()
-#     dev.cop_pred_plot()
-#     dev.Err_plr_plot()
-#     dev.Err_SET_plot()
+    dev = plot(dev, plot_data, res_real_data, df_real_data)    
+    # dev.boxplot()
+    # dev.cop_pred_plot()
+    # dev.Err_plr_plot()
+    # dev.Err_SET_plot()
+    # # dev.COP_time_plot()
         
 # b = res.loc[:,:,"TOT","RMSE"]
 # a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]

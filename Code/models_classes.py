@@ -63,7 +63,7 @@ class model_hp():
             X_dir_qua = np.column_stack([self.X,self.PLR,self.PLR**2])   
             self.model_reg = linear_model.LinearRegression().fit(X_dir_qua, self.COP)
         else:
-            self.calculate_f_cop(f_COP_model_FL)
+            self.calculate_f_cop()
             
     def train_exp_model(self,df):
         
@@ -99,7 +99,7 @@ class model_hp():
             A = self.model_reg['x']
             COP_FL_pred = A[0]*np.exp(A[1]*self.X_PL[:,0] + A[2]*self.X_PL[:,1]) + A[3]*self.X_PL[:,0]/self.X_PL[:,1] + A[4]    
             f_COP_model_FL = self.COP_PL/COP_FL_pred
-            self.calculate_f_cop(f_COP_model_FL)
+            self.calculate_f_cop()
         
     def train_COP_model(self, df, Source_T = 7, Load_T = 35, COP = None):
         
@@ -131,9 +131,9 @@ class model_hp():
         
         f_COP_model_FL = COP_PL/COP_pred_PL
         
-        self.calculate_f_cop(f_COP_model_FL)
+        self.calculate_f_cop()
         
-    def calculate_f_cop(self, f_COP_model_FL):
+    def calculate_f_cop(self):
         if self.plr_method == "ISO 13612-2 mod A":
             
             "Method 1: f_cop by linear regression"
@@ -154,7 +154,7 @@ class model_hp():
         elif self.plr_method == "ISO 13612-2 mod B":
             if not hasattr(self, 'curve'):
                 PLR_curve = np.array([0,0.153846154,0.346153846,0.538461538,0.884615385,1])
-                f_COP_curve = np.array([0,1.666851614,1.422639094,1.415552314,1.031667539,1])        
+                f_COP_curve = np.array([0,1.763963705,1.46640949,1.361503767,1.051338345,1])        
             else:
                 "Method 2: f_cop derived by curves"
                 self.curve.sort_values("X", inplace = True)
@@ -168,9 +168,18 @@ class model_hp():
         elif self.plr_method == "C method":
             
             "Method 3: f_cop calculated"
-            a=1/self.PLR_PL-1
-            b=self.PLR_PL-1
-            c=1/f_COP_model_FL-1
+            if not hasattr(self, 'curve'):
+                PLR_curve = np.array([0,0.153846154,0.346153846,0.538461538,0.884615385,1])
+                f_COP_curve = np.array([0,1.763963705,1.46640949,1.361503767,1.051338345,1])     
+            else:
+                self.curve.sort_values("X", inplace = True)
+                PLR_curve = np.array(self.curve["X"])
+                f_COP_curve = np.array(self.curve["f_cop"])
+            PLR_curve = np.delete(PLR_curve,[0,5])
+            f_COP_curve = np.delete(f_COP_curve,[0,5])
+            a=1/PLR_curve-1
+            b=PLR_curve-1
+            c=1/f_COP_curve-1
             X3=np.column_stack([a,b])
             
             model_reg_3 = linear_model.LinearRegression(fit_intercept = False).fit(X3,c)

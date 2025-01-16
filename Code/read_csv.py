@@ -79,6 +79,7 @@ figure1.suptitle(' COP vs Text',fontsize = 15)
 axs1.scatter(filtered_df["outside_temperature_27"],filtered_df["COP"] )
 
 #%% Read excel 2
+
 import numpy as np
 import os
 import pandas as pd
