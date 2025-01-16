@@ -38,7 +38,7 @@ class plot():
         self.direct_quadratic = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "direct_quadratic", ["model","plr_model","operation","kpi", self.device ]]
         self.Mod_A = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "ISO 13612-2 mod A", ["model","plr_model","operation","kpi", self.device ]]
         self.Mod_B = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "ISO 13612-2 mod B", ["model","plr_model","operation","kpi",self.device ]]
-        self.Mod_C = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "C method", ["model","plr_model","operation","kpi",self.device ]]
+        self.Mod_C = self.ref_si_level.loc[self.ref_si_level["plr_model"] == "method C", ["model","plr_model","operation","kpi",self.device ]]
 
 
         axs1[0].boxplot([self.direct_linear.loc[(self.direct_linear["kpi"] == "MAPE"), self.device],
@@ -47,7 +47,7 @@ class plot():
              self.Mod_B.loc[(self.Mod_B["kpi"] == "MAPE" ), self.device ], 
              self.Mod_C.loc[(self.Mod_C["kpi"] == "MAPE" ), self.device ]],showfliers = False)
         
-        axs1[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ])
+        axs1[0].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","method C" ])
         axs1[0].set_title('$MAE_{TOT}$')   
         
         axs1[1].boxplot([self.direct_linear.loc[(self.direct_linear["kpi"] == "RMSE" ), self.device ],
@@ -56,7 +56,7 @@ class plot():
              self.Mod_B.loc[(self.Mod_B["kpi"] == "RMSE" ), self.device ], 
              self.Mod_C.loc[(self.Mod_C["kpi"] == "RMSE" ), self.device ]],showfliers = False)
         
-        axs1[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method"])
+        axs1[1].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","method C"])
         axs1[1].set_title('$RMSE_{TOT}$')   
         
         axs1[2].boxplot([self.direct_linear.loc[(self.direct_linear["kpi"] == "R2" ), self.device ],
@@ -65,7 +65,7 @@ class plot():
              self.Mod_B.loc[(self.Mod_B["kpi"] == "R2"), self.device ], 
              self.Mod_C.loc[(self.Mod_C["kpi"] == "R2" ), self.device ]],showfliers = False)
         
-        axs1[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ])
+        axs1[2].set_xticks([1,2,3,4,5],["Linear Direct","Linear Quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","method C" ])
         axs1[2].set_title('$R2_{TOT}$')   
         
         figure1.savefig(os.path.join('..',"Results",self.device, f"{self.device}_KPI_TOT.png")) #To modify to svg when defined
@@ -88,7 +88,7 @@ class plot():
         # self.ref_si_level = self. res_real_data.reset_index(level=["model","plr_model","operation","kpi"])
         
         for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
-            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ]:
+            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","method C" ]:
                 
                 if model_tag in ["10","11","12"] and plr_model in ["direct_linear","direct_quadratic",]:
                     continue
@@ -135,7 +135,7 @@ class plot():
         plt.tight_layout()
         
         for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
-            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ]:
+            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","method C" ]:
                 
                 if model_tag in ["10","11","12"] and plr_model in ["direct_linear","direct_quadratic",]:
                     continue
@@ -176,7 +176,7 @@ class plot():
         plt.tight_layout()
         
         for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
-            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ]:
+            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","method C" ]:
                 
                 if model_tag in ["10","11","12"] and plr_model in ["direct_linear","direct_quadratic",]:
                     continue
@@ -208,34 +208,48 @@ class plot():
             os.mkdir(os.path.join('..',"Results",self.device))
         else:
             pass
-    
-        #Set plot
-        figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
-        sns.set_theme(rc={'figure.figsize':(19,9.5)})
-        plt.tight_layout()
+
 
         for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
-            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","C method" ]:
+            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","method C" ]:
                 
                 if model_tag in ["10","11","12"] and plr_model in ["direct_linear","direct_quadratic",]:
                     continue
                 
                 try:
-                    self.COP_real = np.array(self.df_real_data["COP"])
-                    self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
-                    self.time = np.array(self.df_real_data["Time [min]"])
                     
-                    if not np.isnan(self.COP_pred).all():   
-                        plt.plot(self.time, self.COP_real, label = "COP actual")
-                        plt.plot(self.time, self.COP_pred, label = "COP pred")
-                        plt.xlabel("Time [min]")
-                        plt.xlim(0,2500)
-                        plt.ylabel("COP actual")
-                        plt.legend()
+                    COP_real = np.array(self.df_real_data["COP"])
+                    COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
+                    time = np.array(self.df_real_data["Time [min]"])
+                    HC = np.array(self.df_real_data["Heat Cap COND [kW]"])
+                    Pel_real = np.divide(COP_real, HC)
+                    Pel_pred = np.divide(COP_pred, HC)
+                    
+                    
+                    if not np.isnan(COP_pred).all(): 
                         
-                        plt.title('$COP_{act}$'+' vs  '+'$COP_{pred}$'+ ' '+ f"H {model_tag} {plr_model}")
-                        plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_COP_vs_Time_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
-                        plt.close()
+                        figure1, axs1 = plt.subplots(2,figsize = (19,9.5))
+                        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+                        
+                        axs1[0].set_title('COP vs Time')
+                        axs1[0].plot(time, COP_real, label = "COP actual")
+                        axs1[0].plot(time, COP_pred, label = "COP pred")
+                        axs1[0].set_xlabel("Time [min]")
+                        axs1[0].set_xlim(0,2500)
+                        axs1[0].set_ylabel("COP actual")
+                        axs1[0].legend()
+                        
+                        axs1[1].set_title('Power vs Time')
+                        axs1[1].plot(time, HC, label = "Heat Capacity")
+                        axs1[1].plot(time, Pel_real, label = "Power real [kW]")
+                        axs1[1].plot(time, Pel_pred, label = "Power pred [kW]")
+                        axs1[1].set_ylabel("Heat Capacity[kW] - Electrical power [kW]")
+                        axs1[1].set_xlabel("Time [min]")
+                        axs1[1].set_xlim(0,2500)
+                        axs1[1].legend()
+                        
+                        figure1.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_COP_vs_Time_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
+                        plt.close(figure1)
                 
                 except ValueError:
                     pass
@@ -256,11 +270,11 @@ devices = [
  
 models = ["0" + str(i) for i in range(1,10)] + ["10","11","12"]
 plr_models = [
-              # "direct_linear",
-              # "direct_quadratic",
-              # "ISO 13612-2 mod A",
-              # "ISO 13612-2 mod B",
-              "C method"
+              "direct_linear",
+              "direct_quadratic",
+              "ISO 13612-2 mod A",
+              "ISO 13612-2 mod B",
+              "method C"
               ]
 
 dfs_levels = ["TOT","PL","FL"]
@@ -330,10 +344,10 @@ for dev in devices:
     
     dev = plot(dev, plot_data, res_real_data, df_real_data)    
     # dev.boxplot()
-    # dev.cop_pred_plot()
-    # dev.Err_plr_plot()
-    # dev.Err_SET_plot()
-    # # dev.COP_time_plot()
+    dev.cop_pred_plot()
+    dev.Err_plr_plot()
+    dev.Err_SET_plot()
+    dev.COP_time_plot()
         
 # b = res.loc[:,:,"TOT","RMSE"]
 # a = [[m,d["KPI_TOT"]["RMSE_TOT"]]for m,d in KPI.items()]

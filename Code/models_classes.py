@@ -12,7 +12,7 @@ class model_hp():
             "direct_quadratic",
             "ISO 13612-2 mod A",
             "ISO 13612-2 mod B",
-            "C method"
+            "method C"
             ]
     
     def __init__(self, plr_method = "direct_linear"):
@@ -85,7 +85,7 @@ class model_hp():
                     "direct_quadratic":self.f_method_d02,
                     "ISO 13612-2 mod A":self.f_method_n,
                     "ISO 13612-2 mod B":self.f_method_n,
-                    "C method":self.f_method_n,
+                    "method C":self.f_method_n,
                 }[self.plr_method]
             Y_pred = fun_m(x0,xdata)
             return sum((Y_pred-ydata)**2)
@@ -165,7 +165,7 @@ class model_hp():
             self.f_COP = lambda x : np.interp(x, PLR_curve, f_COP_curve)
 
         
-        elif self.plr_method == "C method":
+        elif self.plr_method == "method C":
             
             "Method 3: f_cop calculated"
             if not hasattr(self, 'curve'):
@@ -527,7 +527,7 @@ class model_h10(model_hp):
     allowed_plr_methods = [
             "ISO 13612-2 mod A",
             "ISO 13612-2 mod B",
-            "C method"
+            "method C"
             ]
     
     def __init__(self, plr_method = "ISO 13612-2 mod A"):
@@ -549,7 +549,7 @@ class model_h11(model_hp):
     allowed_plr_methods = [
             "ISO 13612-2 mod A",
             "ISO 13612-2 mod B",
-            "C method"
+            "method C"
             ]
     
     def __init__(self, plr_method = "ISO 13612-2 mod A"):
@@ -571,7 +571,7 @@ class model_h12(model_hp):
     allowed_plr_methods = [
             "ISO 13612-2 mod A",
             "ISO 13612-2 mod B",
-            "C method"
+            "method C"
             ]
     
     def __init__(self, plr_method = "ISO 13612-2 mod A"):
