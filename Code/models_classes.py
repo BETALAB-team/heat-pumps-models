@@ -5,6 +5,7 @@ from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score,mean_absolute_percentage_error
 from scipy.optimize import minimize
 
+
 class model_hp():
     
     allowed_plr_methods = [
@@ -275,7 +276,7 @@ class model_hp():
         
         COP_pred = self.calc_with_data(df_real_data)
         SCOP = np.sum(np.multiply(COP_pred, df_real_data["Pow [kW]"]))/np.sum(df_real_data["Pow [kW]"])
-        
+        # SCOP = ct(np.multiply(COP_pred,df_real_data["Pow [kW]"]),df_real_data["Time [min]"])/ct(np.multiply(COP_pred,df_real_data["Pow [kW]"]))
         return SCOP
 
     
@@ -602,11 +603,6 @@ class model_h12(model_hp):
         
     def calc_with_data(self,df):
         return self.calc_with_data_COP(df)
-
-
-
-
-
 
 
 
