@@ -25,11 +25,12 @@ devices = [
       # "Eneren NAW 006  All Raw Data",
       # "Eneren NAW 006  Old - Filter on catalogue Data",
       # "Eneren NAW 006  New -  Filter on catalogue Data",
-      # "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - Exp Points",
-      "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - 35°C LExT",
-      # "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - 35°C LExT - Reversed",
-      # "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - Catalogue"
-       ]
+      # "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - ID5 Exp Points",
+      "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - ID5 35°C LExT"
+      # "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - ID5 35°C LExT - Reversed",
+      # "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - ID5 Catalogue"
+      # "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - ID53",
+      ]
  
 models = ["0" + str(i) for i in range(1,10)] + ["10","11","12"]
 plr_models = [

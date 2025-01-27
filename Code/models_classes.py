@@ -146,7 +146,7 @@ class model_hp():
                     if  x[i] >= 0.25:
                         f_COP[i]=1;
                     else:
-                        f_COP[i]=x[i]/(0.9*4*x[i]+0.1)
+                        f_COP[i]=4*x[i]/(0.9*4*x[i]+0.1)
                 return f_COP
                     
             self.f_COP = lambda x : f_COP_fun(x)
