@@ -154,7 +154,7 @@ class model_hp():
                 
         elif self.plr_method == "ISO 13612-2 mod B":
             if not hasattr(self, 'curve'):
-                PLR_curve = np.array([0,0.153846154,0.346153846,0.538461538,0.884615385,1])
+                PLR_curve = np.array([0,0.173702757,0.324682609,0.526406144,1.011384493,1])
                 f_COP_curve = np.array([0,1.763963705,1.46640949,1.361503767,1.051338345,1])        
             else:
                 "Method 2: f_cop derived by curves"
@@ -170,7 +170,7 @@ class model_hp():
             
             "Method 3: f_cop calculated"
             if not hasattr(self, 'curve'):
-                PLR_curve = np.array([0,0.153846154,0.346153846,0.538461538,0.884615385,1])
+                PLR_curve = np.array([0,0.173702757,0.324682609,0.526406144,1.011384493,1])
                 f_COP_curve = np.array([0,1.763963705,1.46640949,1.361503767,1.051338345,1])     
             else:
                 self.curve.sort_values("X", inplace = True)

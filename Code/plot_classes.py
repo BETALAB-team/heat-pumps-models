@@ -88,7 +88,8 @@ class plot():
                     self.var = np.array(self.df_real_data[f"{var}"])
                     
                     try:
-                        plt.scatter(self.COP_real,self.COP_pred, c = self.var ,cmap='viridis', edgecolors = "black", label = "COP_pred")
+                        plt.scatter(self.COP_real,self.COP_pred, c = self.var ,cmap='plasma', label = "COP_pred")
+                        # plt.scatter(self.COP_real,self.COP_pred, c = self.var ,cmap='viridis', edgecolors = "black", label = "COP_pred")
                         plt.plot([0, 10], [0, 10], "k--", label = "Bisector")
                         plt.plot([0, 10], [0, 12], "k--", label = "Error +20%")
                     
