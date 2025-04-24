@@ -154,8 +154,8 @@ class model_hp():
                 
         elif self.plr_method == "ISO 13612-2 mod B":
             if not hasattr(self, 'curve'):
-                PLR_curve = np.array([0,0.173702757,0.324682609,0.526406144,1])
-                f_COP_curve = np.array([0,1.763963705,1.46640949,1.361503767,1])        
+                PLR_curve = np.array([0,0.173702757,0.324682609,0.526406144,1.011384493,1])
+                f_COP_curve = np.array([0,1.763963705,1.46640949,1.361503767,1.051338345,1])        
             else:
                 "Method 2: f_cop derived by curves"
                 self.curve.sort_values("X", inplace = True)
@@ -170,14 +170,14 @@ class model_hp():
             
             "Method 3: f_cop calculated"
             if not hasattr(self, 'curve'):
-                PLR_curve = np.array([0,0.173702757,0.324682609,0.526406144,1])
-                f_COP_curve = np.array([0,1.763963705,1.46640949,1.361503767,1])     
+                PLR_curve = np.array([0,0.173702757,0.324682609,0.526406144,1.011384493,1])
+                f_COP_curve = np.array([0,1.763963705,1.46640949,1.361503767,1.051338345,1])     
             else:
                 self.curve.sort_values("X", inplace = True)
                 PLR_curve = np.array(self.curve["X"])
                 f_COP_curve = np.array(self.curve["f_cop"])
-            PLR_curve = np.delete(PLR_curve,[0,4])
-            f_COP_curve = np.delete(f_COP_curve,[0,4])
+            PLR_curve = np.delete(PLR_curve,[0,5])
+            f_COP_curve = np.delete(f_COP_curve,[0,5])
             a=1/PLR_curve-1
             b=PLR_curve-1
             c=1/f_COP_curve-1
@@ -306,7 +306,10 @@ class model_h02(model_hp):
         PLR = np.array(df["PLR"])
         COP = np.array(df["COP"])
         
-        X = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**2])
+        #Definition of new models based on the heat unit instead of the COP
+        HC = np.array(df["Heat capacity COND [kW]"])
+        
+        X = np.column_stack([np.ones(len(SET)),SET,LExT-SET,(LExT-SET)**1.5])
 
         return PLR, COP, X
     

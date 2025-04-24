@@ -70,7 +70,7 @@ class plot():
     
         #Set plot
         figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
-        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        sns.set_theme(rc={'figure.figsize':(19,9.5)},style = 'whitegrid')
         plt.tight_layout()
         
         
@@ -91,8 +91,7 @@ class plot():
                         plt.scatter(self.COP_real,self.COP_pred, c = self.var ,cmap='plasma', label = "COP_pred")
                         # plt.scatter(self.COP_real,self.COP_pred, c = self.var ,cmap='viridis', edgecolors = "black", label = "COP_pred")
                         plt.plot([0, 10], [0, 10], "k--", label = "Bisector")
-                        plt.plot([0, 10], [0, 12], "k--", label = "Error +20%")
-                    
+                        plt.plot([0, 10], [0, 12], "k--", label = "Error +20%")                    
                         plt.text( 6, 4.5, "-20%")
                         plt.plot([0, 10], [0, 8], "k--", label = "Error -20%")
                         plt.text( 6, 7.7, "+20%")
@@ -107,12 +106,14 @@ class plot():
                         plt.title(f"H {model_tag} {plr_model}")
                         plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_COP_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
                         plt.close()
-                        
+
                     except ValueError:
                             pass
                 
                 except ValueError and KeyError:
                     pass
+        
+        
     
     def Err_plr_plot(self,var):
         
@@ -123,7 +124,7 @@ class plot():
     
         #Set plot
         figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
-        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        sns.set_theme(rc={'figure.figsize':(19,9.5)},style = 'whitegrid')
         plt.tight_layout()
         
         for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
@@ -136,7 +137,7 @@ class plot():
                     self.COP_real = np.array(self.df_real_data["COP"])
                     self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
                     
-                    self.Err =  self.COP_pred-self.COP_real
+                    self.Err = (self.COP_pred-self.COP_real)/self.COP_real
                     self.plr = self.df_real_data["PLR"]
                     self.var = np.array(self.df_real_data[f"{var}"])
 
@@ -144,6 +145,7 @@ class plot():
                         plt.scatter(self.plr,self.Err,c = self.var ,cmap='plasma', edgecolors = "black", label = "Error")
                         plt.xlabel("PLR")
                         plt.xlim(0.2,1.1)
+                        plt.ylim(-1,1)
                         cbar = plt.colorbar()
                         cbar.set_label(f"{var}")
                         plt.ylabel('$Err_{cop}$')
@@ -151,10 +153,11 @@ class plot():
                         plt.title(f"H {model_tag} {plr_model}")
                         plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_ERR_vs_PLR_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
                         plt.close()
+                       
                     
                 except ValueError and KeyError:
                     pass
-                    
+              
         
     def Err_SET_plot(self,var):
         
@@ -165,7 +168,7 @@ class plot():
     
         #Set plot
         figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
-        sns.set_theme(rc={'figure.figsize':(19,9.5)})
+        sns.set_theme(rc={'figure.figsize':(19,9.5)},style = 'whitegrid')
         plt.tight_layout()
         
         for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
@@ -178,7 +181,8 @@ class plot():
                     self.COP_real = np.array(self.df_real_data["COP"])
                     self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
                     
-                    self.Err =  self.COP_pred-self.COP_real
+                    self.Err = (self.COP_pred-self.COP_real)/self.COP_real
+                    self.plr = self.df_real_data["PLR"]
                     self.SET= self.df_real_data["SET [°C]"]
                     self.var = np.array(self.df_real_data[f"{var}"])
                     
@@ -188,6 +192,7 @@ class plot():
                         plt.xlabel("SET")
                         plt.ylabel('$Err_{cop}$')
                         plt.legend()
+                        plt.ylim(-1,1)
                         cbar = plt.colorbar()
                         cbar.set_label(f"{var}")
                         plt.title(f"H {model_tag} {plr_model}")
@@ -251,6 +256,54 @@ class plot():
                 
                 except ValueError:
                     pass
+                
+ 
+    def Err_GRAD_plot(self,var,grad):
+        
+        if not os.path.exists(os.path.join('..',"Results",self.device)):
+            os.mkdir(os.path.join('..',"Results",self.device))
+        else:
+            pass
+    
+        #Set plot
+        figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
+        sns.set_theme(rc={'figure.figsize':(19,9.5)},style = 'whitegrid')
+        plt.tight_layout()
+        
+        for model_tag in ['01','02','03','04','05','06','07','08','09','10','11','12']:
+            for plr_model in ["direct_linear","direct_quadratic","ISO 13612-2 mod A","ISO 13612-2 mod B","method C" ]:
+                
+                if model_tag in ["10","11","12"] and plr_model in ["direct_linear","direct_quadratic",]:
+                    continue
+                
+                try:
+                    self.COP_real = np.array(self.df_real_data["COP"])
+                    self.COP_pred = np.array(self.res_real_data.loc[f"{model_tag}",f"{plr_model}", "TOT","COP"][self.device])
+                    self.Err = (self.COP_pred-self.COP_real)/self.COP_real
+                    if grad == "EL":
+                        self.Grad = self.df_real_data["Gradient EL"]
+                    elif grad == "HC":
+                        self.Grad = self.df_real_data["Gradient HC"]
+                    self.var = np.array(self.df_real_data[f"{var}"])
+
+                    if not np.isnan(self.Err).all():    
+                        plt.scatter(self.Grad,self.Err,c = self.var ,cmap='plasma', label = "Error")
+                        plt.xlabel("Gradient")
+                        plt.xlim(-6,6)
+                        plt.ylim(-2,2)
+                        cbar = plt.colorbar()
+                        cbar.set_label(f"{var}")
+                        plt.ylabel('$Err_{cop}$')
+                        plt.legend()
+                        plt.title(f"H {model_tag} {plr_model}")
+                        plt.savefig(os.path.join('..',"Results",self.device, f"{self.device}_Plot_ERR_vs_GRAD_{model_tag}_{plr_model}.png")) #To modify to svg when defined 
+                        plt.close()
+                       
+                    
+                except ValueError and KeyError:
+                    pass
+    
+        
                     
                         
 
