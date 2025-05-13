@@ -96,9 +96,9 @@ def plot_state_as_color(x_data, state_data, axis, add_labels=True):
                 
 #%%Input variables
 devices = [
-           # "Valliant A+ 5kW  ID5 01-11-2022_28-02-2023",
+           "Valliant A+ 5kW  ID5 01-11-2022_28-02-2023",
            "Valliant A+ 5kW  ID9 01-11-2022_28-02-2023",
-           # "Valliant A+ 5kW  ID24 01-11-2022_28-02-2023"
+           "Valliant A+ 5kW  ID24 01-11-2022_28-02-2023",
            ]
 
 #Clear the data
@@ -268,8 +268,6 @@ axs2.plot(np.array(filtered_data["Time"]),np.array(filtered_data["LET [°C]"]), 
 axs2.plot(np.array(filtered_data["Time"]),np.array(filtered_data["SET [°C]"]), label = "SET [°C]", color = "blue")
 axs2.plot(np.array(filtered_data["Time"]),np.array(filtered_data["Gradient EL"]), label = "Gradient EL", color = "red")
 axs2.plot(np.array(filtered_data["Time"]),np.array(filtered_data["Gradient HC"]), label = "Gradient HC", color = "green")
-
-
 
 
 axs1.legend()

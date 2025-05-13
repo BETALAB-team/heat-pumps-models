@@ -1,7 +1,7 @@
-
 import os 
 import pandas as pd
 import numpy as np
+import pwlf
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn import linear_model
@@ -42,7 +42,7 @@ def plot_power_vs_variables(exp,dev,var, HC_pred, Pow_pred, COP_pred):
     
     return
 
-def plot_power_model(exp,dev, Pow_pred, short_catalogue, equation_number,status):
+def plot_power_model(exp,dev, Pow_pred,status):
     
     #Create folder
     if not os.path.exists(os.path.join('..',"Results",dev)):
@@ -75,10 +75,7 @@ def plot_power_model(exp,dev, Pow_pred, short_catalogue, equation_number,status)
     plt.legend()
     
     # plt.tight_layout()
-    if short_catalogue == 0:
-        plt.savefig(os.path.join('..',"Results",f"{dev}","New_models",f"NEW_MODEL_{status}_eq_{equation_number}.png"))
-    else:
-        plt.savefig(os.path.join('..',"Results",f"{dev}","New_models",f"NEW_MODEL_{status}_eq_{equation_number}_SHORT.png"))
+    plt.savefig(os.path.join('..',"Results",f"{dev}","New_models",f"NEW_MODEL_{status}.png"))
     plt.close()
 
 #Color status plot
@@ -263,29 +260,34 @@ def interp_full_load(data, catalogue_data, SET_des = -7, LExT_des = 35, HC_des =
     LExT_exp = np.array(test["LExT [°C]"] + 273.15)
     Delta1_exp = (LExT_exp - SET_exp)/(LExT_des - SET_des)
     Delta2_exp = np.array(Delta1_exp**2)
-    
+     
     #Create train and test models
     X_train_HC = np.column_stack((Delta1,Delta2))
+    # X_train_HC = np.array(Delta1).reshape(-1, 1)
     Y_train_HC =  np.array(train['Heat Cap COND [kW]']/HC_des)
     X_test_HC = np.column_stack((Delta1_exp,Delta2_exp))
+    # X_test_HC = np.array(Delta1_exp).reshape(-1, 1)
     
     X_train_Pow = np.column_stack((Delta1,Delta2))
+    # X_train_Pow = np.array(Delta1).reshape(-1, 1)
     Y_train_Pow =  np.array(train['Pow [kW]']/Pow_des)
     X_test_Pow = np.column_stack((Delta1_exp,Delta2_exp))
-
+    # X_test_Pow = np.array(Delta1_exp).reshape(-1, 1)
+    
     #Create the linear model
     model_HC = linear_model.LinearRegression().fit(X_train_HC,Y_train_HC)
     HC_fl_model = model_HC.predict(X_test_HC)*HC_des
     
     model_Pow = linear_model.LinearRegression().fit(X_train_Pow,Y_train_Pow)
     Pow_fl_model = model_Pow.predict(X_test_Pow)*Pow_des
+    
     PLR = test['Heat Cap COND [kW]']/HC_fl_model
     
     #Create dataframe
     test['PLR'] = PLR
     test["COP"] = test["Heat Cap COND [kW]"]/test["Pow [kW]"]
     test["Heat Cap COND full [kW]"] = HC_fl_model
-    test ["Pow full [kW]"] = Pow_fl_model
+    test["Pow full [kW]"] = Pow_fl_model
     
     #Adjust PLR
     for i in test.index.values:
@@ -297,18 +299,7 @@ def interp_full_load(data, catalogue_data, SET_des = -7, LExT_des = 35, HC_des =
     return test       
 
 #Define new model
-def new_model(devices, catalogue_data_dev, short_catalogue = 0,SET_fl = -7 ,  LExT_fl = 35, HC_fl = 5.89, Pow_fl = 2.89, COP_fl = 2.7):        
-
-    KPI = {}
-    col = ["R2_Pow","MAPE_Pow","RMSE_Pow",
-           "R2_COP","MAPE_COP","RMSE_COP",
-           "SCOP_model","SCOP_exp","Err_SCOP"]
-    
-    states = ["STATIONARY","MODULATION","MOD + DEF","ALL"]
-    multindex = [devices,states]
-    multindex = pd.MultiIndex.from_product(multindex, names = ["model","status"])
-    KPI = pd.DataFrame(KPI,index = multindex,columns = col)
-    
+def complete_excel(devices, catalogue_data_dev,SET_fl = -7 ,  LExT_fl = 35, HC_fl = 5.89, Pow_fl = 2.89, COP_fl = 2.7):           
     
     #Clear the data
     for dev in devices:
@@ -316,231 +307,55 @@ def new_model(devices, catalogue_data_dev, short_catalogue = 0,SET_fl = -7 ,  LE
         #Import entire database for the specific device
         data = pd.read_excel(os.path.join('..','ExpData',f"{dev}.xlsx"), sheet_name = "Sheet1")
         data = data.loc[:, ~data.columns.str.contains('^Unnamed')] 
-    
-    
-        #Import the catalogue data  with the PLR calculation
-        if short_catalogue == 0:
-            catalogue_data =  pd.read_excel(os.path.join('..','Data',f"{catalogue_data_dev}.xlsx"), sheet_name = "SetData")
-        elif short_catalogue == 1:
-            catalogue_data =  pd.read_excel(os.path.join('..','Data',f"{catalogue_data_dev}.xlsx"), sheet_name = "SetData_Short")
-        
+
         #%Creation of databases
         test_exp = status_analysis(data,HC_fl,Pow_fl)
         test_exp = interp_full_load(test_exp,catalogue_data_dev,SET_fl, LExT_fl ,HC_fl)
         
         #Create excel
-        # create_excel(dev,test_exp,catalogue_data_dev)  
-        
-        #Filter
-        for i in range(4):
-            if i == 0:
-               exp = test_exp[test_exp['Status'] == 'STATIONARY']
-            elif i == 1:
-                exp = test_exp[(test_exp['Status'] == 'ACCELERATION') | (test_exp['Status'] == 'DECELERATION')
-                          | (test_exp['Status'] == 'STATIONARY')]
-            elif i == 2:
-                exp = test_exp[(test_exp['Status'] == 'ACCELERATION') | (test_exp['Status'] == 'DECELERATION')
-                          | (test_exp['Status'] == 'STATIONARY') | (test_exp['Status'] == 'DEF')]
-            elif i == 3:
-                exp = test_exp[(test_exp['Status'] == 'ACCELERATION') | (test_exp['Status'] == 'DECELERATION')
-                          | (test_exp['Status'] == 'STATIONARY') | (test_exp['Status'] == 'DEF')  | (test_exp['Status'] == 'DHW')]
-                
-                # figure1, axs1 = plt.subplots(1, figsize = (19,9.5))
-                # sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
-                # axs1.scatter(np.array(exp["Pow [kW]"]),np.array(exp["Heat Cap COND [kW]"]),label = "Exp Data")
-           
-            
-              
-            #Data in design conditions 
-            Pow_fl = HC_fl/ COP_fl #kW
-            PLR_fl = 1
-            
-            #Normalize the thermodynamics variables - Catalogues
-            SET = (catalogue_data["SET [°C]"] + 273.15)/(SET_fl + 273.15)
-            LExT =  (catalogue_data["LExT [°C]"] + 273.15)/(LExT_fl + 273.15)
-            Delta1 = (catalogue_data["LExT [°C]"]-catalogue_data["SET [°C]"])/(LExT_fl - SET_fl)
-            PLR =  catalogue_data["PLR"]
-            
-            # #Normalize the thermodinamics variables - Experimental Data
-            SET_exp = (exp["SET [°C]"] + 273.15)/(SET_fl + 273.15)
-            LExT_exp =  (exp["LExT [°C]"] + 273.15)/(LExT_fl + 273.15)
-            Delta1_exp = (exp["LExT [°C]"]-exp["SET [°C]"])/(LExT_fl - SET_fl)
-            PLR_exp =  exp["PLR"]
-            
-            #Model input_-equation 1
-            # X_train = np.column_stack((PLR,np.ones(len(PLR))))
-            # X_test = np.column_stack((PLR_exp,np.ones(len(PLR_exp)))) 
-            
-            #Model input_-equation 2
-            # X_train = np.column_stack((SET,Delta1,Delta2,PLR))
-            # X_test = np.column_stack((SET_exp,Delta1_exp,Delta2_exp,PLR_exp))
-            
-            #Model input_- equation 3
-            # X_train = np.column_stack((PLR*SET,PLR*Delta1,PLR*Delta2))
-            # X_test = np.column_stack((PLR_exp*SET_exp,PLR_exp*Delta1_exp,PLR_exp*Delta2_exp))
-            
-            #Model input_- equation 4
-            X_train = np.column_stack((Delta1*PLR,PLR*Delta1**2))
-            X_test = np.column_stack((Delta1_exp*PLR_exp,PLR_exp*Delta1_exp**2))
-            
-            # X_train = np.column_stack((PLR,Delta1*PLR,LExT*PLR,PLR*Delta1**2,PLR*LExT**2,Delta1*PLR**2,LExT*PLR**2,PLR**2,PLR**3))
-            # X_test = np.column_stack((PLR_exp,Delta1_exp*PLR_exp,LExT_exp*PLR_exp,PLR_exp*Delta1_exp**2,
-                                # PLR_exp*LExT_exp**2,Delta1_exp*PLR_exp**2,LExT_exp*PLR_exp**2,PLR_exp**2,PLR_exp**3))
-            
-            Y1 = catalogue_data["Heat Cap COND [kW]"]/ HC_fl 
-            Y2 = catalogue_data["Pow [kW]"]/Pow_fl
-            Y3 = catalogue_data["COP"]/COP_fl
-            
-            #Model regression evaluation
-            model_reg_HC = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y1)
-            HC_pred = model_reg_HC.predict(X_test)*HC_fl
-            
-            model_reg_P = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y2)
-            Pow_pred = model_reg_P.predict(X_test)*Pow_fl
-            
-            # model_reg_COP = linear_model.LinearRegression(fit_intercept = False).fit(X_train_COP, Y3)
-            # COP_pred = model_reg_COP.predict(X_test_COP)*COP_fl
-            
-            COP_pred = exp["Heat Cap COND [kW]"]/Pow_pred
-            COP_pred.replace([np.inf, -np.inf], np.nan, inplace=True)
-            COP_pred.fillna(0, inplace = True)
-            COP_fl_model = exp["Heat Cap COND full [kW]"]/ exp["Pow full [kW]"]
-            
-            # #Test spearman 
-            # test_COP = {"COP ratio": exp["COP"]/COP_fl_model,
-            #         "PLR":exp["PLR"],
-            #         "PLR^2": exp["PLR"]**2,
-            #         "PLR^3":exp["PLR"]**3}
-            
-            # test_COP = pd.DataFrame(test_COP)
-            # test_COP_cat = test_cat.corr(method="spearman")
-            
-            
-            
-            #SCOP calculation
-            SCOP_model = sum(np.array(exp["Heat Cap COND [kW]"]))/sum(Pow_pred)
-            SCOP_exp = sum(np.array(exp["Heat Cap COND [kW]"]))/sum(np.array(exp["Pow [kW]"]))
-        
-            #KPI Calculations 
-            if i == 0:
-                KPI.loc[(dev,"STATIONARY"),"R2_Pow"] = float(r2_score(exp["Pow [kW]"],Pow_pred))
-                KPI.loc[(dev,"STATIONARY"),"MAPE_Pow"] = float(mean_absolute_error(exp["Pow [kW]"],Pow_pred))
-                KPI.loc[(dev,"STATIONARY"),"RMSE_Pow"] = float(root_mean_squared_error(exp["Pow [kW]"],Pow_pred).astype(float))
-                
-                # #COP
-                KPI.loc[(dev,"STATIONARY"),"R2_COP"] = float(r2_score(exp["COP"],COP_pred))
-                KPI.loc[(dev,"STATIONARY"),"MAPE_COP"] = float(mean_absolute_error(exp["COP"],COP_pred))
-                KPI.loc[(dev,"STATIONARY"),"RMSE_COP"] = float(root_mean_squared_error(exp["COP"],COP_pred).astype(float))
-                  
-                #SCOP
-                KPI.loc[(dev,"STATIONARY"),"SCOP_model"] = float(SCOP_model.astype(float))
-                KPI.loc[(dev,"STATIONARY"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-                KPI.loc[(dev,"STATIONARY"),"Err_SCOP"] = float(abs(SCOP_exp - SCOP_model))
-                
-                #Plot
-                # plot_power_model(exp, dev, Pow_pred, short_catalogue, 4,"STATIONARY")
-                # COP_PLR_plot(exp, COP_fl_model, exp["PLR"], dev, "STATIONARY")
+        create_excel(dev,test_exp,catalogue_data_dev) 
     
-            elif i == 1:
-                KPI.loc[(dev,"MODULATION"),"R2_Pow"] = float(r2_score(exp["Pow [kW]"],Pow_pred))
-                KPI.loc[(dev,"MODULATION"),"MAPE_Pow"] = float(mean_absolute_error(exp["Pow [kW]"],Pow_pred))
-                KPI.loc[(dev,"MODULATION"),"RMSE_Pow"] = float(root_mean_squared_error(exp["Pow [kW]"],Pow_pred).astype(float))
-                
-                #COP
-                KPI.loc[(dev,"MODULATION"),"R2_COP"] = float(r2_score(exp["COP"],COP_pred))
-                KPI.loc[(dev,"MODULATION"),"MAPE_COP"] = float(mean_absolute_error(exp["COP"],COP_pred))
-                KPI.loc[(dev,"MODULATION"),"RMSE_COP"] = float(root_mean_squared_error(exp["COP"],COP_pred).astype(float))
-                
-                #SCOP
-                KPI.loc[(dev,"MODULATION"),"SCOP_model"] = float(SCOP_model.astype(float))
-                KPI.loc[(dev,"MODULATION"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-                KPI.loc[(dev,"MODULATION"),"Err_SCOP"] = float(abs(SCOP_exp - SCOP_model))
-                
-                #Plot
-                # plot_power_model(exp,dev, Pow_pred,short_catalogue, 4,"MODULATION")
-                # COP_PLR_plot(exp, COP_fl_model, exp["PLR"], dev, "MODULATION")
-            
-            elif i == 2:
-                KPI.loc[(dev,"MOD + DEF"),"R2_Pow"] = float(r2_score(exp["Pow [kW]"],Pow_pred))
-                KPI.loc[(dev,"MOD + DEF"),"MAPE_Pow"] = float(mean_absolute_error(exp["Pow [kW]"],Pow_pred))
-                KPI.loc[(dev,"MOD + DEF"),"RMSE_Pow"] = float(root_mean_squared_error(exp["Pow [kW]"],Pow_pred).astype(float))
-                
-                #COP
-                KPI.loc[(dev,"MOD + DEF"),"R2_COP"] = float(r2_score(exp["COP"],COP_pred))
-                KPI.loc[(dev,"MOD + DEF"),"MAPE_COP"] = float(mean_absolute_error(exp["COP"],COP_pred))
-                KPI.loc[(dev,"MOD + DEF"),"RMSE_COP"] = float(root_mean_squared_error(exp["COP"],COP_pred).astype(float))
-                
-                #SCOP
-                KPI.loc[(dev,"MOD + DEF"),"SCOP_model"] = float(SCOP_model.astype(float))
-                KPI.loc[(dev,"MOD + DEF"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-                KPI.loc[(dev,"MOD + DEF"),"Err_SCOP"] = float(abs(SCOP_exp - SCOP_model))
-                
-                #Plot
-                # plot_power_model(exp,dev, Pow_pred,short_catalogue, 4,"MOD + DEF")
-                # COP_PLR_plot(exp, COP_fl_model, exp["PLR"], dev, "MOD + DEF")
-                
-            elif i == 3:
-                KPI.loc[(dev,"ALL"),"R2_Pow"] = float(r2_score(exp["Pow [kW]"],Pow_pred))
-                KPI.loc[(dev,"ALL"),"MAPE_Pow"] = float(mean_absolute_error(exp["Pow [kW]"],Pow_pred))
-                KPI.loc[(dev,"ALL"),"RMSE_Pow"] = float(root_mean_squared_error(exp["Pow [kW]"],Pow_pred).astype(float))
-                
-                #COP
-                KPI.loc[(dev,"ALL"),"R2_COP"] = float(r2_score(exp["COP"],COP_pred))
-                KPI.loc[(dev,"ALL"),"MAPE_COP"] = float(mean_absolute_error(exp["COP"],COP_pred))
-                KPI.loc[(dev,"ALL"),"RMSE_COP"] = float(root_mean_squared_error(exp["COP"],COP_pred).astype(float))
-                
-                #SCOP
-                KPI.loc[(dev,"ALL"),"SCOP_model"] = float(SCOP_model.astype(float))
-                KPI.loc[(dev,"ALL"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-                KPI.loc[(dev,"ALL"),"Err_SCOP"] = float(abs(SCOP_exp - SCOP_model))
-                
-                #Plot
-                # plot_power_model(exp,dev, Pow_pred, short_catalogue,4,"ALL") 
-                # COP_PLR_plot(exp, COP_fl_model, exp["PLR"], dev, "ALL")
-                
-
         
-    return KPI,test_exp
+#%% Creation of the complete excel file
+def main():
+    devices_valliant = [
+               "Valliant A+ 5kW  ID5 01-11-2022_28-02-2023",
+               "Valliant A+ 5kW  ID9 01-11-2022_28-02-2023",
+               "Valliant A+ 5kW  ID24 01-11-2022_28-02-2023"
+               ]
+    
+    devices_riello = [
+                      "Riello NXHM 10 kW ID458 01-11-2024_28-02-2025",
+                      "Riello NXHM 10 kW ID526 01-11-2024_28-02-2025"
+                      ]
+    
+    devices_nibe = [
+                      "NIBE 2050 10 kW ID65 01-11-2024_28-02-2025",
+                      "NIBE 2050 10 kW ID167 01-11-2024_28-02-2025",
+                      "NIBE 2050 10 kW ID531 01-11-2024_28-02-2025"
+                      ]
+    devices_nibe_2 = [
+                    "NIBE F2040 12 kW ID61 01-11-2024_28-02-2025"
+                    ]
+    
+    #Excel creation
+    complete_excel(devices_valliant,"Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA")
+    complete_excel(devices_riello,"Riello NXHM 10 kW - DATA",SET_fl = -7, LExT_fl = 35, HC_fl = 8, Pow_fl = 2.62, COP_fl =3.1)
+    complete_excel(devices_nibe,"NIBE 2050 10 kW - DATA",SET_fl = -7,LExT_fl = 35,HC_fl = 8.7, Pow_fl = 2.9,COP_fl = 3)
+    complete_excel(devices_nibe_2,"NIBE F2040 12 kW - DATA",SET_fl = -7,LExT_fl = 35,HC_fl = 10.3, Pow_fl = 3.73 ,COP_fl = 2.76)
+    
+#Run main
+if __name__ == '__main__':
+    main()
+    
 
-#%% New model creation and results
-
-devices_valliant = [
-           "Valliant A+ 5kW  ID5 01-11-2022_28-02-2023",
-           "Valliant A+ 5kW  ID9 01-11-2022_28-02-2023",
-           "Valliant A+ 5kW  ID24 01-11-2022_28-02-2023"
-           ]
-
-devices_riello = [
-                  "Riello NXHM 10 kW ID458 01-11-2024_28-02-2025",
-                  "Riello NXHM 10 kW ID526 01-11-2024_28-02-2025"
-                  ]
-
-devices_nibe = [
-                  "NIBE 2050 10 kW ID65 01-11-2024_28-02-2025",
-                  "NIBE 2050 10 kW ID167 01-11-2024_28-02-2025",
-                  "NIBE 2050 10 kW ID531 01-11-2024_28-02-2025"]
-                  
-devices_nibe_S21258 =[
-                 "NIBE S2125 8 kW ID252 01-11-2024_28-02-2025"]
-
-devices_nibe_S212512 =[
-                 "NIBE S2125 12 kW ID448 01-11-2024_28-02-2025"
-                 ]
-
-
-KPI_all_val,test_exp_val = new_model(devices_valliant,"Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA")
-KPI_all_riello, test_exp_riello = new_model(devices_riello,"Riello NXHM 10 kW - DATA",0,-7,35,8,2.62,3.1)
-KPI_all_nibe_2050, test_exp_nibe_2050 = new_model(devices_nibe,"NIBE 2050 10 kW - DATA",0,-7,35,8.7,2.9,3)
-# KPI_all_nibe_S21258, test_exp_nibe_S21258 = new_model(devices_nibe_S21258,"NIBE S2125 8 kW - DATA",0,-7,35,5.3,1.06,5)
-# KPI_all_nibe_S212512, test_exp_nibe_S212512 = new_model(devices_nibe_S212512,"NIBE S2125 12 kW - DATA",0,-10,35,6.8,1.37,4.96)
-KPI_all = pd.concat([KPI_all_val ,KPI_all_riello, KPI_all_nibe_2050])
-KPI_all.to_csv(os.path.join('..',"Result Analysis","KPI_new_model_2.csv"))
+# KPI_all = pd.concat([KPI_all_val ,KPI_all_riello, KPI_all_nibe_2050])
+# KPI_all.to_csv(os.path.join('..',"Result Analysis","KPI_new_model_2.csv"))
 
 #Plot one single day
 # single_day_plot(test_exp_nibe,"2024-12-12 00:00:00","2024-12-30 00:00:00" )
 
 # KPI_short_val = new_model(devices_valliant, "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA",1)
-# KPI_short_midea = new_model(devices_valliant,"Midea MHC-V16 - DATA")
 # KPI_short = pd.concat(KPI_all_val ,KPI_all_midea)
 
 # KPI_short.to_csv(os.path.join('..',"Result Analysis","KPI_new_model_short.csv"))
@@ -632,6 +447,8 @@ KPI_all.to_csv(os.path.join('..',"Result Analysis","KPI_new_model_2.csv"))
 
 # test_pearson_exp = test_exp.corr(method="pearson")
 # test_spearman_exp = test_exp.corr(method="spearman")
+
+
 
 
 
