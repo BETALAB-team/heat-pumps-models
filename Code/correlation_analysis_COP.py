@@ -8,78 +8,102 @@ import math
 from sklearn import linear_model
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score,mean_absolute_percentage_error
 from sklearn.model_selection import train_test_split
-from gplearn.genetic import SymbolicRegressor
+from sklearn.linear_model import LassoCV
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import BayesianRidge
+# from gplearn.genetic import SymbolicRegressor
+# from pysr import PySRRegressor
+from scipy.optimize import curve_fit
+from sklearn.preprocessing import StandardScaler
 from sympy import *
 #%% Methods
 
 #Plot COP ratio as PLR function
-def COP_Pow_PLR_plot(test,COP_ratio_model,Pow_ratio_model,COP_pred):
-    figure1, axs1 = plt.subplots(1,2,figsize = (19,9.5))
-    sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
+def COP_Pow_PLR_plot(test,Pow_ratio_model):
+    # figure1, axs1 = plt.subplots(1,2,figsize = (19,9.5))
+    # sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
    
     
     COP_fl_model = test["Heat Cap COND full [kW]"]/ test["Pow full [kW]"]
     COP_ratio = test["COP"]/COP_fl_model
     Pow_ratio = test["Pow [kW]"]/test["Pow full [kW]"]
+    Pow = test["Pow [kW]"]
     
-    #Plot
-    axs1[0].scatter(test["PLR"] ,COP_ratio,label = "experimental points")
-    axs1[0].scatter(test["PLR"] ,COP_ratio_model, label = "model")
-    axs1[0].set_xlabel("PLR")
-    axs1[0].set_ylabel("COP/COP_fl")
-    axs1[0].set_ylim(0,2)
-    axs1[0].legend()
+    # #Plot
+    # axs1[0].scatter(test["LExT [°C]"] - test["SET [°C]"] ,Pow_ratio,label = "experimental points")
+    # axs1[0].scatter(test["LExT [°C]"] - test["SET [°C]"] ,Pow_ratio_model, label = "model")
+    # axs1[0].set_xlabel("PLR")
+    # axs1[0].set_ylabel("COP/COP_fl")
+    # axs1[0].set_ylim(0,2)
+    # axs1[0].legend()
     
-    axs1[1].scatter(test["PLR"],Pow_ratio,label = "experimental points")
-    axs1[1].scatter(test["PLR"],Pow_ratio_model, label = "model")
-    axs1[1].set_xlabel("PLR")
-    axs1[1].set_ylabel("Pow ratio")
-    axs1[1].set_ylim(0,2)
-    axs1[1].legend()
+    # axs1[1].scatter(test["PLR"],Pow_ratio,label = "experimental points")
+    # axs1[1].scatter(test["PLR"],Pow_ratio_model, label = "model")
+    # axs1[1].set_xlabel("PLR")
+    # axs1[1].set_ylabel("Pow ratio")
+    # axs1[1].set_ylim(0,2)
+    # axs1[1].legend()
     
-    plt.tight_layout()
+    # plt.tight_layout()
+    
+    # figure3, axs3 = plt.subplots(1,figsize = (19,9.5))
+    # sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
+   
+    # #Plot
+    # x = [0, 0.12, 0.29,0.52, 1]
+    # y = [0, 1.02, 1.05, 1.19, 1]
+    # axs3.scatter(test["PLR"],COP_ratio,label = "experimental points")
+    # axs3.plot(x,y, "red",label = "experimental points")
+    # axs3.set_xlabel("PLR")
+    # axs3.set_ylabel("COP/COP_fl")
+    # axs3.set_ylim(0,3)
+    # axs3.legend()
+    
+    
     
     #Error plot
-    # figure2, axs2 = plt.subplots(1,2,figsize = (19,9.5))
-    # sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
-    # axs2[0].scatter(test["COP"] ,COP_pred,label = "experimental points", c = test["PLR"], cmap='jet')
-    # axs2[0].set_xlim(0,10)
-    # axs2[0].set_ylim(0,10)
-    # axs2[0].plot([0, 10], [0, 10], "k--", label = "Bisector")
-    # axs2[0].plot([0, 10], [0, 12], "k--", label = "Error +20%")                    
-    # axs2[0].text( 6, 4.5, "-20%")
-    # axs2[0].plot([0, 10], [0, 8], "k--", label = "Error -20%")
-    # axs2[0].text( 6, 7.7, "+20%")
-    # axs2[0].set_xlabel("COP")
-    # axs2[0].set_ylabel("COP_pred")
+    figure2, axs2 = plt.subplots(1,2,figsize = (19,9.5))
+    sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
+    axs2[0].scatter(test["COP"] ,COP_pred,label = "experimental points", c = test["PLR"], cmap='jet')
+    axs2[0].set_xlim(0,10)
+    axs2[0].set_ylim(0,10)
+    axs2[0].plot([0, 10], [0, 10], "k--", label = "Bisector")
+    axs2[0].plot([0, 10], [0, 12], "k--", label = "Error +20%")                    
+    axs2[0].text( 6, 4.5, "-20%")
+    axs2[0].plot([0, 10], [0, 8], "k--", label = "Error -20%")
+    axs2[0].text( 6, 7.7, "+20%")
+    axs2[0].set_xlabel("COP")
+    axs2[0].set_ylabel("COP_pred")
     
-    # axs2[1].scatter(test["Pow [kW]"] ,Pow_ratio_model * test["Pow full [kW]"],label = "experimental points",c = test["PLR"], cmap='jet')
-    # axs2[1].set_xlim(0,3)
-    # axs2[1].set_ylim(0,3)
-    # axs2[1].plot([0, 10], [0, 10], "k--", label = "Bisector")
-    # axs2[1].plot([0, 10], [0, 12], "k--", label = "Error +20%")                    
-    # axs2[1].text( 6, 4.5, "-20%")
-    # axs2[1].plot([0, 10], [0, 8], "k--", label = "Error -20%")
-    # axs2[1].text( 6, 7.7, "+20%")
-    # axs2[1].set_xlabel("Pow")
-    # axs2[1].set_ylabel("Pow_pred")
+    axs2[1].scatter(test["Pow [kW]"] ,Pow_ratio_model * test["Pow full [kW]"],label = "experimental points",c = test["PLR"], cmap='jet')
+    axs2[1].set_xlim(0,3)
+    axs2[1].set_ylim(0,3)
+    axs2[1].plot([0, 10], [0, 10], "k--", label = "Bisector")
+    axs2[1].plot([0, 10], [0, 12], "k--", label = "Error +20%")                    
+    axs2[1].text( 6, 4.5, "-20%")
+    axs2[1].plot([0, 10], [0, 8], "k--", label = "Error -20%")
+    axs2[1].text( 6, 7.7, "+20%")
+    axs2[1].set_xlabel("Pow")
+    axs2[1].set_ylabel("Pow_pred")
     
     #3D plot dependency
-    figure2, axs2 = plt.subplots(subplot_kw={"projection": "3d"})
-    sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
-    X = - test["PLR"]
-    Y = test["LExT [°C]"] - test["SET [°C]"]
-    Z = Pow_ratio
+    # figure2, axs2 = plt.subplots(subplot_kw={"projection": "3d"})
+    # sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
+    # # X = - test["PLR"]
+    # # Y = test["LExT [°C]"] - test["SET [°C]"]
+    # X = - test["PLR"]*(test["LExT [°C]"] - test["SET [°C]"])**2
+    # Y = test["PLR"]*test["LExT [°C]"]**2
+    # Z = Pow_ratio
     
-    axs2.set_xlabel('PLR')
-    axs2.set_ylabel('DeltaT')
-    axs2.set_zlim(0,1)
-    axs2.set_zlabel('Pow_ratio')
+    # axs2.set_xlabel('X')
+    # axs2.set_ylabel('Y')
+    # axs2.set_zlim(0,1)
+    # axs2.set_zlabel('Pow_ratio')
     
 
-    # Plot the surface
-    axs2.scatter(X, Y, Z, c = Y, cmap = "jet",
-                       linewidth=0, antialiased=False)
+    # # Plot the surface
+    # axs2.scatter(X, Y, Z, c = Y, cmap = "jet",
+    #                    linewidth=0, antialiased=False)
                        
 def cum_value_plot(test):  
     bins = np.arange(0,1.1,0.1)
@@ -110,8 +134,72 @@ def cum_value_plot(test):
     # axs3[1].set_xticks(br1,)
     axs3[1].set_ylabel("Cum frequency")
    
-   
+def plot_fl(test):
+    
+    figure4, axs4 = plt.subplots(1,figsize = (19,9.5))
+    sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
+    
+    filt_test = test.loc[test["PLR"] >= 0.95]
+    filt_test = filt_test.loc[filt_test["Status"] == "STATIONARY"]
+    LExT_desh = []
+    for i in filt_test.index:
+        LExT = filt_test.loc[i,"LExT [°C]"]
+        if LExT >= 30 and LExT <= 40:
+            LExT_desh.append(35)
+        elif LExT > 40 and LExT <= 50:
+            LExT_desh.append(45)
+        elif LExT > 50:
+            LExT_desh.append(55)
+        else:
+            LExT_desh.append(0)
+    
+    filt_test["LExT_desh"] = LExT_desh
+    
+    fil1 = filt_test.loc[filt_test["LExT_desh"] == 35]
+    fil2 = filt_test.loc[filt_test["LExT_desh"] == 45]
+    fil3 = filt_test.loc[filt_test["LExT_desh"] == 55]
+    fil4 = filt_test.loc[filt_test["LExT_desh"] == 0]
+    
+    axs4.scatter(fil1["SET [°C]"],fil1["Pow [kW]"],c = "red", label = "35°C")
+    axs4.scatter(fil2["SET [°C]"],fil2["Pow [kW]"],c = "blue", label = "45°C")
+    axs4.scatter(fil3["SET [°C]"],fil3["Pow [kW]"],c = "green", label = "55°C")
+    axs4.scatter(fil4["SET [°C]"],fil4["Pow [kW]"],c = "grey", label = "off design")
+    axs4.scatter(filt_test["SET [°C]"],filt_test["Pow full [kW]"])
+    axs4.set_xlabel("SET [°C]")
+    axs4.set_ylabel("Pow [kW]")
+    axs4.legend()
+    print("Tot n points PLR >= 0.95:", len(LExT_desh))
+    
+def cum_value_LExT_plot(test):
+    
+    test = test.loc[test["PLR"]>= 0.95]
+    
+    bins = [0,5, 10,15, 20,25, 30,35, 40,45, 50,55, 60]
+    labels = ['0-5', '5-10','10-15','15-20', '20-25','25-30', '30-35','35-40','40-45','45-50','50-55,','55-60']
 
+    # Categorizzare i dati nei bin
+    test['range'] = pd.cut(test['LExT [°C]'], bins=bins, labels=labels, right=False)
+    counts = test['range'].value_counts().sort_index()
+    
+    figure3, axs3 = plt.subplots(1,figsize = (19,9.5))
+    sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
+    
+    
+    # y = [box_below30, box35, box45, box55, box_above60]
+    # x_ticks = ["Below (30)°C","[30,40) °C","[40,50) °C","[50,60) °C", "Above [60]° C"]
+    br1 = np.arange(len(labels)) 
+    
+    axs3.bar(br1,np.array(counts),width = 0.5)
+    axs3.set_xlabel("LExT")
+    axs3.set_xticks(br1,labels)
+    plt.tight_layout()
+
+
+    
+    
+    
+    
+    
 #%% Processing test
 
 devices = [
@@ -119,24 +207,34 @@ devices = [
            # "Valliant A+ 5kW  ID9 01-11-2022_28-02-2023",
            # "Valliant A+ 5kW  ID24 01-11-2022_28-02-2023",
            # "Riello NXHM 10 kW ID458 01-11-2024_28-02-2025",
-           # "Riello NXHM 10 kW ID526 01-11-2024_28-02-2025",
+           "Riello NXHM 10 kW ID526 01-11-2024_28-02-2025",
            # "NIBE 2050 10 kW ID65 01-11-2024_28-02-2025",
            # "NIBE 2050 10 kW ID167 01-11-2024_28-02-2025",
            # "NIBE 2050 10 kW ID531 01-11-2024_28-02-2025",
-           "NIBE F2040 12 kW ID61 01-11-2024_28-02-2025"
+           # "NIBE F2040 12 kW ID61 01-11-2024_28-02-2025"
            ]
                   
 for dev in devices:
     
     test = pd.read_excel(os.path.join('..','Data',f"{dev}.xlsx"), sheet_name = "Test")
     train =  pd.read_excel(os.path.join('..','Data',f"{dev}.xlsx"), sheet_name = "SetData")
-    
+
     #Filter
     test = test[test['Status'] == 'STATIONARY']
     # test = test[(test['Status'] == 'ACCELERATION') | (test['Status'] == 'DECELERATION')
               # | (test['Status'] == 'STATIONARY')]
     # test = test[test['PLR'] >= 0.3]
     
+    LExT_mean = np.mean(test["LExT [°C]"])
+    LExT_std = np.std(test["LExT [°C]"])
+    LExT_Err = LExT_std/math.sqrt(len(test.index))
+    print("Mean Operative Water Temperatue:", LExT_mean,"+-",2 * LExT_std)
+    
+    test_fl = test.loc[test["PLR"] >= 0.95]
+    LExT_mean_fl = np.mean(test_fl["LExT [°C]"])
+    LExT_std_fl = np.std(test_fl["LExT [°C]"])
+    LExT_Err_fl = LExT_std_fl/math.sqrt(len(test_fl.index))
+    print("Mean Operative Water Temperatue fl:", LExT_mean_fl,"+-",2 * LExT_std_fl)
     
     COP_fl_model = test["Heat Cap COND full [kW]"]/ test["Pow full [kW]"]
     COP_ratio = test["COP"]/COP_fl_model
@@ -157,18 +255,21 @@ for dev in devices:
                  "SET": test["SET [°C]"]
                 }
     
+    
+    
     corr_dict_Pow = {"Pow_ratio": Pow_ratio,
                      "PLR": test["PLR"],
-                     "PLR^2":test["PLR"]**2,
-                     "PLR^3":test["PLR"]**3,
+                     # "PLR^2":test["PLR"]**2,
+                     # "PLR^3":test["PLR"]**3,
                      "LExT": test["LExT [°C]"],
                      "SET": test["SET [°C]"],
-                     "PLR*SET":test["PLR"]*test["SET [°C]"],
-                     "PLR*LExT":test["PLR"]*test["LExT [°C]"],
+                     # "PLR*SET":test["PLR"]*test["SET [°C]"],
+                     # "PLR*LExT":test["PLR"]*test["LExT [°C]"],
                      "Delta": test["LExT [°C]"]- test["SET [°C]"],
-                     "ratio": test["LExT [°C]"]/test["SET [°C]"]*test["PLR"],
-                     "exp_lext":np.exp(test["LExT [°C]"]),
-                     "exp_set":np.exp(test["SET [°C]"])}
+                     # "ratio": test["LExT [°C]"]/test["SET [°C]"]*test["PLR"],
+                     # "exp_lext":np.exp(test["LExT [°C]"]),
+                     # "exp_set":np.exp(test["SET [°C]"])
+                     }
     
     LExT_test = test["LExT [°C]"]
     SET_test = test["SET [°C]"]
@@ -176,7 +277,7 @@ for dev in devices:
     PLR_test = test["PLR"]
     
     test_exp = {
-            "Pow":Pow_ratio,
+            "Pow_ratio":Pow_ratio,
             "COP": test["COP"],
             "SET": test["SET [°C]"],
             "LExT": test["LExT [°C]"],
@@ -217,9 +318,27 @@ for dev in devices:
     corr_df_Pow = pd.DataFrame(corr_dict_Pow)
     test_pearson_Pow = corr_df_Pow.corr(method="pearson")
     test_spearman_Pow = corr_df_Pow.corr(method="spearman")
-
- 
     
+    corr_df = pd.DataFrame(corr_dict_Pow)
+    test_pearson_Pow = corr_df.corr(method="pearson")
+    test_spearman_Pow = corr_df.corr(method="spearman")
+
+#%% Lasso regression + RFE
+    # X = corr_df.loc[:,(corr_df.columns != "Pow_ratio") & (corr_df.columns != "COP")]
+    # y = corr_df.loc[:,"Pow_ratio"]
+    
+    # model = LassoCV(cv=5, max_iter=5000).fit(X, y)
+    # selected_features = X.columns[model.coef_ != 0]
+    # # print(selected_features)
+    
+    
+    # rfe = RFE(model, n_features_to_select= 2)  # Voglio solo 2 feature finali
+    # rfe.fit(X, y)
+
+    # #Visualizzo le feature selezionate
+    # selected_features = X.columns[rfe.support_]
+    # print(selected_features)
+        
 #%% Create model of regression
     #Split the model in two submodels
     
@@ -229,8 +348,8 @@ for dev in devices:
     # train1 = train.loc[train["PLR"] <= 0.25]
     # train2 = train.loc[train["PLR"] > 0.25]
     
-    # X_train = np.column_stack((train["PLR"],train["PLR"]**2))
-    # X_test = np.column_stack((test["PLR"],test["PLR"]**2))
+    # X_train = np.column_stack((train["PLR"],train["LExT [°C]"]-train["SET [°C]"]))
+    # X_test = np.column_stack((test["PLR"],test["LExT [°C]"]-test["SET [°C]"]))
     
     # X_train = np.array(train["PLR"]).reshape(-1, 1)
     # X_test = np.array(test["PLR"]).reshape(-1, 1)
@@ -238,9 +357,8 @@ for dev in devices:
     # X_train = np.column_stack(( train["PLR"]/train_delta * train["Pow full [kW]"],(train["PLR"]/train_delta * train["Pow full [kW]"])**2 ))
     # X_test = np.column_stack(( test["PLR"]/test_delta * test["Pow full [kW]"],(test["PLR"]/test_delta * test["Pow full [kW]"])**2))
     
-    # X_train = np.column_stack((train["PLR"]*train["LExT [°C]"],train["PLR"]*train["SET [°C]"]))
-    # X_test = np.column_stack((test["PLR"]*test["LExT [°C]"],test["PLR"]*test["SET [°C]"]))
-    
+    # X_train = np.column_stack((train["PLR"]*(train["LExT [°C]"]-train["SET [°C]"])**2,train["PLR"]*train["LExT [°C]"]**2))
+    # X_test = np.column_stack((test["PLR"]*(test["LExT [°C]"]-test["SET [°C]"])*2,test["PLR"]*test["LExT [°C]"]**2))
     X_train = np.column_stack((train["PLR"],train["PLR"]/(train["LExT [°C]"]-train["SET [°C]"])))
     X_test = np.column_stack((test["PLR"],test["PLR"]/(test["LExT [°C]"]-test["SET [°C]"])))
        
@@ -248,86 +366,95 @@ for dev in devices:
     COP_fl_train = train["Heat Cap COND full [kW]"]/train["Pow full [kW]"]
     Y_train_COP = train["COP"]/ COP_fl_train
     Y_train_Pow = train["Pow [kW]"]/train["Pow full [kW]"]
+    # Y_train_Pow = train["Pow [kW]"]
     
-    #Try picewise linear regression
-    # model_reg_COP = pwlf.PiecewiseLinFit(test["PLR"],COP_ratio)
-    # z = model_reg_COP.fit_with_breaks([0,0.25,1])
-    # y = model_reg_COP.predict(z)
-    # COP_ratio_pred = model_reg_COP.predict(test["PLR"])
+    # Picewise
+    model_reg_Pow = pwlf.PiecewiseLinFit(train["PLR"],Y_train_Pow)
+    z = model_reg_Pow.fit_with_breaks([0,0.2,1])
+    y = model_reg_Pow.predict(z)    
+    Pow_ratio_pred = model_reg_Pow.predict(test["PLR"])
+    Pow_ratio_pred_train = model_reg_Pow.predict(train["PLR"])
     
-    # #Model regression evaluation
-    model_reg_COP = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y_train_COP)
-    COP_ratio_pred = model_reg_COP.predict(X_test)
+    #Linear Rgression
+    # model_reg_Pow = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y_train_Pow)
+    # Pow_ratio_pred = model_reg_Pow.predict(X_test)
     
-    # model_reg_Pow = pwlf.PiecewiseLinFit(train["PLR"],Y_train_Pow)
-    # z = model_reg_Pow.fit_with_breaks([0,0.2,1])
-    # y = model_reg_Pow.predict(z)    
-    # Pow_ratio_pred = model_reg_Pow.predict(test["PLR"])
-    # Pow_ratio_pred_train = model_reg_Pow.predict(train["PLR"])
+    #BayesianRidge
+    # model_reg_Pow = BayesianRidge()
+    # model_reg_Pow.fit(X_train, Y_train_Pow)
     
-    model_reg_Pow = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y_train_Pow)
-    Pow_ratio_pred = model_reg_Pow.predict(X_test)
-    Pow_pred =  Pow_ratio_pred * test["Pow full [kW]"]
-    COP_pred = test["Heat Cap COND [kW]"]/Pow_pred
+    #Curve-fit
+    # def model_reg_Pow(X, a, b, c, d):
+    #     x = X[:,0]
+    #     y = X[:,1]
+      
+    #     return   a* np.log(-x + 1e-6) + b * y**c + d
     
-    Pow_ratio_pred_train = model_reg_Pow.predict(X_train)
-    Pow_pred_train =  Pow_ratio_pred_train* train["Pow full [kW]"]
-    COP_pred_train = train["Heat Cap COND [kW]"]/Pow_pred_train
+    # scaler_x = StandardScaler()
+    # scaler_y = StandardScaler()
     
-    print("Pow_model_score:",r2_score(Pow_ratio, Pow_ratio_pred))
+    # X_scaled = scaler_x.fit_transform(X_train) # shape (2, N)
+    # y_scaled = scaler_y.fit_transform(np.array(Y_train_Pow).reshape(-1, 1)).flatten()
+    
+    
+    # params, _ = curve_fit(model_reg_Pow, X_scaled, y_scaled, maxfev = 10000)
+    # a, b, c, d = params
+    
+    # #%%Symbolic regression
+    # model = PySRRegressor(
+    #     niterations=100,                # più iterazioni → maggiore precisione
+    #     population_size=100,            # dimensione della popolazione evolutiva
+    #     select_k_features=3,            # (opzionale) quante feature selezionare
+    #     model_selection="accuracy",
+    #     maxsize = 7,
+    #     temp_equation_file=True,        
+    #     binary_operators=["+", "-", "*", "/"],
+    #     loss="loss(x, y) = (x - y)^2",  # funzione di loss personalizzabile
+    # )
+    
+    # X_test = np.column_stack((test["PLR"],test["LExT [°C]"],test["SET [°C]"]))
+    # y = np.array(Pow_ratio)
+    # model.fit(X_test, y)
+    # print(model.get_best())
+
+    # # print(f"Pow_ratio ≈ {a:.3f}·PLR + {b:.3f}·PLR² + {c:.3f}·log(DeltaT) + {d:.3f}")
+    # Pow_ratio_pred_scaled = model_reg_Pow(X_test,*params)
+    # Pow_ratio_pred = scaler_y.inverse_transform(Pow_ratio_pred_scaled.reshape(-1, 1)).flatten()
+    
+    # # Pow_ratio_pred = model_reg_Pow.predict(X_test)
+    # Pow_pred =  Pow_ratio_pred * test["Pow full [kW]"]
+    # COP_pred = test["Heat Cap COND [kW]"]/Pow_pred
+    
+    # Pow_ratio_pred_train = model_reg_Pow.predict(X_train)
+    # Pow_pred_train =  Pow_ratio_pred_train* train["Pow full [kW]"]
+    # COP_pred_train = train["Heat Cap COND [kW]"]/Pow_pred_train
+    
+    print("PowR_model_score:",r2_score(Pow_ratio, Pow_ratio_pred))
+    # print("Pow_model_score:",r2_score(Pow_pred, test["Pow [kW]"]))
     # print("COP_model_RMSE:",root_mean_squared_error(COP_ratio, COP_ratio_pred))
-    print("Pow_model_RMSE:",root_mean_squared_error(Pow_ratio, Pow_ratio_pred))
+    print("PowR_model_RMSE:",root_mean_squared_error(Pow_ratio, Pow_ratio_pred))
+    # print("Pow_model_RMSE:",root_mean_squared_error(Pow_pred, test["Pow [kW]"]))
     # print("COP_model_MAPE:",mean_absolute_percentage_error(COP_ratio, COP_ratio_pred))
-    print("Pow_model_MAPE:",mean_absolute_percentage_error(Pow_ratio, Pow_ratio_pred))
+    print("PowR_model_MAPE:",mean_absolute_percentage_error(Pow_ratio, Pow_ratio_pred))
+    # print("Pow_model_MAPE:",mean_absolute_percentage_error(Pow_pred, test["Pow [kW]"]))
     
     #Perfomance evaluation on catalogue data
-    print("\n Pow_model_score:",r2_score(Pow_ratio_train, Pow_ratio_pred_train))
-    print("Pow_model_RMSE:",root_mean_squared_error(Pow_ratio_train, Pow_ratio_pred_train))
-    print("Pow_model_MAPE:",mean_absolute_percentage_error(Pow_ratio_train, Pow_ratio_pred_train))
+    # print("\nPow_model_score:",r2_score(Pow_ratio_train, Pow_ratio_pred_train))
+    # print("Pow_model_RMSE:",root_mean_squared_error(Pow_ratio_train, Pow_ratio_pred_train))
+    # print("Pow_model_MAPE:",mean_absolute_percentage_error(Pow_ratio_train, Pow_ratio_pred_train))
     
     
-    
-    COP_Pow_PLR_plot(test,COP_ratio_pred,Pow_ratio_pred,COP_pred)
+    # COP_Pow_PLR_plot(test,Pow_ratio_pred)
     # cum_value_plot(test)    
-#%%Symbolic regression
-    # Create test
-    # X =test[["PLR","LExT [°C]","SET [°C]"]]
-    # Y = Pow_ratio
-    # X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.30)
-    
-    # #Create model
-    # function_set = ['add', 'sub', 'mul', 'div','cos','sin','neg','inv']
-    # est_gp = SymbolicRegressor(population_size=5000,function_set=function_set,
-    #                        generations=40, stopping_criteria=0.01,
-    #                        p_crossover=0.7, p_subtree_mutation=0.1,
-    #                        p_hoist_mutation=0.05, 
-    #                        p_point_mutation=0.1,
-    #                        max_samples=0.9, verbose=1,
-    #                        parsimony_coefficient=0.01, random_state=0,
-    #                       feature_names=X_train.columns)
-    
-    # converter = {
-    #            'sub': lambda x, y : x - y,
-    #            'div': lambda x, y : x/y,
-    #            'mul': lambda x, y : x*y,
-    #            'add': lambda x, y : x + y,
-    #            'neg': lambda x    : -x,
-    #            'pow': lambda x, y : x**y,
-    #            'sin': lambda x    : sin(x),
-    #            'cos': lambda x    : cos(x),
-    #            'inv': lambda x: 1/x,
-    #            'sqrt': lambda x: x**0.5,
-    #            'pow3': lambda x: x**3
-    #            } 
+    plot_fl(test)
+    # cum_value_LExT_plot(test)
 
 
-    # est_gp.fit(X_train, y_train)
-    # print('R2:',est_gp.score(X_test,y_test))
-    # next_e = sympify((est_gp._program), locals=converter)
-    # next_e
+    # figure5, axs5 = plt.subplots(1,2,figsize = (19,9.5))
+    # sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
 
-
-
+    # axs5[0].hist(test["LExT [°C]"], color='lightgreen', ec='black', bins=15)
+    # axs5[1].hist(test["SET [°C]"], color='orange', ec='black', bins=15)
 
 
 

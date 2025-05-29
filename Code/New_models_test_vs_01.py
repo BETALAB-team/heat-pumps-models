@@ -5,9 +5,11 @@ import pwlf
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn import linear_model
+from scipy.optimize import curve_fit
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score,mean_absolute_percentage_error
-from New_models_preprocess_vs_01 import *
+from New_models_preprocess_vs_02 import *
 from matplotlib.ticker import FormatStrFormatter
+import statsmodels.api as sm
 
 #%%
 #Barplot
@@ -75,9 +77,8 @@ def barplot(KPI):
     
     figure1.suptitle("KPIs")
     plt.tight_layout()
-    plt.savefig(os.path.join('..',"Result Analysis","New_Models_KPI_without_Delta^2.png"))
+    plt.savefig(os.path.join('..',"Result Analysis","New_Models_KPI_weight_no_DeltaT^2.png"))
     plt.close()
-    
     
     #Create figures
     figure2, axs2 = plt.subplots(2,1,figsize = (19,9.5))
@@ -100,10 +101,47 @@ def barplot(KPI):
     axs2[1].legend()
     
     
-    figure2.suptitle("SCOP")
+    figure2.suptitle("SCOP_filt_catalogue")
     plt.tight_layout()
-    plt.savefig(os.path.join('..',"Result Analysis","SCOP_without_Delta^2.png"))
+    plt.savefig(os.path.join('..',"Result Analysis","SCOP_weight_no_DeltaT^2.png"))
     plt.close()
+
+def plot_COP_model(exp,dev, COP_pred,status):
+    
+    #Create folder
+    if not os.path.exists(os.path.join('..',"Results",dev)):
+        os.mkdir(os.path.join('..',"Results",dev))
+    else:
+        pass
+    
+    if not os.path.exists(os.path.join('..',"Results",f"{dev}","New_models")):
+        os.mkdir(os.path.join('..',"Results",dev,"New_models"))
+    else:
+        pass
+
+
+    #Plot Power_pred vs Power_real 
+    figure3, axs3 = plt.subplots(1, figsize = (19,9.5))
+    sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
+
+    plt.scatter(np.array(exp["COP"]),COP_pred, c = exp["PLR"], cmap='jet', label = "COP_model")
+    plt.plot([0, 10], [0, 10], "k--", label = "Bisector")
+    plt.plot([0, 10], [0, 12], "k--", label = "Error +20%")                    
+    plt.text( 6, 4.5, "-20%")
+    plt.plot([0, 10], [0, 8], "k--", label = "Error -20%")
+    plt.text( 6, 7.7, "+20%")
+    cbar = plt.colorbar()
+    cbar.set_label("PLR")
+    plt.xlabel("COP_exp [kW]")
+    plt.xlim(0,10)
+    plt.ylim(0,10)
+    plt.ylabel('COP_model[kW]')
+    plt.legend()
+    
+    # plt.tight_layout()
+    plt.savefig(os.path.join('..',"Results",f"{dev}","New_models",f"NEW_MODEL_COP_{status}.png"))
+    plt.close()
+
     
 #Define new model
 def new_model(devices):        
@@ -125,7 +163,9 @@ def new_model(devices):
         #Import entire database for the specific device
         data = pd.read_excel(os.path.join('..','Data',f"{dev}.xlsx"), sheet_name = "Test")
         data = data.loc[:, ~data.columns.str.contains('^Unnamed')] 
-    
+        
+        #Test with just PLR >= 0.25 to veirfy if it is necessary to split the equation in two
+        # data = data.loc[data["PLR"] >= 0.25]
     
         #Import the catalogue data  with the PLR calculation
         catalogue_data =  pd.read_excel(os.path.join('..','Data',f"{dev}.xlsx"), sheet_name = "SetData")    
@@ -145,47 +185,49 @@ def new_model(devices):
                           | (data['Status'] == 'STATIONARY') | (data['Status'] == 'DEF')  | (data['Status'] == 'DHW')]
                     
             #Normalize the thermodynamics variables - Catalogues
-            Pow_fl = catalogue_data.loc[(catalogue_data["SET [°C]"] == -7) & (catalogue_data["LExT [°C]"] == 35) &
-                                        (catalogue_data["PLR"] == 1),"Pow [kW]"].item()
+            # Pow_fl = catalogue_data.loc[(catalogue_data["SET [°C]"] == -7) & (catalogue_data["LExT [°C]"] == 35) &
+                                        # (catalogue_data["PLR"] == 1),"Pow [kW]"].item()
             
-            SET = (catalogue_data["SET [°C]"] + 273.15)/(-7 + 273.15)
-            LExT =  (catalogue_data["LExT [°C]"] + 273.15)/(35 + 273.15)
-            Delta1 = (catalogue_data["LExT [°C]"]-catalogue_data["SET [°C]"])/(35 + 7)
+            # SET = (catalogue_data["SET [°C]"] + 273.15)/(-7 + 273.15)
+            # LExT =  (catalogue_data["LExT [°C]"] + 273.15)/(35 + 273.15)
+            # Delta1 = (catalogue_data["LExT [°C]"]-catalogue_data["SET [°C]"])/(35 + 7)
+            Delta1 = (catalogue_data["LExT [°C]"]-catalogue_data["SET [°C]"])
             PLR =  catalogue_data["PLR"]
         
-            # # #Normalize the thermodinamics variables - Experimental Data
-            SET_exp = (exp["SET [°C]"] + 273.15)/(-7 + 273.15)
-            LExT_exp =  (exp["LExT [°C]"] + 273.15)/(35 + 273.15)
-            Delta1_exp = (exp["LExT [°C]"]-exp["SET [°C]"])/(35 + 7 )
+             # #Normalize the thermodinamics variables - Experimental Data
+            # SET_exp = (exp["SET [°C]"] + 273.15)/(-7 + 273.15)
+            # LExT_exp =  (exp["LExT [°C]"] + 273.15)/(35 + 273.15)
+            # Delta1_exp = (exp["LExT [°C]"]-exp["SET [°C]"])/(35 + 7 )
+            Delta1_exp = (exp["LExT [°C]"]-exp["SET [°C]"])
             PLR_exp =  exp["PLR"]
                     
-            # # Model input - single equation
-            # X_train = np.column_stack((Delta1*PLR,PLR*Delta1**2))
-            # X_test = np.column_stack((Delta1_exp*PLR_exp,PLR_exp*Delta1_exp**2))
+            
+             # Model input - alternative equation
+            X_train = np.column_stack((PLR,PLR/Delta1))
+            X_test = np.column_stack((PLR_exp,PLR_exp/Delta1_exp))
+            Y_train = catalogue_data["Pow [kW]"]/catalogue_data["Pow full [kW]"]
 
-            # Y2 = catalogue_data["Pow [kW]"]/Pow_fl
-            # model_reg_P = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y2)
-            # Pow_pred = model_reg_P.predict(X_test)*Pow_fl
+            #Linear model and evaluation of reisudals
+            X_train = sm.add_constant(X_train)
+            ols_model_Pow = sm.OLS(Y_train,X_train).fit()
+            residuals_Pow = ols_model_Pow.resid
+            weights_pow = 1 /abs(residuals_Pow)  
+            
+            #Second Training - Power
+            X_test = sm.add_constant(X_test)
+            model_Pow_weight = sm.WLS(Y_train, X_train, weights= weights_pow)
+            model_Pow_weight = model_Pow_weight.fit()
             
             
-            # # Model input - alternative equation
-            # X_train = np.column_stack((PLR,PLR/Delta1))
-            # X_test = np.column_stack((PLR_exp,PLR_exp/Delta1_exp))
-            
-            # Y2 = catalogue_data["Pow [kW]"]/catalogue_data["Pow full [kW]"]
-            # model_reg_P = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y2)
+            # model_reg_P = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y_train)
             # Pow_pred = model_reg_P.predict(X_test)* exp["Pow full [kW]"]
+            Pow_pred = model_Pow_weight.predict(X_test)* exp["Pow full [kW]"]
             
-            # #Model input - linear regressioon
-            X_train = np.array(catalogue_data["PLR"]).reshape(-1, 1)
-            X_test = np.array(exp["PLR"]).reshape(-1, 1)
-            Y = catalogue_data["Pow [kW]"]/catalogue_data["Pow full [kW]"]
-            
-            # #Picewise regression
-            model_reg_Pow = pwlf.PiecewiseLinFit(catalogue_data["PLR"],Y)
-            z = model_reg_Pow.fit_with_breaks([0,0.25,1])
-            Pow_ratio_pred = model_reg_Pow.predict(exp["PLR"])
-            Pow_pred = Pow_ratio_pred* exp["Pow full [kW]"]
+            # Picewise regression
+            # model_reg_Pow = pwlf.PiecewiseLinFit(catalogue_data["PLR"],catalogue_data["Pow [kW]"]/catalogue_data["Pow full [kW]"])
+            # z = model_reg_Pow.fit_with_breaks([0,0.25,1])
+            # Pow_ratio_pred = model_reg_Pow.predict(exp["PLR"])
+            # Pow_pred = Pow_ratio_pred* exp["Pow full [kW]"]
 
             #COP calculation
             COP_pred = exp["Heat Cap COND [kW]"]/Pow_pred
@@ -216,6 +258,7 @@ def new_model(devices):
                 
                 #Plot
                 # plot_power_model(exp, dev, Pow_pred,"STATIONARY")
+                # plot_COP_model(exp,dev, COP_pred,"STATIONARY")
     
             elif i == 1:
                 KPI.loc[(dev,"MODULATION"),"R2_Pow"] = float(r2_score(exp["Pow [kW]"],Pow_pred))
@@ -233,6 +276,7 @@ def new_model(devices):
                 
                 #Plot
                 # plot_power_model(exp,dev, Pow_pred,"MODULATION")
+                # plot_COP_model(exp,dev, COP_pred,"MODULATION")
             
             elif i == 2:
                 KPI.loc[(dev,"MOD + DEF"),"R2_Pow"] = float(r2_score(exp["Pow [kW]"],Pow_pred))
@@ -250,6 +294,7 @@ def new_model(devices):
                 
                 #Plot
                 # plot_power_model(exp,dev, Pow_pred,"MOD + DEF")
+                # plot_COP_model(exp,dev, COP_pred,"MOD + DEF")
                 
             elif i == 3:
                 KPI.loc[(dev,"ALL"),"R2_Pow"] = float(r2_score(exp["Pow [kW]"],Pow_pred))
@@ -266,7 +311,8 @@ def new_model(devices):
                 KPI.loc[(dev,"ALL"),"Err_SCOP"] = float(abs(SCOP_exp - SCOP_model))
                 
                 #Plot
-                # plot_power_model(exp,dev, Pow_pred,"ALL") 
+                # plot_power_model(exp,dev, Pow_pred,"ALL")
+                # plot_COP_model(exp,dev, COP_pred,"ALL")
                 
     return KPI
 
