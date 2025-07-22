@@ -105,26 +105,31 @@ def plot_state_as_color(x_data, state_data, axis, add_labels=True):
 def single_day_plot(data,start_date,end_date):
     figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
     sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
-    plt.tight_layout()
+
     
     data['Time'] = pd.to_datetime(data['Time'], unit='s')    
     filtered_data = data.loc[data["Time"] >= start_date]
     filtered_data = filtered_data.loc[filtered_data["Time"] <= end_date]
     x_data = np.array(filtered_data["Time"]) - pd.Timedelta(minutes = 2.5)
     
-    axs1.set_title('HC and Pow')
+    # axs1.set_title('HC and Pow',font = 15)
     axs1.plot(np.array(filtered_data["Time"]) ,np.array(filtered_data["Heat Cap COND [kW]"]), label = "Heat capacity [kW]")
     plot_state_as_color(x_data, state_data=np.array(filtered_data["Status"]), axis=axs1)
     axs1.plot(np.array(filtered_data["Time"]),np.array(filtered_data["Pow [kW]"]), label = "Power [kW]")
-    axs1.set_xlabel("Time [hours]")
-    
-    axs2 = axs1.twinx() 
-    axs2.plot(np.array(filtered_data["Time"]), np.array(filtered_data["LExT [°C]"]), label = "LExT [°C]", color = "red")
-    axs2.plot(np.array(filtered_data["Time"]),np.array(filtered_data["LET [°C]"]), label = "LET [°C]", color = "green")
-    axs2.plot(np.array(filtered_data["Time"]),np.array(filtered_data["SET [°C]"]), label = "SET [°C]", color = "blue")
+    axs1.set_xlabel("Time [hours]",fontsize = 25)
+    axs1.tick_params(axis='y', labelsize= 25)
+    axs1.tick_params(axis='x', labelsize= 25)
+    axs1.set_ylabel("Power and HC [kW]",fontsize = 25)
 
-    axs1.legend()
-    axs2.legend()
+
+    # axs2 = axs1.twinx() 
+    # axs2.plot(np.array(filtered_data["Time"]), np.array(filtered_data["LExT [°C]"]), label = "LExT [°C]", color = "red")
+    # axs2.plot(np.array(filtered_data["Time"]),np.array(filtered_data["LET [°C]"]), label = "LET [°C]", color = "green")
+    # axs2.plot(np.array(filtered_data["Time"]),np.array(filtered_data["SET [°C]"]), label = "SET [°C]", color = "blue")
+
+    axs1.legend(fontsize = 22)
+    plt.tight_layout()
+    # axs2.legend()
     
 #Plot COP ratio as PLR function
 def COP_PLR_plot(test, COP_fl, PLR, dev, status):
@@ -159,8 +164,8 @@ def COP_PLR_plot(test, COP_fl, PLR, dev, status):
 #%% Methods - Create excel
 def create_excel(new_file_name,test,catalogue_data):
     
-    setdata = pd.read_excel(os.path.join('..','Data', f"{catalogue_data}.xlsx"), sheet_name = "SetData")
-    curve = pd.read_excel(os.path.join('..','Data', f"{catalogue_data}.xlsx"), sheet_name = "curve")
+    setdata = pd.read_excel(os.path.join('..','Data', f"{catalogue_data}.xlsx"), sheet_name = "SetData").round(2)
+    curve = pd.read_excel(os.path.join('..','Data', f"{catalogue_data}.xlsx"), sheet_name = "curve").round(2)
     
     with pd.ExcelWriter(
         os.path.join('..','Data',new_file_name + ".xlsx"),
@@ -170,7 +175,9 @@ def create_excel(new_file_name,test,catalogue_data):
     ) as writer:
         setdata.to_excel(writer, sheet_name = "SetData")
         curve.to_excel(writer, sheet_name = "curve")
-        test.to_excel(writer, sheet_name = "Test")            
+        test.to_excel(writer, sheet_name = "Test")
+    
+    
 
 #%% Methods - Define status and interpolations
 
@@ -220,16 +227,27 @@ def status_analysis(test, HC_des, Pow_des):
             status[i] = 'DEF'
             
     #Modulation and steady state regime   
+    # for i in test.index:
+    #     if status[i] == 0 and abs(Grad_HC[i]) <= 0.05 * HC_des:
+    #         #10%  of the full load HC SET =-7°C and LExT = 35°C from catalogue
+    #         status[i] = 'STATIONARY'
+    #     elif status[i] == 0 and Grad_HC[i] > 0.05 * HC_des:
+    #         status[i] = 'ACCELERATION'
+    #     elif status[i] == 0 and Grad_HC[i] < -0.05 * HC_des: #kW/min
+    #         status[i] = 'DECELERATION'
+    
     for i in test.index:
-        if status[i] == 0 and abs(Grad_HC[i]) <= 0.05 * HC_des:
+        if status[i] == 0 and abs(Grad_EL[i]) <= 0.1:
             #10%  of the full load HC SET =-7°C and LExT = 35°C from catalogue
             status[i] = 'STATIONARY'
-        elif status[i] == 0 and Grad_HC[i] > 0.05 * HC_des:
+        elif status[i] == 0 and Grad_EL[i] > 0.1:
             status[i] = 'ACCELERATION'
-        elif status[i] == 0 and Grad_HC[i] < -0.05 * HC_des: #kW/min
+        elif status[i] == 0 and Grad_EL[i] < -0.1: #kW/min
             status[i] = 'DECELERATION'
     
     test["Status"] = status
+    
+    
     return test        
     
     
@@ -286,14 +304,14 @@ def interp_full_load(data, catalogue_data, SET_des = -7, LExT_des = 35, HC_des =
     X_train_HC = sm.add_constant(X_train_HC)
     ols_model_HC = sm.OLS(Y_train_HC,X_train_HC).fit()
     residuals_HC = ols_model_HC.resid
-    # residuals_HC_2 =  residuals_HC **2
+    residuals_HC_2 =  residuals_HC **2
        
     
     #Linear model and evaluation of reisudals
     X_train_Pow = sm.add_constant(X_train_Pow)
     ols_model_Pow = sm.OLS(Y_train_Pow,X_train_Pow).fit()
     residuals_Pow = ols_model_Pow.resid
-    # residuals_Pow_2 = residuals_Pow**2
+    residuals_Pow_2 = residuals_Pow**2
        
     #Append to train   
     train["Weights_HC"] = 1/abs(residuals_HC)
@@ -352,46 +370,52 @@ def complete_excel(devices, catalogue_data_dev,SET_fl = -7 ,  LExT_fl = 35, HC_f
         
         #Create excel
         create_excel(dev,test_exp,catalogue_data_dev) 
+        test2 = pd.read_excel(os.path.join('..','Data', f"{dev}.xlsx"),sheet_name = "Test")
+        
+        return test_exp,test2
     
         
 #%% Creation of the complete excel file
 def main():
     devices_valliant = [
-               "Valliant A+ 5kW  ID5 01-11-2022_28-02-2023",
-               "Valliant A+ 5kW  ID9 01-11-2022_28-02-2023",
-               "Valliant A+ 5kW  ID24 01-11-2022_28-02-2023"
+               # "Valliant A+ 5kW  ID5 01-11-2022_28-02-2023",
+               # "Valliant A+ 5kW  ID9 01-11-2022_28-02-2023",
+               # "Valliant A+ 5kW  ID24 01-11-2022_28-02-2023"
                ]
     
     devices_riello = [
-                      "Riello NXHM 10 kW ID458 01-11-2024_28-02-2025",
-                      "Riello NXHM 10 kW ID526 01-11-2024_28-02-2025"
+                      # "Riello NXHM 10 kW ID458 01-11-2024_28-02-2025",
+    #                   "Riello NXHM 10 kW ID526 01-11-2024_28-02-2025"
                       ]
     
     devices_nibe = [
-                      "NIBE 2050 10 kW ID65 01-11-2024_28-02-2025",
+    #                   "NIBE 2050 10 kW ID65 01-11-2024_28-02-2025",
                       "NIBE 2050 10 kW ID167 01-11-2024_28-02-2025",
                       "NIBE 2050 10 kW ID531 01-11-2024_28-02-2025"
                       ]
-    devices_nibe_2 = [
-                    "NIBE F2040 12 kW ID61 01-11-2024_28-02-2025"
-                    ]
+    # devices_nibe_2 = [
+    #                 "NIBE F2040 12 kW ID61 01-11-2024_28-02-2025"
+    #                 ]
     
     #Excel creation
-    complete_excel(devices_valliant,"Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA")
-    complete_excel(devices_riello,"Riello NXHM 10 kW - DATA",SET_fl = -7, LExT_fl = 35, HC_fl = 8, Pow_fl = 2.62, COP_fl =3.1)
-    complete_excel(devices_nibe,"NIBE 2050 10 kW - DATA",SET_fl = -7,LExT_fl = 35,HC_fl = 8.7, Pow_fl = 2.9,COP_fl = 3)
-    complete_excel(devices_nibe_2,"NIBE F2040 12 kW - DATA",SET_fl = -7,LExT_fl = 35,HC_fl = 10.3, Pow_fl = 3.73 ,COP_fl = 2.76)
+    # test_exp,test2 = complete_excel(devices_valliant,"Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA")
+    # test_exp,test2 = complete_excel(devices_riello,"Riello NXHM 10 kW - DATA",SET_fl = -7, LExT_fl = 35, HC_fl = 8, Pow_fl = 2.62, COP_fl =3.1)
+    test_exp,test2 = complete_excel(devices_nibe,"NIBE 2050 10 kW - DATA",SET_fl = -7,LExT_fl = 35,HC_fl = 8.7, Pow_fl = 2.9,COP_fl = 3)
+    # complete_excel(devices_nibe_2,"NIBE F2040 12 kW - DATA",SET_fl = -7,LExT_fl = 35,HC_fl = 10.3, Pow_fl = 3.73 ,COP_fl = 2.76)
+    
+    #Plot one single day
+    # single_day_plot(test_exp,"2022-12-25 00:00:00","2022-12-26 00:00:00" )
+    return test_exp,test2
     
 #Run main
 if __name__ == '__main__':
-    main()
+    test_exp,test2 = main()
     
 
 # KPI_all = pd.concat([KPI_all_val ,KPI_all_riello, KPI_all_nibe_2050])
 # KPI_all.to_csv(os.path.join('..',"Result Analysis","KPI_new_model_2.csv"))
 
-#Plot one single day
-# single_day_plot(test_exp_nibe,"2024-12-12 00:00:00","2024-12-30 00:00:00" )
+
 
 # KPI_short_val = new_model(devices_valliant, "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA",1)
 # KPI_short = pd.concat(KPI_all_val ,KPI_all_midea)

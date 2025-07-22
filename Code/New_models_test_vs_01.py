@@ -144,8 +144,7 @@ def plot_COP_model(exp,dev, COP_pred,status):
 
     
 #Define new model
-def new_model(devices):        
-
+def new_model(devices, tupler):        
     KPI = {}
     col = ["R2_Pow","MAPE_Pow","RMSE_Pow",
            "MAPE_COP","RMSE_COP",
@@ -156,9 +155,8 @@ def new_model(devices):
     multindex = pd.MultiIndex.from_product(multindex, names = ["model","status"])
     KPI = pd.DataFrame(KPI,index = multindex,columns = col)
     
-    
     #Clear the data
-    for dev in devices:
+    for dev,cat in tupler:
         
         #Import entire database for the specific device
         data = pd.read_excel(os.path.join('..','Data',f"{dev}.xlsx"), sheet_name = "Test")
@@ -168,7 +166,7 @@ def new_model(devices):
         # data = data.loc[data["PLR"] >= 0.25]
     
         #Import the catalogue data  with the PLR calculation
-        catalogue_data =  pd.read_excel(os.path.join('..','Data',f"{dev}.xlsx"), sheet_name = "SetData")    
+        catalogue_data =  pd.read_excel(os.path.join('..','Data',f"{cat}.xlsx"),sheet_name="SetData")    
         
         #Filter
         for i in range(4):
@@ -176,13 +174,13 @@ def new_model(devices):
                exp = data[data['Status'] == 'STATIONARY']
             elif i == 1:
                 exp = data[(data['Status'] == 'ACCELERATION') | (data['Status'] == 'DECELERATION')
-                          | (data['Status'] == 'STATIONARY')]
+                          | (data['Status'] == 'STATIONARY') | (data['Status'] == 'START') | (data['Status'] == 'STOP')]
             elif i == 2:
                 exp = data[(data['Status'] == 'ACCELERATION') | (data['Status'] == 'DECELERATION')
-                          | (data['Status'] == 'STATIONARY') | (data['Status'] == 'DEF')]
+                          | (data['Status'] == 'STATIONARY') | (data['Status'] == 'DEF')| (data['Status'] == 'START') | (data['Status'] == 'STOP')]
             elif i == 3:
                 exp = data[(data['Status'] == 'ACCELERATION') | (data['Status'] == 'DECELERATION')
-                          | (data['Status'] == 'STATIONARY') | (data['Status'] == 'DEF')  | (data['Status'] == 'DHW')]
+                          | (data['Status'] == 'STATIONARY') | (data['Status'] == 'DEF')  | (data['Status'] == 'DHW')| (data['Status'] == 'START') | (data['Status'] == 'STOP')]
                     
             #Normalize the thermodynamics variables - Catalogues
             # Pow_fl = catalogue_data.loc[(catalogue_data["SET [°C]"] == -7) & (catalogue_data["LExT [°C]"] == 35) &
@@ -194,7 +192,7 @@ def new_model(devices):
             Delta1 = (catalogue_data["LExT [°C]"]-catalogue_data["SET [°C]"])
             PLR =  catalogue_data["PLR"]
         
-             # #Normalize the thermodinamics variables - Experimental Data
+             # #Normalize the thermodinamics variables - Experimental Data 
             # SET_exp = (exp["SET [°C]"] + 273.15)/(-7 + 273.15)
             # LExT_exp =  (exp["LExT [°C]"] + 273.15)/(35 + 273.15)
             # Delta1_exp = (exp["LExT [°C]"]-exp["SET [°C]"])/(35 + 7 )
@@ -208,26 +206,30 @@ def new_model(devices):
             Y_train = catalogue_data["Pow [kW]"]/catalogue_data["Pow full [kW]"]
 
             #Linear model and evaluation of reisudals
-            X_train = sm.add_constant(X_train)
-            ols_model_Pow = sm.OLS(Y_train,X_train).fit()
-            residuals_Pow = ols_model_Pow.resid
-            weights_pow = 1 /abs(residuals_Pow)  
+            # X_train = sm.add_constant(X_train)
+            # ols_model_Pow = sm.OLS(Y_train,X_train).fit()
+            # residuals_Pow = ols_model_Pow.resid
+            # weights_pow = 1 /abs(residuals_Pow)  
             
-            #Second Training - Power
-            X_test = sm.add_constant(X_test)
-            model_Pow_weight = sm.WLS(Y_train, X_train, weights= weights_pow)
-            model_Pow_weight = model_Pow_weight.fit()
+            # #Second Training - Power
+            # X_test = sm.add_constant(X_test)
+            # model_Pow_weight = sm.WLS(Y_train, X_train, weights= weights_pow)
+            # model_Pow_weight = model_Pow_weight.fit()
             
             
-            # model_reg_P = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y_train)
-            # Pow_pred = model_reg_P.predict(X_test)* exp["Pow full [kW]"]
-            Pow_pred = model_Pow_weight.predict(X_test)* exp["Pow full [kW]"]
+            model_reg_P = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y_train)
+            print(model_reg_P.coef_)
+            Pow_pred = model_reg_P.predict(X_test)* exp["Pow full [kW]"]
+            # Pow_pred = model_Pow_weight.predict(X_test)* exp["Pow full [kW]"]
             
             # Picewise regression
             # model_reg_Pow = pwlf.PiecewiseLinFit(catalogue_data["PLR"],catalogue_data["Pow [kW]"]/catalogue_data["Pow full [kW]"])
             # z = model_reg_Pow.fit_with_breaks([0,0.25,1])
             # Pow_ratio_pred = model_reg_Pow.predict(exp["PLR"])
             # Pow_pred = Pow_ratio_pred* exp["Pow full [kW]"]
+             # Model input - alternative equation
+             
+
 
             #COP calculation
             COP_pred = exp["Heat Cap COND [kW]"]/Pow_pred
@@ -314,7 +316,7 @@ def new_model(devices):
                 # plot_power_model(exp,dev, Pow_pred,"ALL")
                 # plot_COP_model(exp,dev, COP_pred,"ALL")
                 
-    return KPI
+    return KPI, Pow_pred
 
 #%% Test the models
 
@@ -329,11 +331,23 @@ devices = [
        "NIBE 2050 10 kW ID167 01-11-2024_28-02-2025",
        "NIBE 2050 10 kW ID531 01-11-2024_28-02-2025",
        
-       "NIBE F2040 12 kW ID61 01-11-2024_28-02-2025"
+       "NIBE F2040 12 kW ID61 01-11-2024_28-02-2025",
+     
+       ]
+       
+tupler = [ 
+       # ("Riello NXHM 10 kW ID458 01-11-2024_28-02-2025","Riello NXHM 10 kW - DATA"),
+       # ("Riello NXHM 10 kW ID526 01-11-2024_28-02-2025","Riello NXHM 10 kW - DATA"),
+       
+       ("NIBE 2050 10 kW ID167 01-11-2024_28-02-2025","NIBE 2050 10 kW - DATA"),
+       ("NIBE 2050 10 kW ID531 01-11-2024_28-02-2025","NIBE 2050 10 kW - DATA"),
+       
+       # ("NIBE F2040 12 kW ID61 01-11-2024_28-02-2025","NIBE F2040 12 kW - DATA"),
+       
        ]
 
-KPI = new_model(devices)
-barplot(KPI)
+KPI, Pow_pred = new_model(devices,tupler)
+# barplot(KPI)
 
 
 
