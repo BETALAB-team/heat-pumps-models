@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error,r2_score,mean_absolute_percentage_error
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_score
 from sklearn import linear_model
 from scipy.signal import savgol_filter
+from scipy.interpolate import UnivariateSpline
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -16,14 +16,15 @@ class Heat_Pumps():
     
     def __init__(self,device):
         
-        self.name, self.catalogue_data, self.source = device
+        self.name, catalogue_data, self.source = device
 
         self.test = pd.read_excel(os.path.join('..','ExpData',f"{self.name}.xlsx"), sheet_name = "Sheet1")
         self.test = self.test.loc[:, ~self.test.columns.str.contains('^Unnamed')] 
         
-        self.train_fl = pd.read_excel(os.path.join('..','Data',f"{self.catalogue_data}.xlsx"), sheet_name = "Full Load").astype(float)
-        self.train = pd.read_excel(os.path.join('..','Data', f"{self.catalogue_data}.xlsx"), sheet_name = "SetData")
-     
+        self.train_fl = pd.read_excel(os.path.join('..','Data',f"{catalogue_data}.xlsx"), sheet_name = "Full Load").astype(float)
+        self.train = pd.read_excel(os.path.join('..','Data', f"{catalogue_data}.xlsx"), sheet_name = "SetData")
+
+    
     #Plot method
     def plot_power_model(self,Pow_pred, status):
         
@@ -191,6 +192,7 @@ class Heat_Pumps():
         
         #Plot Power_pred vs Power_real 
         figure3, axs3 = plt.subplots(1,2, figsize = (19,9.5))
+        sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
         df = self.test.loc[self.test["PLR"] >= 0.95]
         
         axs3[0].scatter(np.array(df["LExT [°C]"] - df["SET [°C]"]),np.array(df["Heat Cap COND [kW]"]),c = "blue")
@@ -202,36 +204,8 @@ class Heat_Pumps():
         
         plt.tight_layout()
         
-    def envelope_plot(self):
-        
-        #Create folder
-        if not os.path.exists(os.path.join('..',"Results",self.name)):
-            os.mkdir(os.path.join('..',"Results",self.name))
-        else:
-            pass
-        
-        if not os.path.exists(os.path.join('..',"Results",f"{self.name}","New_models")):
-            os.mkdir(os.path.join('..',"Results",self.name,"New_models"))
-        else:
-            pass
-        
-        #Plot Power_pred vs Power_real 
-        figure1, axs1 = plt.subplots(1, figsize = (19,9.5))
-        
-        
-        axs1.scatter(np.array(self.test["LExT [°C]"]),np.array(self.test["SET [°C]"]) ,c = "orange", alpha = 0.5)  
-        axs1.scatter(np.array(self.train["LExT [°C]"]),np.array(self.train["SET [°C]"]),c = "blue",alpha = 0.5)              
-        axs1.set_xlabel("LExT [°C]")
-        axs1.set_ylabel("SET [°C]")
-        axs1.set_xlabel("LExT [°C]")
-        axs1.set_ylabel("SET [°C]")
-    
-        plt.tight_layout()    
-        plt.savefig(os.path.join('..',"Results",f"{self.name}","New_models",f"Envelope_plot.png"))
-        plt.close()   
-        
-    def function_plot(self,font):
-
+    def function_plot(self):
+        font = 20
         
         #Create folder
         if not os.path.exists(os.path.join('..',"Results",self.name)):
@@ -305,8 +279,9 @@ class Heat_Pumps():
         plt.savefig(os.path.join('..',"Results",f"{self.name}","New_models",f"Function_plot.png"))
         plt.close()
 
-    def function_plot_2(self,font):
+    def function_plot_2(self):
         
+        font = 20
         #Create folder
         if not os.path.exists(os.path.join('..',"Results",self.name)):
             os.mkdir(os.path.join('..',"Results",self.name))
@@ -384,13 +359,8 @@ class Heat_Pumps():
         figure3.suptitle("Linear regression on Catalogues vs Experimental",fontsize = font)
         plt.tight_layout()
         plt.savefig(os.path.join('..',"Results",f"{self.name}","New_models",f"Function_plot_PLRcost.png"))
-        plt.close()
-
-    # def plt_hist(self):
-    #     df = self.test.loc[self.test["Status"] != "OFF"]
-    #     df.plot.hist(column = ["LExT [°C]"],bins = 10)
-    #     print(df["LExT [°C]"].quantile(q=0.1))
-    #     print(df["LExT [°C]"].quantile(q=0.9))
+        plt.close()  
+    
 
 #%% Methods in the HPs classes
     #Method to analalise the status of operation of the HP    
@@ -413,9 +383,12 @@ class Heat_Pumps():
             self.HC_des = self.train_fl.loc[self.train_fl.index == 0, "Heat Cap COND [kW]"].item()
             
         #Clean the dataset
-        col = ["Time","Pow [kW]","Heat Cap COND [kW]", "LExT [°C]", "LET [°C]","SET [°C]"]
+        col = ["Time","Pow [kW]","Heat Cap COND [kW]", "LExT [°C]", "LET [°C]", "LFR [kg/s]","SET [°C]"]
         self.test.columns = col
-       
+        self.test = self.test.drop(columns=['LFR [kg/s]'])
+        self.test = self.test.dropna(axis = 0)
+        self.test = self.test.reset_index()
+        
         #Ground source heat pumps
         if self.source == "WtW":
             mean_air_t = np.mean(self.test["SET [°C]"])
@@ -426,8 +399,8 @@ class Heat_Pumps():
         #Conversion units of measurement
         self.test['Heat Cap COND [kW]'] = self.test['Heat Cap COND [kW]']/1000 #trasform to kW
         self.test['Pow [kW]'] = self.test['Pow [kW]']/1000  #trasform to kW
-        self.test = self.test.reset_index()
-        
+        # self.test["LFR [kg/s]"] = self.test["LFR [kg/s]"] / 3600 #Conversion from l/h to kg/s
+  
         #Initilize status
         status = []
         
@@ -440,16 +413,42 @@ class Heat_Pumps():
                 status.append(0)
                 
         #Define Gradient
-        #Values equally spaced by a 5 minutes interval
+        def spline_deriv_local(x, y, window_size=7, spline_order=3):
+                """
+                Calcola la derivata prima in ogni punto usando spline locale su finestra mobile.
+                
+                Parametri:
+                    x : array-like (non uniforme)
+                    y : array-like
+                    window_size : int, numero dispari di punti nella finestra (es. 7)
+                    spline_order : int, grado del polinomio (es. 3)
+                
+                Ritorna:
+                    dy_dx : array delle derivate stimate in ciascun punto
+                """
+                if window_size % 2 == 0:
+                    raise ValueError("La finestra deve avere un numero dispari di punti")
+                
+                n = len(x)
+                half_w = window_size // 2
+                dy_dx = np.full(n, np.nan)  # inizializza array delle derivate
+            
+                for i in range(half_w, n - half_w):
+                    x_win = x[i - half_w : i + half_w + 1]
+                    y_win = y[i - half_w : i + half_w + 1]
+            
+                    # Fit locale con spline interpolante (senza smoothing)
+                    spline = UnivariateSpline(x_win, y_win, k=spline_order, s=0)
+                    dy_dx[i] = spline.derivative()(x[i])
+            
+                return dy_dx
+            
         x_min = np.zeros(len(self.test["Time"]))
-        
         for i in self.test.index:
             x_min[i] = (self.test.loc[i,"Time"] - self.test.loc[0,"Time"]).total_seconds() /60
         
-        Grad_HC = np.gradient(self.test["Heat Cap COND [kW]"],x_min)  #compute the gradient using the delta time of 5 minutes [kW/min]
-        
         #Try usign savgol_filter
-        # Grad_HC = savgol_filter(self.test["Heat Cap COND [kW]"], window_length=7, polyorder=3, deriv=1, delta=5)
+        Grad_HC = spline_deriv_local(x_min, self.test['Heat Cap COND [kW]'], window_size= 19, spline_order=2)
         
         #START and STOP status
         for i in self.test.index:
@@ -483,7 +482,7 @@ class Heat_Pumps():
         #Since the units with water have a greater inertia, a smaller limit is required.
         if self.source == "WtW"or self.source == "WtA":
             for i in self.test.index:
-                if status[i] == 0 and abs(Grad_HC[i]) <= 0.05 * self.HC_des:
+                if status[i] == 0 and abs(Grad_HC[i]) <= 0.005* self.HC_des:
                     #10%  of the full load HC SET =-7°C and LExT = 35°C from catalogue
                     status[i] = 'STATIONARY'
                 elif status[i] == 0 and Grad_HC[i] > 0.005* self.HC_des:
@@ -624,13 +623,7 @@ class Heat_Pumps():
             elif i == 3:
                 self.test_fil = self.test[(self.test['Status'] == 'ACCELERATION') | (self.test['Status'] == 'DECELERATION')| (self.test['Status'] == 'START') | (self.test['Status'] == 'STOP')
                           | (self.test['Status'] == 'STATIONARY') | (self.test['Status'] == 'DEF')  | (self.test['Status'] == 'DHW')]
-             
-            #Filter
-            # self.test_fil = self.test_fil.loc[self.test_fil["PLR"] <= 0.8]
-            # self.train = self.train.loc[self.train["PLR"] <= 0.8]
-            # self.test_fil = self.test_fil.loc[(self.test_fil["LExT [°C]"] <= 55) & (self.test_fil["LExT [°C]"] >= 35)]
-            # self.test_fil = self.test_fil.loc[(self.test_fil["SET [°C]"] <= 12) & (self.test_fil["SET [°C]"] >= -7)]
-            
+                    
             #Normalize the thermodynamics variables - Catalogue
             Delta1 = self.train["LExT [°C]"]-self.train["SET [°C]"]
             PLR =  self.train["PLR"]
@@ -689,11 +682,7 @@ class Heat_Pumps():
                 #SCOP
                self.KPI.loc[(self.name,"STATIONARY"),"SCOP_model"] = float(SCOP_model.astype(float))
                self.KPI.loc[(self.name,"STATIONARY"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI.loc[(self.name,"STATIONARY"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
-                
-               #Mean and std LExt
-               # self.KPI.loc[(self.name,"STATIONARY"),"mean LExT [°C]"] = float(np.mean(self.test_fil["LExT [°C]"]))
-               # self.KPI.loc[(self.name,"STATIONARY"),"std LExT"] = float(np.std(self.test_fil["LExT [°C]"]))
+               self.KPI.loc[(self.name,"STATIONARY"),"Err_SCOP [%]"] = float(abs(SCOP_exp - SCOP_model)/SCOP_model *100)
                 
                #Plot
                # self.plot_power_model(Pow_pred,"STATIONARY")
@@ -713,12 +702,8 @@ class Heat_Pumps():
                 #SCOP
                self.KPI.loc[(self.name,"MODULATION"),"SCOP_model"] = float(SCOP_model.astype(float))
                self.KPI.loc[(self.name,"MODULATION"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI.loc[(self.name,"MODULATION"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
-               
-               #Mean and std LExt
-               # self.KPI.loc[(self.name,"MODULATION"),"mean LExT [°C]"] = float(np.mean(self.test_fil["LExT [°C]"]))
-               # self.KPI.loc[(self.name,"MODULATION"),"std LExT"] = float(np.std(self.test_fil["LExT [°C]"]))
-               
+               self.KPI.loc[(self.name,"MODULATION"),"Err_SCOP [%]"] = float(abs(SCOP_exp - SCOP_model)/SCOP_model *100)
+                
                #Plot
                # self.plot_power_model(Pow_pred,"MODULATION")
                # self.plot_COP_model(COP_pred,"MODULATION")
@@ -737,12 +722,8 @@ class Heat_Pumps():
                 #SCOP
                self.KPI.loc[(self.name,"MOD + DEF"),"SCOP_model"] = float(SCOP_model.astype(float))
                self.KPI.loc[(self.name,"MOD + DEF"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI.loc[(self.name,"MOD + DEF"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
-               
-               #Mean and std LExt
-               # self.KPI.loc[(self.name,"MOD + DEF"),"mean LExT [°C]"] = float(np.mean(self.test_fil["LExT [°C]"]))
-               # self.KPI.loc[(self.name,"MOD + DEF"),"std LExT"] = float(np.std(self.test_fil["LExT [°C]"]))
-               
+               self.KPI.loc[(self.name,"MOD + DEF"),"Err_SCOP [%]"] = float(abs(SCOP_exp - SCOP_model)/SCOP_model *100)
+                
                #Plot
                # self.plot_power_model(Pow_pred,"MOD + DEF")
                # self.plot_COP_model(COP_pred,"MOD + DEF")
@@ -761,12 +742,8 @@ class Heat_Pumps():
                 #SCOP
                self.KPI.loc[(self.name,"ALL"),"SCOP_model"] = float(SCOP_model.astype(float))
                self.KPI.loc[(self.name,"ALL"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI.loc[(self.name,"ALL"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
+               self.KPI.loc[(self.name,"ALL"),"Err_SCOP [%]"] = float(abs(SCOP_exp - SCOP_model)/SCOP_model *100)
                 
-               # #Mean and std LExt
-               # self.KPI.loc[(self.name,"MOD + DEF"),"mean LExT [°C]"] = float(np.mean(self.test_fil["LExT [°C]"]))
-               # self.KPI.loc[(self.name,"MOD + DEF"),"std LExT"] = float(np.std(self.test_fil["LExT [°C]"]))
-              
                #Plot
                # self.plot_power_model(Pow_pred,"ALL")
                # self.plot_COP_model(COP_pred,"ALL")
@@ -804,11 +781,12 @@ class Heat_Pumps():
                           | (self.test['Status'] == 'STATIONARY') | (self.test['Status'] == 'DEF')  | (self.test['Status'] == 'DHW')]
             
            
-            
-            #Normalize the thermodinamics variables - experimental Data
+        
+             #Normalize the thermodinamics variables - experimental Data
             Delta1_exp = self.test_fil["LExT [°C]"]-self.test_fil["SET [°C]"]
             PLR_exp =  self.test_fil["PLR"]
                     
+           
             #Input
             X = np.column_stack((PLR_exp,PLR_exp/Delta1_exp, self.test_fil["Heat Cap COND [kW]"],self.test_fil["Pow [kW]"],self.test_fil["COP"]))
             Y = np.column_stack((self.test_fil["Pow [kW]"]/self.test_fil["Pow full [kW]"],self.test_fil["Pow full [kW]"]))
@@ -847,7 +825,7 @@ class Heat_Pumps():
                 #SCOP
                self.KPI_ML.loc[(self.name,"STATIONARY"),"SCOP_model"] = float(SCOP_model.astype(float))
                self.KPI_ML.loc[(self.name,"STATIONARY"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI_ML.loc[(self.name,"STATIONARY"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
+               self.KPI_ML.loc[(self.name,"STATIONARY"),"Err_SCOP [%]"] = float(abs(SCOP_exp - SCOP_model)/SCOP_model *100)
                 
                #Plot
                # self.plot_power_model(Pow_pred,"STATIONARY")
@@ -866,7 +844,7 @@ class Heat_Pumps():
                 #SCOP
                self.KPI_ML.loc[(self.name,"MODULATION"),"SCOP_model"] = float(SCOP_model.astype(float))
                self.KPI_ML.loc[(self.name,"MODULATION"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI_ML.loc[(self.name,"MODULATION"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
+               self.KPI_ML.loc[(self.name,"MODULATION"),"Err_SCOP [%]"] = float(abs(SCOP_exp - SCOP_model)/SCOP_model *100)
                 
                #Plot
                # self.plot_power_model(Pow_pred,"MODULATION")
@@ -885,7 +863,7 @@ class Heat_Pumps():
                 #SCOP
                self.KPI_ML.loc[(self.name,"MOD + DEF"),"SCOP_model"] = float(SCOP_model.astype(float))
                self.KPI_ML.loc[(self.name,"MOD + DEF"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI_ML.loc[(self.name,"MOD + DEF"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
+               self.KPI_ML.loc[(self.name,"MOD + DEF"),"Err_SCOP[%]"] = float(abs(SCOP_exp - SCOP_model)/SCOP_model *100)
                 
                #Plot
                # self.plot_power_model(Pow_pred,"MOD + DEF")
@@ -904,7 +882,7 @@ class Heat_Pumps():
                 #SCOP
                self.KPI_ML.loc[(self.name,"ALL"),"SCOP_model"] = float(SCOP_model.astype(float))
                self.KPI_ML.loc[(self.name,"ALL"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI_ML.loc[(self.name,"ALL"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
+               self.KPI_ML.loc[(self.name,"ALL"),"Err_SCOP [%]"] = float(abs(SCOP_exp - SCOP_model)/SCOP_model *100)
                 
                #Plot
                # self.plot_power_model(Pow_pred,"ALL")
@@ -912,162 +890,10 @@ class Heat_Pumps():
                # self.Err_Power(Pow_pred, "ALL")
                 
         return self.KPI_ML
+    
 
-#%% New class for comparing different heat pumps   
-     
-class Heat_Pumps_comparison():
-    
-    
-    def __init__(self,HP1, HP2):
-        self.HP1 = HP1
-        self.HP2 = HP2
-        
-    def test_on_different_machines(self):
-        
-        self.KPI = {}
-        
-        col = ["R2_Pow","MAPE_Pow","RMSE_Pow",
-               "MAPE_COP","RMSE_COP",
-               "SCOP_model","SCOP_exp","Err_SCOP [%]"]
-        
-        states = ["STATIONARY","MODULATION","MOD + DEF","ALL"]
-        multindex = [["TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}"],states]
-        multindex = pd.MultiIndex.from_product(multindex, names = ["model","status"])
-        self.KPI = pd.DataFrame(self.KPI,index = multindex,columns = col)
-                    
-        #Filter on different stauts
-        for i in range(4):
-            if i == 0:
-                self.HP1.test_fil = self.HP1.test[self.HP1.test['Status'] == 'STATIONARY']
-                self.HP2.test_fil = self.HP2.test[self.HP2.test['Status'] == 'STATIONARY']    
-            elif i == 1:
-                self.HP1.test_fil = self.HP1.test[(self.HP1.test['Status'] == 'ACCELERATION') | (self.HP1.test['Status'] == 'DECELERATION')
-                          | (self.HP1.test['Status'] == 'STATIONARY') | (self.HP1.test['Status'] == 'START') | (self.HP1.test['Status'] == 'STOP')]
-                
-                self.HP2.test_fil = self.HP2.test[(self.HP2.test['Status'] == 'ACCELERATION') | (self.HP2.test['Status'] == 'DECELERATION')
-                          | (self.HP2.test['Status'] == 'STATIONARY') | (self.HP2.test['Status'] == 'START') | (self.HP2.test['Status'] == 'STOP')]
-            elif i == 2:
-                self.HP1.test_fil = self.HP1.test[(self.HP1.test['Status'] == 'ACCELERATION') | (self.HP1.test['Status'] == 'DECELERATION') | (self.HP1.test['Status'] == 'START')
-                         | (self.HP1.test['Status'] == 'STOP') | (self.HP1.test['Status'] == 'STATIONARY') | (self.HP1.test['Status'] == 'DEF')]
-                
-                self.HP2.test_fil = self.HP2.test[(self.HP2.test['Status'] == 'ACCELERATION') | (self.HP2.test['Status'] == 'DECELERATION') | (self.HP2.test['Status'] == 'START')
-                         | (self.HP2.test['Status'] == 'STOP') | (self.HP2.test['Status'] == 'STATIONARY') | (self.HP2.test['Status'] == 'DEF')]
-            elif i == 3:
-                self.HP1.test_fil = self.HP1.test[(self.HP1.test['Status'] == 'ACCELERATION') | (self.HP1.test['Status'] == 'DECELERATION')| (self.HP1.test['Status'] == 'START') | (self.HP1.test['Status'] == 'STOP')
-                          | (self.HP1.test['Status'] == 'STATIONARY') | (self.HP1.test['Status'] == 'DEF')  | (self.HP1.test['Status'] == 'DHW')]
-            
-                self.HP2.test_fil = self.HP2.test[(self.HP2.test['Status'] == 'ACCELERATION') | (self.HP2.test['Status'] == 'DECELERATION')| (self.HP2.test['Status'] == 'START') | (self.HP2.test['Status'] == 'STOP')
-                          | (self.HP2.test['Status'] == 'STATIONARY') | (self.HP2.test['Status'] == 'DEF')  | (self.HP2.test['Status'] == 'DHW')]
-            
-          
-            #Calculate the thermodynamics variables - Train
-            Delta1 = self.HP1.test_fil["LExT [°C]"]-self.HP1.test_fil["SET [°C]"]
-            PLR =  self.HP1.test_fil["PLR"]
-            
-            #Calculate the thermodynamic variables - Test
-            Delta1_exp = self.HP2.test_fil["LExT [°C]"]-self.HP2.test_fil["SET [°C]"]
-            PLR_exp =  self.HP2.test_fil["PLR"]
-        
-            # Model input 
-            X_train = np.column_stack((PLR,PLR/Delta1))
-            X_test = np.column_stack((PLR_exp,PLR_exp/Delta1_exp))
-            Y_train = self.HP1.test_fil["Pow [kW]"]/self.HP1.test_fil["Pow full [kW]"]
-            
-            #Model fitting and testing
-            self.model_reg_P = linear_model.LinearRegression(fit_intercept = True).fit(X_train, Y_train)
-            Pow_pred = self.model_reg_P.predict(X_test)* self.HP2.test_fil["Pow full [kW]"]
-            
-            #COP calculation
-            COP_pred = self.HP2.test_fil["Heat Cap COND [kW]"]/Pow_pred
-            COP_pred.replace([np.inf, -np.inf], np.nan, inplace=True)
-            COP_pred.fillna(0, inplace = True)
-            
-            #SCOP calculation
-            SCOP_model = sum(np.array(self.HP2.test_fil["Heat Cap COND [kW]"]))/sum(Pow_pred)
-            SCOP_exp = sum(np.array(self.HP2.test_fil["Heat Cap COND [kW]"]))/sum(np.array(self.HP2.test_fil["Pow [kW]"]))
-        
-            #KPI Calculations 
-            if i == 0:
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","STATIONARY"),"R2_Pow"] = float(r2_score(self.HP2.test_fil["Pow [kW]"],Pow_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","STATIONARY"),"MAPE_Pow"] = float(mean_absolute_error(self.HP2.test_fil["Pow [kW]"],Pow_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","STATIONARY"),"RMSE_Pow"] = float(root_mean_squared_error(self.HP2.test_fil["Pow [kW]"],Pow_pred).astype(float))
-                
-                # #COP
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","STATIONARY"),"MAPE_COP"] = float(mean_absolute_error(self.HP2.test_fil["COP"],COP_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","STATIONARY"),"RMSE_COP"] = float(root_mean_squared_error(self.HP2.test_fil["COP"],COP_pred).astype(float))
-                  
-                #SCOP
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","STATIONARY"),"SCOP_model"] = float(SCOP_model.astype(float))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","STATIONARY"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","STATIONARY"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
-                
-               #Plot
-               # self.HP2.plot_power_model(Pow_pred,"STATIONARY")
-               # self.HP2.plot_COP_model(COP_pred,"STATIONARY")
-               # self.HP2.Err_Power(Pow_pred, "STATIONARY")
-               
-        
-            elif i == 1:
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MODULATION"),"R2_Pow"] = float(r2_score(self.HP2.test_fil["Pow [kW]"],Pow_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MODULATION"),"MAPE_Pow"] = float(mean_absolute_error(self.HP2.test_fil["Pow [kW]"],Pow_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MODULATION"),"RMSE_Pow"] = float(root_mean_squared_error(self.HP2.test_fil["Pow [kW]"],Pow_pred).astype(float))
-                
-                #COP
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MODULATION"),"MAPE_COP"] = float(mean_absolute_error(self.HP2.test_fil["COP"],COP_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MODULATION"),"RMSE_COP"] = float(root_mean_squared_error(self.HP2.test_fil["COP"],COP_pred).astype(float))
-                
-                #SCOP
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MODULATION"),"SCOP_model"] = float(SCOP_model.astype(float))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MODULATION"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MODULATION"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
-                
-               #Plot
-               # self.HP2.plot_power_model(Pow_pred,"MODULATION")
-               # self.HP2.plot_COP_model(COP_pred,"MODULATION")
-               # self.HP2.Err_Power(Pow_pred, "MODULATION")
-             
-               
-            elif i == 2:
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MOD + DEF"),"R2_Pow"] = float(r2_score(self.HP2.test_fil["Pow [kW]"],Pow_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MOD + DEF"),"MAPE_Pow"] = float(mean_absolute_error(self.HP2.test_fil["Pow [kW]"],Pow_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MOD + DEF"),"RMSE_Pow"] = float(root_mean_squared_error(self.HP2.test_fil["Pow [kW]"],Pow_pred).astype(float))
-                
-                #COP
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MOD + DEF"),"MAPE_COP"] = float(mean_absolute_error(self.HP2.test_fil["COP"],COP_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MOD + DEF"),"RMSE_COP"] = float(root_mean_squared_error(self.HP2.test_fil["COP"],COP_pred).astype(float))
-                
-                #SCOP
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MOD + DEF"),"SCOP_model"] = float(SCOP_model.astype(float))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MOD + DEF"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","MOD + DEF"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
-                
-               #Plot
-               # self.HP2.plot_power_model(Pow_pred,"MOD + DEF")
-               # self.HP2.plot_COP_model(COP_pred,"MOD + DEF")
-               # self.HP2.Err_Power(Pow_pred, "MOD + DEF")
-              
-                
-            elif i == 3:
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","ALL"),"R2_Pow"] = float(r2_score(self.HP2.test_fil["Pow [kW]"],Pow_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","ALL"),"MAPE_Pow"] = float(mean_absolute_error(self.HP2.test_fil["Pow [kW]"],Pow_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","ALL"),"RMSE_Pow"] = float(root_mean_squared_error(self.HP2.test_fil["Pow [kW]"],Pow_pred).astype(float))
-                
-                #COP
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","ALL"),"MAPE_COP"] = float(mean_absolute_error(self.HP2.test_fil["COP"],COP_pred))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","ALL"),"RMSE_COP"] = float(root_mean_squared_error(self.HP2.test_fil["COP"],COP_pred).astype(float))
-                
-                #SCOP
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","ALL"),"SCOP_model"] = float(SCOP_model.astype(float))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","ALL"),"SCOP_exp"] = float(SCOP_exp.astype(float))
-               self.KPI.loc[("TRAIN:" + f" {self.HP1.name}"+"\nTEST: "+ f" {self.HP2.name}","ALL"),"Err_SCOP [%]"] = float((SCOP_model - SCOP_exp)/SCOP_exp *100)
-                
-               #Plot
-               # self.HP2.plot_power_model(Pow_pred,"ALL")
-               # self.HP2.plot_COP_model(COP_pred,"ALL")
-               # self.HP2.Err_Power(Pow_pred, "ALL")
-             
-              
-        return self.KPI
+
+
 
 
 
