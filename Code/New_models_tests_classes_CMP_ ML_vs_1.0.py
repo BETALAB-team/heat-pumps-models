@@ -4,25 +4,13 @@ from matplotlib.ticker import FormatStrFormatter
 sns.set_theme(rc={'figure.figsize':(19,9.5)},style = 'whitegrid')
 
 #%%Plots
-def barplot(KPI,font):
+def barplot(model,KPI,font):
 
     #Create figures
     figure1, axs1 = plt.subplots(3,1,figsize = (19,9.5))
        
     #Create labels
-    model = ["ID167 + ID458", 
-             "ID167 + ID526",
-             "ID531 + ID458", 
-             "ID531 + ID526",
-             "ID458 + ID167", 
-             "ID458 + ID531",
-             "ID526 + ID167", 
-             "ID526 + ID531",
-             "ID118 + ID83",
-             "ID83 + ID118",
-             "ID288 + ID118",
-             "ID288 + ID83"
-             ]
+
     
     R2_stat = KPI.loc[KPI.index.get_level_values("status") == "STATIONARY","R2_Pow"]
     R2_all =  KPI.loc[KPI.index.get_level_values("status") == "ALL","R2_Pow"]  
@@ -141,40 +129,38 @@ def barplot(KPI,font):
 
 #%%%% Couples lists
 
-devices = [
-            (("NIBE 2050 10 kW ID167 01-11-2024_28-02-2025","NIBE 2050 10 kW - DATA","AtW"),
-            ("Riello NXHM 10 kW ID458 01-11-2024_28-02-2025","Riello NXHM 10 kW - DATA","AtW")),
+devices = [  
+
+            #10 kW        
+            (("NIBE 2050 10 kW ID167 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
+            ("Riello NXHM 10 kW ID526 01-09-2024_30-04-2025","Riello NXHM 10 kW - DATA","AtW")),
+
+            (("NIBE 2050 10 kW ID531 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
+            ("Riello NXHM 10 kW ID526 01-09-2024_30-04-2025","Riello NXHM 10 kW - DATA","AtW")),
             
-            (("NIBE 2050 10 kW ID167 01-11-2024_28-02-2025","NIBE 2050 10 kW - DATA","AtW"),
-            ("Riello NXHM 10 kW ID526 01-11-2024_28-02-2025","Riello NXHM 10 kW - DATA","AtW")),
+            (("Riello NXHM 10 kW ID526 01-09-2024_30-04-2025","Riello NXHM 10 kW - DATA","AtW"),
+            ("NIBE 2050 10 kW ID167 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW")),
             
-            (("NIBE 2050 10 kW ID531 01-11-2024_28-02-2025","NIBE 2050 10 kW - DATA","AtW"),
-            ("Riello NXHM 10 kW ID458 01-11-2024_28-02-2025","Riello NXHM 10 kW - DATA","AtW")),
+            (("Riello NXHM 10 kW ID526 01-09-2024_30-04-2025","Riello NXHM 10 kW - DATA","AtW"),
+            ("NIBE 2050 10 kW ID531 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW")),
             
-            (("NIBE 2050 10 kW ID531 01-11-2024_28-02-2025","NIBE 2050 10 kW - DATA","AtW"),
-            ("Riello NXHM 10 kW ID526 01-11-2024_28-02-2025","Riello NXHM 10 kW - DATA","AtW")),
+            #16 kW
+            (("NIBE F2040 16kW  ID288 01-09-2024_30-04-2025","NIBE F2040 16 kW - DATA","AtW"),
+            ("LG Therma V 16kW  ID83 01-09-2024_30-04-2025","LG therma 16  kW - DATA ","AtW")),
             
-            (("Riello NXHM 10 kW ID458 01-11-2024_28-02-2025","Riello NXHM 10 kW - DATA","AtW"),
-            ("NIBE 2050 10 kW ID167 01-11-2024_28-02-2025","NIBE 2050 10 kW - DATA","AtW")),
-            
-            (("Riello NXHM 10 kW ID526 01-11-2024_28-02-2025","Riello NXHM 10 kW - DATA","AtW"),
-            ("NIBE 2050 10 kW ID167 01-11-2024_28-02-2025","NIBE 2050 10 kW - DATA","AtW")),
-            
-            (("Riello NXHM 10 kW ID458 01-11-2024_28-02-2025","Riello NXHM 10 kW - DATA","AtW"),
-            ("NIBE 2050 10 kW ID531 01-11-2024_28-02-2025","NIBE 2050 10 kW - DATA","AtW")),
-            
-            (("Riello NXHM 10 kW ID526 01-11-2024_28-02-2025","Riello NXHM 10 kW - DATA","AtW"),
-            ("NIBE 2050 10 kW ID531 01-11-2024_28-02-2025","NIBE 2050 10 kW - DATA","AtW")),
-            
-            (("Midea MHC-V16 16kW  ID118 01-11-2024_28-02-2025","Midea MHC-V16  kW - DATA","AtW"),
-            ("LG Therma V 16kW  ID83 01-11-2024_28-02-2025","LG therma 16  kW - DATA ","AtW")),
-            
-            (("NIBE F2040 16kW  ID288 01-11-2024_28-02-2025","NIBE F2040 16 kW - DATA","AtW"),
-            ("Midea MHC-V16 16kW  ID118 01-11-2024_28-02-2025","Midea MHC-V16  kW - DATA","AtW")),
-            
-            (("NIBE F2040 16kW  ID288 01-11-2024_28-02-2025","NIBE F2040 16 kW - DATA","AtW"),
-            ("LG Therma V 16kW  ID83 01-11-2024_28-02-2025","LG therma 16  kW - DATA ","AtW"))
+            (("LG Therma V 16kW  ID83 01-09-2024_30-04-2025","LG therma 16  kW - DATA ","AtW"),
+            ("NIBE F2040 16kW  ID288 01-09-2024_30-04-2025","NIBE F2040 16 kW - DATA","AtW")),
+        
              ]
+
+model = [
+         "ID167 + ID526", 
+         "ID531 + ID526",
+         "ID526 + ID167", 
+         "ID526 + ID531",
+         "ID288 + ID83",
+         "ID83 + ID288",
+         ]
 
 #%%Test on different machines
 
@@ -198,7 +184,7 @@ for dev in devices:
     KPI.append(HPC.KPI)
 
 KPI = pd.concat(KPI)    
-barplot(KPI, font = 15)
+barplot(model,KPI, font = 12)
 
 
 
