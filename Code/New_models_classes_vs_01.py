@@ -14,6 +14,7 @@ import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import seaborn as sns
+from scipy.stats import shapiro
 
 #%% Model vs 2.0 class structure
 
@@ -182,7 +183,7 @@ class Heat_Pumps():
         labels = [line.get_label() for line in lines]
         
         axs1.legend(handles=lines + state_handles, labels=labels + [h.get_label() for h in state_handles],
-                    loc='upper left', fontsize=font)
+                   loc="center left", bbox_to_anchor=(0, -0.2), frameon = False, ncol = 5, fontsize = font)
         
         plt.tight_layout()
         plt.show()
@@ -190,7 +191,7 @@ class Heat_Pumps():
 #%% Plot power model vs actual power consumed
     def plot_time_series(self, start_date, end_date, font):
      
-        fig, axs1 = plt.subplots(2, figsize=(19, 9.5))
+        fig,  axs1= plt.subplots(2, figsize=(19, 9.5))
         
         # Filtra i dati
         self.test_fil['Time'] = pd.to_datetime(self.test_fil['Time'], unit='s')
@@ -250,14 +251,23 @@ class Heat_Pumps():
         axs1[0].tick_params(axis='x', labelsize=font)
         axs1[0].tick_params(axis='y', labelsize=font)
         
+        # Secondo asse y per temperature
+        axs2 = axs1[0].twinx()
+        axs2.plot(filtered_data["Time"], filtered_data["LExT [°C]"], label="LExT [°C]", color="green")
+        axs2.plot(filtered_data["Time"], filtered_data["SET [°C]"], label="SET [°C]", color="grey")
+        axs2.set_ylabel("Temperatures [°C]", fontsize=font)
+        axs2.tick_params(axis='x', labelsize=font)
+        axs2.tick_params(axis='y', labelsize=font)
+        
+        
         # Plottaggio stati con colori
         state_handles = plot_state_as_color(x_data, filtered_data["Status"], axs1[0])
         # axs1[0].legend(loc="center left", bbox_to_anchor=(1, 0.5), frameon = False, ncol = 1 , fontsize = font)
-        lines = axs1[0].get_lines() + axs1[1].get_lines()
+        lines = axs1[0].get_lines() + axs2.get_lines() + axs1[1].get_lines()
         labels = [line.get_label() for line in lines]
         
         axs1[0].legend(handles=lines + state_handles, labels=labels + [h.get_label() for h in state_handles],
-                    loc="center left", bbox_to_anchor=(1, 0.5), frameon = False, ncol = 1 , fontsize = font)
+                    loc="center left", bbox_to_anchor=(1.1, 0.5), frameon = False, ncol = 1 , fontsize = font)
 
 
         # Secondo asse y per temperature
@@ -307,17 +317,18 @@ class Heat_Pumps():
         
         #Plot Power_pred vs Power_real 
         figure3, axs3 = plt.subplots(1,2, figsize = (19,9.5))
-        df = self.test.loc[self.test["PLR"] >= 0.95]
+        # df = self.test.loc[self.test["PLR"] >= 0.95]
+        df = self.test
         
-        axs3[0].scatter(np.array(df["LExT [°C]"] - df["SET [°C]"]),np.array(df["Heat Cap COND [kW]"]),c = "blue")
-        axs3[1].scatter(np.array(df["LExT [°C]"] - df["SET [°C]"]),np.array(df["Pow [kW]"]) ,c = "red")                
+        axs3[0].scatter(np.array((df["LExT [°C]"] - df["SET [°C]"])/42),np.array(df["Heat Cap COND [kW]"]/self.HC_des),c = "blue")
+        axs3[1].scatter(np.array((df["LExT [°C]"] - df["SET [°C]"])/42),np.array(df["Pow [kW]"]/self.Pow_des) ,c = "red")                
         axs3[0].set_xlabel("DeltaT")
         axs3[0].set_ylabel("HC full [kW]")
         axs3[1].set_xlabel("DeltaT")
         axs3[1].set_ylabel("Pow [kW]")
         
         plt.tight_layout()
-        
+        return df
 #%%Rnvelope plot        
     def envelope_plot(self):
         
@@ -739,22 +750,32 @@ class Heat_Pumps():
             elif self.test.loc[i,"Pow_ratio"] < 0:
                 self.test.loc[i,"Pow_ratio"] = 0
         
-        #  Cleaning from outlayers the X variable PLR
-        mean = self.test["PLR"].mean()
-        std = self.test["PLR"].std()
+        #Cleaning data from oulayer HC
+        # Q1 = self.test["Heat Cap COND [kW]"].quantile(0.25)
+        # Q3 = self.test["Heat Cap COND [kW]"].quantile(0.75)
+        # IQR = Q3 - Q1
         
-        self.test =self.test[(self.test["PLR"] >= mean - 3*std) &
-                    (self.test["PLR"] <= mean + 3*std)]
+        # lower_bound = Q1 - 1.5 * IQR
+        # upper_bound = Q3 + 1.5 * IQR
         
-        #Cleaning from outlayers the Power Ratio
-        mean = self.test["Pow_ratio"].mean()
-        std = self.test["Pow_ratio"].std()
+        # # Filtrare outlier
+        # self.test= self.test[(self.test["Heat Cap COND [kW]"] >= lower_bound) &
+        #                                (self.test["Heat Cap COND [kW]"] <= upper_bound)]
         
-        self.test =self.test[(self.test["Pow_ratio"] >= mean - 3*std) &
-                    (self.test["Pow_ratio"] <= mean + 3*std)]
+        # #Cleaning data from outlayers Pow_ratio
+        # Q1 = self.test["Pow_ratio"].quantile(0.25)
+        # Q3 = self.test["Pow_ratio"].quantile(0.75)
+        # IQR = Q3 - Q1
+        
+        # lower_bound = Q1 - 1.5 * IQR
+        # upper_bound = Q3 + 1.5 * IQR
+        
+        # # Filtrare outlier
+        # self.test = self.test[(self.test["Pow_ratio"] >= lower_bound) &
+        #                                (self.test["Pow_ratio"] <= upper_bound)]
         
         
-        return self.test  
+        return self.test , plt 
                     
 #%%Select best features
     def Selectbest(self):
@@ -809,8 +830,8 @@ class Heat_Pumps():
                           | (self.test['Status'] == 'STEADY STATE') | (self.test['Status'] == 'DEF')  | (self.test['Status'] == 'DHW')]
              
             # Filter on PLR
-            # self.test_fil = self.test_fil.loc[self.test_fil["PLR"] <= 0.8]
-            # self.train = self.train.loc[self.train["PLR"] <= 0.8]
+            # self.test_fil = self.test_fil.loc[self.test_fil["PLR"] <= 0.85]
+            # self.train = self.train.loc[self.train["PLR"] <= 0.85]
             
             
             # Filter on training data -LExT and SET

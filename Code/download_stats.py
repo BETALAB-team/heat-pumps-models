@@ -31,8 +31,8 @@ response = requests.get(url)
 meta = response.json()
 df = pd.DataFrame(meta)
 # %%
-r = df.loc[df["id"] == 249]
-
+r = df.loc[df["id"] == 78]
+# r = r.loc["uses_backup_heater"]
 heatpumps =df[["hp_model","hp_type","hp_output","refrigerant","id","notes"]]
 heatpumps.set_index("id",drop =True, inplace = True)
 

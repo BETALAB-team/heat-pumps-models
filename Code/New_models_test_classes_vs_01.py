@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 sns.set_theme(rc={'figure.figsize':(19,9.5)},style = 'whitegrid')
 
 #%%Barplot
-def barplot(model,KPI,font):
+def barplot(model,KPI,font,k):
 
     #Create figures
     figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
@@ -55,23 +55,30 @@ def barplot(model,KPI,font):
     # axs1.legend(fontsize = font)
     axs1.legend(loc="upper center", bbox_to_anchor=(0.5, -0.15), frameon = False, ncol = 2 ,fontsize = font)
     
-    for i, tick in enumerate(axs1.get_xticklabels()):
-        if i <= 7:  # solo i primi due
-            tick.set_color("red")
-        elif i >7 and i <=9:
-           tick.set_color("blue")
-        elif i >9 and i <=12:
-           tick.set_color("purple")
-        elif i == 13:
-            tick.set_color("grey")
-        elif i > 13 and i <= 19:
-            tick.set_color("orange")
-        elif i == 20:
-             tick.set_color("green")   
+    if k == 1:
+        for i, tick in enumerate(axs1.get_xticklabels()):
+            if i <= 7:  # solo i primi due
+                tick.set_color("red")
+            elif i >7 and i <=9:
+               tick.set_color("blue")
+            elif i >9 and i <=12:
+               tick.set_color("purple")
+            elif i == 13:
+                tick.set_color("grey")
+            elif i > 13 and i <= 19:
+                tick.set_color("orange")
+            elif i == 20:
+                 tick.set_color("green")   
+    elif k ==2:
+        for i, tick in enumerate(axs1.get_xticklabels()):
+            if i <= 7:  # solo i primi due
+                tick.set_color("red")
+            elif i >7 and i <=13:
+               tick.set_color("orange")
       
              
     plt.tight_layout()
-    # plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_R2.svg"))
+    # plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_R2_sen.svg"))
     # plt.close()
     
 #%% Plot 2 MAE
@@ -91,22 +98,31 @@ def barplot(model,KPI,font):
     axs2.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
     axs2.set_ylabel("MAE [kW]",fontsize = font)
     
-    for i, tick in enumerate(axs2.get_xticklabels()):
-        if i <= 7:  # solo i primi due
-            tick.set_color("red")
-        elif i >7 and i <=9:
-           tick.set_color("blue")
-        elif i >9 and i <=12:
-           tick.set_color("purple")
-        elif i == 13:
-            tick.set_color("grey")
-        elif i > 13 and i <= 19:
-            tick.set_color("orange")
-        elif i == 20:
-             tick.set_color("green")   
-    
+       
+    if k == 1:
+        for i, tick in enumerate(axs2.get_xticklabels()):
+            if i <= 7:  # solo i primi due
+                tick.set_color("red")
+            elif i >7 and i <=9:
+               tick.set_color("blue")
+            elif i >9 and i <=12:
+               tick.set_color("purple")
+            elif i == 13:
+                tick.set_color("grey")
+            elif i > 13 and i <= 19:
+                tick.set_color("orange")
+            elif i == 20:
+                 tick.set_color("green")   
+    elif k ==2:
+        for i, tick in enumerate(axs2.get_xticklabels()):
+            if i <= 7:  # solo i primi due
+                tick.set_color("red")
+            elif i >7 and i <=13:
+               tick.set_color("orange")
+            
+            
     plt.tight_layout()
-    # plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_MAE.svg"))
+    # plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_MAE_sen.svg"))
     # plt.close()
 
 #%%Plot 3 cRMSE
@@ -127,36 +143,53 @@ def barplot(model,KPI,font):
     # axs2b.set_ylim(0,1)
     axs2b.legend(loc="upper center", bbox_to_anchor=(0.5, -0.15), frameon = False, ncol = 2 , fontsize = font)
     
-    for i, tick in enumerate(axs2b.get_xticklabels()):
-        if i <= 7:  # solo i primi due
-            tick.set_color("red")
-        elif i >7 and i <=9:
-           tick.set_color("blue")
-        elif i >9 and i <=12:
-           tick.set_color("purple")
-        elif i == 13:
-            tick.set_color("grey")
-        elif i > 13 and i <= 19:
-            tick.set_color("orange")
-        elif i == 20:
-             tick.set_color("green")     
+        
+    if k == 1:
+        for i, tick in enumerate(axs2b.get_xticklabels()):
+            if i <= 7:  # solo i primi due
+                tick.set_color("red")
+            elif i >7 and i <=9:
+               tick.set_color("blue")
+            elif i >9 and i <=12:
+               tick.set_color("purple")
+            elif i == 13:
+                tick.set_color("grey")
+            elif i > 13 and i <= 19:
+                tick.set_color("orange")
+            elif i == 20:
+                 tick.set_color("green")   
+    elif k ==2:
+        for i, tick in enumerate(axs2b.get_xticklabels()):
+            if i <= 7:  # solo i primi due
+                tick.set_color("red")
+            elif i >7 and i <=13:
+               tick.set_color("orange")
+      
     
     plt.tight_layout()
-    # plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_RMSE.svg"))
+    # plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_RMSE_sen.svg"))
     # plt.close()
    
 
 #%% Scatter plot SCOP and Error
     figure4, axs4= plt.subplots(1,2,figsize = (19,9.5))
     
-    #Marker 
-    markers = ['o']*8 +['s']*2 +['^']*3+['D']*1+['o']*6+['v'] *1
-    label = ["A05"]*8 + ["B10"]*2+["C10"]*3+["D12"]*1+["A12"]*6+["G11"]*1
-    colors = ["red"]*8 +["blue"]*2+["purple"]*3+["grey"]*1+["orange"]*6+["green"]*1
-    x = np.array(SCOP_mod_stat)
-    y = np.array(SCOP_exp_stat)
-    x2 = np.array(SCOP_mod_all)
-    y2 = np.array(SCOP_exp_all)
+    if k == 1:
+        #Marker 
+        markers = ['o']*8 +['s']*2 +['^']*3+['D']*1+['o']*6+['v'] *1
+        label = ["A05"]*8 + ["B10"]*2+["C10"]*3+["D12"]*1+["A12"]*6+["G11"]*1
+        colors = ["red"]*8 +["blue"]*2+["purple"]*3+["grey"]*1+["orange"]*6+["green"]*1
+        
+    elif k == 2:
+        #Marker 
+        markers = ['o']*8 +['o']*6
+        label = ["A05"]*8+["A12"]*6
+        colors = ["red"]*8 +["orange"]*6
+        
+    y = np.array(SCOP_mod_stat)
+    x = np.array(SCOP_exp_stat)
+    y2 = np.array(SCOP_mod_all)
+    x2 = np.array(SCOP_exp_all)
     
     added = set()
     for xi, yi, m,col in zip(x, y, markers,colors):
@@ -201,62 +234,78 @@ def barplot(model,KPI,font):
     
 
     # Proxy legend
-    legend_elements = [
-    plt.Line2D([0], [0], marker='o', color='w', label='A05',
-               markerfacecolor='red', markersize=10, markeredgecolor='black'),
-    plt.Line2D([0], [0], marker='s', color='w', label='B10',
-               markerfacecolor='blue', markersize=10, markeredgecolor='black'),
-    plt.Line2D([0], [0], marker='^', color='w', label='C10',
-               markerfacecolor='purple', markersize=10, markeredgecolor='black'),
-    plt.Line2D([0], [0], marker='D', color='w', label='D12',
-               markerfacecolor='grey', markersize=10, markeredgecolor='black'),
-    plt.Line2D([0], [0], marker='o', color='w', label='A12',
-               markerfacecolor='orange', markersize=10, markeredgecolor='black'),
-    plt.Line2D([0], [0], marker='v', color='w', label='G11',
-               markerfacecolor='green', markersize=10, markeredgecolor='black'),
+    if k == 1:
+        legend_elements = [
+        plt.Line2D([0], [0], marker='o', color='w', label='A05',
+                   markerfacecolor='red', markersize=10, markeredgecolor='black'),
+        plt.Line2D([0], [0], marker='s', color='w', label='B10',
+                   markerfacecolor='blue', markersize=10, markeredgecolor='black'),
+        plt.Line2D([0], [0], marker='^', color='w', label='C10',
+                   markerfacecolor='purple', markersize=10, markeredgecolor='black'),
+        plt.Line2D([0], [0], marker='D', color='w', label='D12',
+                   markerfacecolor='grey', markersize=10, markeredgecolor='black'),
+        plt.Line2D([0], [0], marker='o', color='w', label='A12',
+                   markerfacecolor='orange', markersize=10, markeredgecolor='black'),
+        plt.Line2D([0], [0], marker='v', color='w', label='G11',
+                   markerfacecolor='green', markersize=10, markeredgecolor='black'),
+        # Reference lines
+        plt.Line2D([0,1], [0,1], color='k', linestyle='--', label='Bisector'),
+        plt.Line2D([0,1], [0,1], color='k', linestyle='--', label='Error -10%'),
+        plt.Line2D([0,1], [0,1], color='k', linestyle='--', label='Error +10%')
+         ]
+           
     
-    # Reference lines
-    plt.Line2D([0,1], [0,1], color='k', linestyle='--', label='Bisector'),
-    plt.Line2D([0,1], [0,1], color='k', linestyle='--', label='Error -10%'),
-    plt.Line2D([0,1], [0,1], color='k', linestyle='--', label='Error +10%')
-    ]   
+    elif k ==2:
+        legend_elements = [
+        plt.Line2D([0], [0], marker='o', color='w', label='A05',
+                   markerfacecolor='red', markersize=10, markeredgecolor='black'),
+        plt.Line2D([0], [0], marker='o', color='w', label='A12',
+                   markerfacecolor='orange', markersize=10, markeredgecolor='black'),
+        
+        # Reference lines
+        plt.Line2D([0,1], [0,1], color='k', linestyle='--', label='Bisector'),
+        plt.Line2D([0,1], [0,1], color='k', linestyle='--', label='Error -10%'),
+        plt.Line2D([0,1], [0,1], color='k', linestyle='--', label='Error +10%')
+        ]
+         
 
     # Aggiungi la legenda al subplot
     axs4[1].legend(handles=legend_elements, fontsize=font)
-    plt.tight_layout()
     
-    # plt.savefig(os.path.join('..',"Result Analysis","New models results","SCOP.svg"))
+
+    plt.tight_layout()
+    # plt.savefig(os.path.join('..',"Result Analysis","New models results","SCOP_sen.svg"))
     # plt.close()
 
 #%% Devices lists and tests - catalogues
 
 devices = [ #5kW
-           ("Valliant A+ 5kW ID9 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID24 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID33 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID77 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID78 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID115 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID151 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID227 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
+           # ("Valliant A+ 5kW ID9 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
+           # ("Valliant A+ 5kW ID24 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
+           # ("Valliant A+ 5kW ID33 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
+           # ("Valliant A+ 5kW ID77 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
+           # ("Valliant A+ 5kW ID78 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
+           # ("Valliant A+ 5kW ID115 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
+           # ("Valliant A+ 5kW ID151 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
+           # ("Valliant A+ 5kW ID227 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
            
-           # 10 kW
-           ("Riello NXHM 10 kW ID458 01-09-2024_30-04-2025","Riello NXHM 10 kW - DATA","AtW"),
-           ("Riello NXHM 10 kW ID526 01-09-2024_30-04-2025","Riello NXHM 10 kW - DATA","AtW"),
-           ("NIBE 2050 10 kW ID167 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
-           ("NIBE 2050 10 kW ID531 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
-           ("NIBE 2050 10 kW ID249 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
+           #  # 10 kW
+           # ("Riello NXHM 10 kW ID458 01-09-2024_30-04-2025","Riello NXHM 10 kW - DATA","AtW"),
+           # ("Riello NXHM 10 kW ID526 01-09-2024_30-04-2025","Riello NXHM 10 kW - DATA","AtW"),
+           # ("NIBE 2050 10 kW ID167 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
+           # ("NIBE 2050 10 kW ID531 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
+           # ("NIBE 2050 10 kW ID249 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
            
-           # 12 kW
-           ("NIBE F2040 12 kW ID61 01-09-2024_30-04-2025","NIBE F2040 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID196 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID208 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID277 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID281 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID305 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID477 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
+           # # 12 kW
+           # ("NIBE F2040 12 kW ID61 01-09-2024_30-04-2025","NIBE F2040 12 kW - DATA","AtW"),
+           # ("Valliant A+ 12kW ID196 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
+           # ("Valliant A+ 12kW ID208 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
+           # ("Valliant A+ 12kW ID277 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
+           # ("Valliant A+ 12kW ID281 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
+           # ("Valliant A+ 12kW ID305 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
+           # ("Valliant A+ 12kW ID477 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
            
-           #GeoT
+           # # GeoT
            ("EcoGEO B1-9 11 kW ID571 01-09-2024_30-04-2025","EcoGEO B1-9 11 kW- DATA","WtW")
            ]
 
@@ -318,26 +367,30 @@ for dev in devices:
     # HP.plot_test("2025-01-10 00:00:00","2025-01-11 00:00:00",20 )
     # HP.plot_test("2025-01-28 00:00:00","2025-01-29 00:00:00",20 )
     
+
     #Modelling
     HP.interp_full_load()
     HP.new_model_fit()
-    KPIs.append(HP.KPI)
-  
+     
 
     #Plots
     # HP.plt_hist()
     # HP.function_plot()
     # HP.function_plot_2()
     # HP.envelope_plot()
-    # HP.plot_full_load()
+    # df = HP.plot_full_load()
     # HP.plot_power_ratio()
     # P,S = HP.Selectbest()
+    # HP.plot_time_series("2025-01-10 00:00:00","2025-01-11 00:00:00",20 )
     # HP.plot_time_series("2025-01-28 00:00:00","2025-01-29 00:00:00",20 )
-
+    
+    #Counter
+    HC =np.array(HP.test["Heat Cap COND [kW]"])
+    za = (HC >19).sum()
     
 KPIs = pd.concat(KPIs)
-# KPIs.to_csv(os.path.join('..',"Result Analysis","New models results","KPIs.csv"))
-barplot(model,KPIs,20)
+# KPIs.to_csv(os.path.join('..',"Result Analysis","New models results","KPIs_sen.csv"))
+# barplot(model,KPIs,20,1)
 
 
 

@@ -28,7 +28,7 @@ def write_url(system_id, search_keys):
     return url
 
 #%%
-system_id = '115'
+system_id = '78'
 # Get available data of selected system
 url = "https://heatpumpmonitor.org/timeseries/available?id=" + system_id
 response = requests.get(url)
