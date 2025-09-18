@@ -13,6 +13,7 @@ from scipy.interpolate import make_splrep,splev
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.dates as mdates
 import seaborn as sns
 from scipy.stats import shapiro
 
@@ -161,10 +162,12 @@ class Heat_Pumps():
         # Plottaggio dati principali
         axs1.plot(filtered_data["Time"], filtered_data["Heat Cap COND [kW]"], label="HC [kW]")
         axs1.plot(filtered_data["Time"], filtered_data["Pow [kW]"], label="W [kW]")
-        axs1.set_xlabel("Time [month-day-hour]", fontsize=font)
+        axs1.set_xlabel("Time [h]", fontsize=font)
         axs1.set_ylabel("W and HC [kW]", fontsize=font)
         axs1.tick_params(axis='x', labelsize=font)
         axs1.tick_params(axis='y', labelsize=font)
+        axs1.xaxis.set_major_formatter(mdates.DateFormatter('%H'))
+        
         
         # Plottaggio stati con colori
         state_handles = plot_state_as_color(x_data, filtered_data["Status"], axs1)
@@ -196,9 +199,7 @@ class Heat_Pumps():
         # Filtra i dati
         self.test_fil['Time'] = pd.to_datetime(self.test_fil['Time'], unit='s')
         filtered_data = self.test_fil.loc[(self.test_fil["Time"] >= start_date) & (self.test_fil["Time"] <= end_date)]
-        x_data = filtered_data["Time"]
-        # filtered_data["Residuals"] = (filtered_data["Residuals"] /self.test_fil["Pow [kW]"])*100
-        
+       
           
         # Dizionario colori più visibili per stati
         state_colors = {
@@ -209,10 +210,31 @@ class Heat_Pumps():
             "DHW": "#9467bd",  # viola
             "START": "#8c564b",  # marrone
             "STOP": "#e377c2",  # rosa
-            "OFF": "#7f7f7f"  # grigio
+            "OFF": "#7f7f7f" ,# grigio
         }
+      
+        def fill_time_gaps_with_nan(df, time_col="Time", freq="5min"):
+            """
+            Riempie i buchi temporali con righe NaN.
+            df        : dataframe con colonna temporale
+            time_col  : nome della colonna temporale
+            freq      : frequenza desiderata (es. "5min")
+            """
+            df = df.sort_values(time_col).reset_index(drop=True)
+            
+            # Genera un nuovo index temporale con frequenza regolare
+            full_range = pd.date_range(start=df[time_col].min(),
+                                       end=df[time_col].max(),
+                                       freq=freq)
+            
+            # Reindicizza il dataframe sulla griglia completa
+            df_full = df.set_index(time_col).reindex(full_range).rename_axis("Time").reset_index()
+            return df_full
         
+        filtered_data = fill_time_gaps_with_nan(filtered_data, time_col="Time", freq="5min")
+        x_data = filtered_data["Time"]
         # Funzione per plottare stati con colori, traslazione e handle per legenda
+        
         def plot_state_as_color(x_data, state_data, axis):
             state_handles = []
             state_encountered = []
@@ -222,11 +244,12 @@ class Heat_Pumps():
             span_left = x_data.iloc[0] - offset
     
             for span_right, state_next in zip(x_data, state_data):
+                
                 if state_current != state_next:
                     color = state_colors.get(state_current, "white")
                     axis.axvspan(span_left, span_right - offset, facecolor=color, edgecolor=color, alpha=0.3)
-                    
-                    if state_current not in state_encountered:
+
+                    if not pd.isna(state_current) and state_current not in state_encountered:
                         state_encountered.append(state_current)
                         handle = mpatches.Patch(facecolor=color, edgecolor=color, alpha=0.3, label=state_current)
                         state_handles.append(handle)
@@ -237,19 +260,21 @@ class Heat_Pumps():
             # Ultima sezione
             color = state_colors.get(state_current, "#7f7f7f")
             axis.axvspan(span_left, x_data.iloc[-1], facecolor=color, edgecolor=color, alpha=0.3)
+            
             if state_current not in state_encountered:
                 handle = mpatches.Patch(facecolor=color, edgecolor=color, alpha=0.3, label=state_current)
                 state_handles.append(handle)
-    
+                
             return state_handles
         
         # Plottaggio dati principali
         axs1[0].plot(filtered_data["Time"], filtered_data["Pow_pred"], label="$W_{mod}$ [kW]",color ="blue")
         axs1[0].plot(filtered_data["Time"], filtered_data["Pow [kW]"], label="W [kW]", color ="red")
-        axs1[0].set_xlabel("Time [month-day-hour]", fontsize=font)
+        axs1[0].set_xlabel("Time [h]", fontsize=font)
         axs1[0].set_ylabel("W and HC [kW]", fontsize=font)
         axs1[0].tick_params(axis='x', labelsize=font)
         axs1[0].tick_params(axis='y', labelsize=font)
+        axs1[0].xaxis.set_major_formatter(mdates.DateFormatter('%H'))
         
         # Secondo asse y per temperature
         axs2 = axs1[0].twinx()
@@ -271,16 +296,17 @@ class Heat_Pumps():
 
 
         # Secondo asse y per temperature
-        axs1[1].plot(filtered_data["Time"], filtered_data["Residuals"], label="Residuals",color ="green")
-        axs1[1].set_xlabel("Time [month-day-hour]", fontsize=font)
+        axs1[1].plot(filtered_data["Time"], filtered_data["Residuals"], label="Residuals")
+        axs1[1].set_xlabel("Time [h]", fontsize=font)
         axs1[1].set_ylabel("Residuals", fontsize=font)
         axs1[1].tick_params(axis='x', labelsize=font)
         axs1[1].tick_params(axis='y', labelsize=font)
-        
+        axs1[1].xaxis.set_major_formatter(mdates.DateFormatter('%H'))
         
         
         plt.tight_layout()
         plt.show()
+        return filtered_data
 #%% Err plot    
     def Err_Power(self,Pow_pred,status):
         
@@ -546,6 +572,43 @@ class Heat_Pumps():
         # axs1[1].set_xlim(0,0.1)
         plt.show()
         
+#%%Select best features
+    def Selectbest(self,font):
+        X = np.column_stack((self.test["PLR"],self.test["LExT [°C]"],self.test["SET [°C]"],self.test["LExT [°C]"] -self.test["SET [°C]"]))
+        Y = self.test["Pow [kW]"]/self.test["Pow full [kW]"]
+    
+        selector = SelectKBest(score_func=f_regression, k=2)
+        X_new = selector.fit_transform(X, Y)
+        
+        mask = selector.get_support()
+        selected_features =[i for i, x in enumerate(mask) if x]
+    
+        print("Migliori feature:", selected_features)
+        
+        #Correlation 
+        fil = self.test.loc[(self.test['Status'] == 'ACCELERATION') | (self.test['Status'] == 'DECELERATION')
+                   | (self.test['Status'] == 'START') | (self.test['Status'] == 'STOP')]
+        fil = self.test[self.test['Status'] == 'STEADY STATE']
+        fil["DeltaT [K]"] = self.test["LExT [°C]"] -self.test["SET [°C]"]
+        fil["W ratio"] = self.test["Pow [kW]"]/self.test["Pow full [kW]"]
+        
+        df = fil.loc[:,["W ratio", "PLR","LExT [°C]", "SET [°C]","DeltaT [K]"]] 
+        Pears = df.corr("pearson")
+        Spear = df.corr("spearman")
+        
+        #Plot figure
+        figure1, axs1 = plt.subplots(1,2, figsize = (19,9.5))
+        sns.heatmap(Pears, annot=True, cmap="coolwarm", center=0, fmt=".2f", ax = axs1[0], cbar=False, annot_kws={"size":font})
+        axs1[0].set_title("Pearson Matrix", fontsize= font)
+        sns.heatmap(Spear, annot=True, cmap="coolwarm", center=0, fmt=".2f", ax = axs1[1], cbar=False, annot_kws={"size":font}) 
+        axs1[1].set_title("Spearman Matrix", fontsize= font)
+        for ax in axs1:
+            ax.set_xticklabels(ax.get_xticklabels(), fontsize=font, rotation=45, ha="right")
+            ax.set_yticklabels(ax.get_yticklabels(), fontsize=font, rotation=0)
+
+        
+        plt.tight_layout() 
+        return (Pears,Spear)
 #%% Methods in the HPs classes
     #Method to analalise the status of operation of the HP    
     def status_analysis(self):
@@ -655,7 +718,6 @@ class Heat_Pumps():
     def interp_full_load(self):
  
         #Drop Nan  and null values
-        # self.test = self.test[self.test["Pow [kW]"] != 0] # If it is zero, the machine is not working
         self.test = self.test[self.test['Pow [kW]'].notna()]
         self.test = self.test[self.test['Heat Cap COND [kW]'].notna()]
         self.test = self.test[self.test['LExT [°C]'].notna()]
@@ -674,7 +736,7 @@ class Heat_Pumps():
         SET_exp = np.array(self.test["SET [°C]"] + 273.15)
         LExT_exp = np.array(self.test["LExT [°C]"] + 273.15)
         Delta1_exp = (LExT_exp - SET_exp)/(LExT_des - SET_des)
-        Delta2_exp = np.array(Delta1_exp**2)
+        # Delta2_exp = np.array(Delta1_exp**2)
          
         #Create train and test model
         X_train_HC = np.array(Delta1)
@@ -708,10 +770,9 @@ class Heat_Pumps():
         residuals_Pow_2 = residuals_Pow**2  #Square the residuals to increase the values of weights
            
         #Append to train   
-        self.train_fl["Weights_HC"] = 1/abs(residuals_HC)
-        self.train_fl["Weights_Pow"] = 1 /abs(residuals_Pow)  
+        self.train_fl["Weights_HC"] = 1/abs(residuals_HC_2)
+        self.train_fl["Weights_Pow"] = 1 /abs(residuals_Pow_2)  
 
-        
         #Second Training - HC with weights
         model_HC_weight = sm.WLS(Y_train_HC, X_train_HC, weights= self.train_fl["Weights_HC"])
         model_HC_weight = model_HC_weight.fit()
@@ -762,46 +823,10 @@ class Heat_Pumps():
         # self.test= self.test[(self.test["Heat Cap COND [kW]"] >= lower_bound) &
         #                                (self.test["Heat Cap COND [kW]"] <= upper_bound)]
         
-        # #Cleaning data from outlayers Pow_ratio
-        # Q1 = self.test["Pow_ratio"].quantile(0.25)
-        # Q3 = self.test["Pow_ratio"].quantile(0.75)
-        # IQR = Q3 - Q1
-        
-        # lower_bound = Q1 - 1.5 * IQR
-        # upper_bound = Q3 + 1.5 * IQR
-        
-        # # Filtrare outlier
-        # self.test = self.test[(self.test["Pow_ratio"] >= lower_bound) &
-        #                                (self.test["Pow_ratio"] <= upper_bound)]
-        
-        
+               
         return self.test , plt 
                     
-#%%Select best features
-    def Selectbest(self):
-        X = np.column_stack((self.test["PLR"],self.test["LExT [°C]"],self.test["SET [°C]"],self.test["LExT [°C]"] -self.test["SET [°C]"]))
-        Y = self.test["Pow [kW]"]/self.test["Pow full [kW]"]
-    
-        selector = SelectKBest(score_func=f_regression, k=2)
-        X_new = selector.fit_transform(X, Y)
-        
-        mask = selector.get_support()
-        selected_features =[i for i, x in enumerate(mask) if x]
-    
-        print("Migliori feature:", selected_features)
-        
-        #Correlation 
-        fil = self.test.loc[(self.test['Status'] == 'ACCELERATION') | (self.test['Status'] == 'DECELERATION')
-                   | (self.test['Status'] == 'START') | (self.test['Status'] == 'STOP')]
-        fil = self.test[self.test['Status'] == 'STEADY STATE']
-        
-        df = fil.loc[:,["COP", "PLR","LExT [°C]", "SET [°C]","Pow [kW]","Heat Cap COND [kW]"]]
-        df["Delta"] = self.test["LExT [°C]"] -self.test["SET [°C]"]
-        df["Pow_rat"] = self.test["Pow [kW]"]/self.test["Pow full [kW]"]
-        Pears = df.corr("pearson")
-        Spear = df.corr("spearman")
-        
-        return (Pears,Spear)
+
 #%%#Calculation of the model KPIs and Results
     def new_model_fit(self):        
 
@@ -830,8 +855,8 @@ class Heat_Pumps():
                           | (self.test['Status'] == 'STEADY STATE') | (self.test['Status'] == 'DEF')  | (self.test['Status'] == 'DHW')]
              
             # Filter on PLR
-            # self.test_fil = self.test_fil.loc[self.test_fil["PLR"] <= 0.85]
-            # self.train = self.train.loc[self.train["PLR"] <= 0.85]
+            # self.test_fil = self.test_fil.loc[self.test_fil["PLR"] <= 0.9]
+            # self.train = self.train.loc[self.train["PLR"] <= 0.9]
             
             
             # Filter on training data -LExT and SET
@@ -865,7 +890,7 @@ class Heat_Pumps():
             Pow_pred[Pow_pred < 0] = 0 #Delete values below zeros
         
                     
-            residuals = self.test_fil["Pow [kW]"]- Pow_pred
+            residuals = Pow_pred - self.test_fil["Pow [kW]"]
             self.test_fil = self.test_fil.copy()
             self.test_fil["Residuals"] = residuals
             self.test_fil["Pow_pred"] = Pow_pred
@@ -895,17 +920,20 @@ class Heat_Pumps():
             def mean_percentage_error(y_true, y_pred):
                 return np.mean((y_true - y_pred) / y_true) * 100   
             
+            def relative_mean_absolute_error(y_true, y_pred):
+                return 1/np.mean(y_true) * np.mean(np.abs(y_true - y_pred)) * 100 
+            
             def CV_RMSE(y_true,y_pred):
                 return 1/np.mean(y_true)*root_mean_squared_error(y_true,y_pred)*100
             
             #KPI Calculations 
             if i == 0:
                self.KPI.loc[(self.name,"STEADY STATE"),"R2_Pow"] = float(r2_score(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
-               self.KPI.loc[(self.name,"STEADY STATE"),"MAE_Pow"] = float(mean_absolute_error(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
+               self.KPI.loc[(self.name,"STEADY STATE"),"MAE_Pow"] = float(relative_mean_absolute_error(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                self.KPI.loc[(self.name,"STEADY STATE"),"cRMSE_Pow"] = float(CV_RMSE(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                 
                #COP
-               # self.KPI.loc[(self.name,"STEADY STATE"),"MAPE_COP"] = float(mean_absolute_error(self.test_fil["COP"],COP_pred))
+               # self.KPI.loc[(self.name,"STEADY STATE"),"MAPE_COP"] = float(relative_mean_absolute_error(self.test_fil["COP"],COP_pred))
                # self.KPI.loc[(self.name,"STEADY STATE"),"RMSE_COP"] = float(CV_RMSE(self.test_fil["COP"],COP_pred))
                   
                #SCOP
@@ -926,11 +954,11 @@ class Heat_Pumps():
     
             elif i == 1:
                self.KPI.loc[(self.name,"MODULATION"),"R2_Pow"] = float(r2_score(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
-               self.KPI.loc[(self.name,"MODULATION"),"MAE_Pow"] = float(mean_absolute_error(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
+               self.KPI.loc[(self.name,"MODULATION"),"MAE_Pow"] = float(relative_mean_absolute_error(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                self.KPI.loc[(self.name,"MODULATION"),"cRMSE_Pow"] = float(CV_RMSE(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                 
                 #COP
-               # self.KPI.loc[(self.name,"MODULATION"),"MAPE_COP"] = float(mean_absolute_error(self.test_fil["COP"],COP_pred))
+               # self.KPI.loc[(self.name,"MODULATION"),"MAPE_COP"] = float(relative_mean_absolute_error(self.test_fil["COP"],COP_pred))
                # self.KPI.loc[(self.name,"MODULATION"),"RMSE_COP"] = float(CV_RMSE(self.test_fil["COP"],COP_pred))
                 
                 #SCOP
@@ -951,11 +979,11 @@ class Heat_Pumps():
                
             elif i == 2:
                self.KPI.loc[(self.name,"MOD + DEF"),"R2_Pow"] = float(r2_score(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
-               self.KPI.loc[(self.name,"MOD + DEF"),"MAE_Pow"] = float(mean_absolute_error(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
+               self.KPI.loc[(self.name,"MOD + DEF"),"MAE_Pow"] = float(relative_mean_absolute_error(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                self.KPI.loc[(self.name,"MOD + DEF"),"cRMSE_Pow"] = float(CV_RMSE(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                 
                 #COP
-               # self.KPI.loc[(self.name,"MOD + DEF"),"MAPE_COP"] = float(mean_absolute_error(self.test_fil["COP"],COP_pred))
+               # self.KPI.loc[(self.name,"MOD + DEF"),"MAPE_COP"] = float(relative_mean_absolute_error(self.test_fil["COP"],COP_pred))
                # self.KPI.loc[(self.name,"MOD + DEF"),"RMSE_COP"] = float(CV_RMSE(self.test_fil["COP"],COP_pred))
                 
                 #SCOP
@@ -977,7 +1005,7 @@ class Heat_Pumps():
                 
             elif i == 3:
                self.KPI.loc[(self.name,"ALL"),"R2_Pow"] = float(r2_score(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
-               self.KPI.loc[(self.name,"ALL"),"MAE_Pow"] = float(mean_absolute_error(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
+               self.KPI.loc[(self.name,"ALL"),"MAE_Pow"] = float(relative_mean_absolute_error(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                self.KPI.loc[(self.name,"ALL"),"cRMSE_Pow"] = float(CV_RMSE(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                 
                 #COP

@@ -1,36 +1,33 @@
-import numpy as np
-from New_models_classes_vs_01 import *
 from matplotlib.ticker import FormatStrFormatter
+from matplotlib.ticker import MaxNLocator
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import os
 import matplotlib.pyplot as plt
 #%% Set Seaborn theme
 sns.set_theme(rc={'figure.figsize':(19,9.5)},style = 'whitegrid')
-
 #%%Barplot
 def barplot(model,KPI,font,k):
 
     #Create figures
     figure1, axs1 = plt.subplots(1,figsize = (19,9.5))
     
-    R2_stat = KPI.loc[KPI.index.get_level_values("status") == "STEADY STATE","R2_Pow"]
-    R2_all =  KPI.loc[KPI.index.get_level_values("status") == "ALL","R2_Pow"]  
+    R2_stat = KPI.loc[KPI["status"] == "STEADY STATE","R2_Pow"]
+    R2_all =  KPI.loc[KPI["status"] == "ALL","R2_Pow"]  
     
-    MAE_stat = KPI.loc[KPI.index.get_level_values("status") == "STEADY STATE","MAE_Pow"]
-    MAE_mod =  KPI.loc[KPI.index.get_level_values("status") == "MODULATION","MAE_Pow"]
-    MAE_mod_def =  KPI.loc[KPI.index.get_level_values("status") == "MOD + DEF","MAE_Pow"]
-    MAE_all =  KPI.loc[KPI.index.get_level_values("status") == "ALL","MAE_Pow"]  
+    MAE_stat = KPI.loc[KPI["status"] == "STEADY STATE","MAE_Pow"]
+    MAE_all =  KPI.loc[KPI["status"] == "ALL","MAE_Pow"]  
     
-    cRMSE_stat = KPI.loc[KPI.index.get_level_values("status") == "STEADY STATE","cRMSE_Pow"]
-    cRMSE_mod =  KPI.loc[KPI.index.get_level_values("status") == "MODULATION","cRMSE_Pow"]
-    cRMSE_mod_def =  KPI.loc[KPI.index.get_level_values("status") == "MOD + DEF","cRMSE_Pow"]
-    cRMSE_all =  KPI.loc[KPI.index.get_level_values("status") == "ALL","cRMSE_Pow"]  
+    cRMSE_stat = KPI.loc[KPI["status"] == "STEADY STATE","cRMSE_Pow"]
+    cRMSE_all =  KPI.loc[KPI["status"] == "ALL","cRMSE_Pow"]  
     
-
     
-    SCOP_mod_stat = KPI.loc[KPI.index.get_level_values("status") == "STEADY STATE","SCOP_model"]
-    SCOP_exp_stat = KPI.loc[KPI.index.get_level_values("status") == "STEADY STATE","SCOP_exp"]
+    SCOP_mod_stat = KPI.loc[KPI["status"] == "STEADY STATE","SCOP_model"]
+    SCOP_exp_stat = KPI.loc[KPI["status"] == "STEADY STATE","SCOP_exp"]
     
-    SCOP_mod_all =  KPI.loc[KPI.index.get_level_values("status") == "ALL","SCOP_model"]  
-    SCOP_exp_all =  KPI.loc[KPI.index.get_level_values("status") == "ALL","SCOP_exp"]  
+    SCOP_mod_all =  KPI.loc[KPI["status"] == "ALL","SCOP_model"]  
+    SCOP_exp_all =  KPI.loc[KPI["status"] == "ALL","SCOP_exp"]  
     
     
     
@@ -44,8 +41,12 @@ def barplot(model,KPI,font,k):
     br5 = [x  for x in br2]
     
     #Create barplot 1 
-    axs1.bar(br1, np.array(R2_stat), width = barWidth, label = "Steady-state")
-    axs1.bar(br2, np.array(R2_all), width = barWidth, label = 'All operative conditions',c = "tab:red")
+    axs1.bar(br1, np.array(R2_stat), width = barWidth, color = "#13315c",label = "Steady-state")
+    axs1.bar(br2, np.array(R2_all), width = barWidth, color = "#d62828",label = 'All operative conditions')
+    mean_stat = np.mean(R2_stat)
+    mean_all = np.mean(R2_all)
+    axs1.axhline(mean_stat, color="#012a4a", linestyle="--", label=f"$Mean_{{stat}}$ = {mean_stat:.2f}")
+    axs1.axhline(mean_all, color= "#dc2f02", linestyle="--", label=f"$Mean_{{all}}$ = {mean_all:.2f}")
     axs1.set_xticks(brn,model, fontsize = font)
     axs1.tick_params(axis='y', labelsize = font)
     axs1.set_xticklabels(model,rotation = 90,fontsize = font)
@@ -78,16 +79,20 @@ def barplot(model,KPI,font,k):
       
              
     plt.tight_layout()
-    # plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_R2.svg"))
-    # plt.close()
+    plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_R2_sen.svg"))
+    plt.close()
     
 #%% Plot 2 rMAE
     figure2, axs2 = plt.subplots(1,figsize = (19,9.5))
     
-    axs2.bar(br1, np.array(MAE_stat), width = barWidth, label = "Steady-State")
+    axs2.bar(br1, np.array(MAE_stat), width = barWidth, color = "#13315c",label = "Steady-State")
     # axs2.bar(br2, np.array(MPE_mod), width = barWidth, label = "MODULATION",color = "green")
     # axs2.bar(br3, np.array(MPE_mod_def), width = barWidth, label = "MOD + DEF", color  ="purple")
-    axs2.bar(br2, np.array(MAE_all), width = barWidth, label = "All operative conditions",c = "tab:red")
+    axs2.bar(br2, np.array(MAE_all), width = barWidth, color = "#d62828",label = "All operative conditions")
+    mean_stat = np.mean(MAE_stat)
+    mean_all = np.mean(MAE_all)
+    axs2.axhline(mean_stat, color="#012a4a", linestyle="--", label=f"$Mean_{{stat}}$ = {mean_stat:.2f}")
+    axs2.axhline(mean_all, color= "#dc2f02", linestyle="--", label=f"$Mean_{{all}}$ = {mean_all:.2f}")
     # axs2.legend(fontsize = font)
     axs2.legend(loc="upper center", bbox_to_anchor=(0.5, -0.15), frameon = False, ncol = 2 , fontsize = font)
     
@@ -122,17 +127,21 @@ def barplot(model,KPI,font,k):
             
             
     plt.tight_layout()
-    # plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_MAE.svg"))
-    # plt.close()
+    plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_rMAE_sen.svg"))
+    plt.close()
 
 #%%Plot 3 cRMSE
     
     figure2b, axs2b= plt.subplots(1,figsize = (19,9.5))
        
-    axs2b.bar(br1, np.array(cRMSE_stat), width = barWidth, label = "Steady-State")
+    axs2b.bar(br1, np.array(cRMSE_stat), width = barWidth,color = "#13315c", label = "Steady-State")
     # axs2b.bar(br2, np.array(RMSE_mod), width = barWidth, label = "MODULATION",color = "green")
     # axs2b.bar(br3, np.array(RMSE_mod_def), width = barWidth, label = "MOD + DEF", color  ="purple")
-    axs2b.bar(br2, np.array(cRMSE_all), width = barWidth, label = 'All operative conditions',c = "tab:red")
+    axs2b.bar(br2, np.array(cRMSE_all), width = barWidth, color = "#d62828",label = 'All operative conditions')
+    mean_stat = np.mean(cRMSE_stat)
+    mean_all = np.mean(cRMSE_all)
+    axs2b.axhline(mean_stat, color="#012a4a", linestyle="--", label=f"$Mean_{{stat}}$ = {mean_stat:.2f}")
+    axs2b.axhline(mean_all, color= "#dc2f02", linestyle="--", label=f"$Mean_{{all}}$ = {mean_all:.2f}")
     
     axs2b.set_xticks(br2,model,fontsize = font)
     axs2b.tick_params(axis='y',labelsize = font)
@@ -167,8 +176,8 @@ def barplot(model,KPI,font,k):
       
     
     plt.tight_layout()
-    # plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_RMSE.svg"))
-    # plt.close()
+    plt.savefig(os.path.join('..',"Result Analysis","New models results","New_Models_cRMSE_sen.svg"))
+    plt.close()
    
 
 #%% Scatter plot SCOP and Error
@@ -275,40 +284,9 @@ def barplot(model,KPI,font,k):
 
     plt.tight_layout()
     # plt.savefig(os.path.join('..',"Result Analysis","New models results","SCOP.svg"))
-    # plt.close()
-
-#%% Devices lists and tests - catalogues
-
-devices = [ #5kW
-           ("Valliant A+ 5kW ID9 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID24 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID33 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID77 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID78 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID115 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID151 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           ("Valliant A+ 5kW ID227 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 55-6  A S3 5 kW - DATA","AtW"),
-           
-           # #  # 10 kW
-           ("Riello NXHM 10 kW ID458 01-09-2024_30-04-2025","Riello NXHM 10 kW - DATA","AtW"),
-           ("Riello NXHM 10 kW ID526 01-09-2024_30-04-2025","Riello NXHM 10 kW - DATA","AtW"),
-           ("NIBE 2050 10 kW ID167 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
-           ("NIBE 2050 10 kW ID531 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
-           ("NIBE 2050 10 kW ID249 01-09-2024_30-04-2025","NIBE 2050 10 kW - DATA","AtW"),
-           
-           # 12 kW
-           ("NIBE F2040 12 kW ID61 01-09-2024_30-04-2025","NIBE F2040 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID196 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID208 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID277 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID281 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID305 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           ("Valliant A+ 12kW ID477 01-09-2024_30-04-2025", "Valliant Aerotherm plus  VWL 125-6  A S3 12 kW - DATA","AtW"),
-           
-           # # # GeoT
-           ("EcoGEO B1-9 11 kW ID571 01-09-2024_30-04-2025","EcoGEO B1-9 11 kW- DATA","WtW")
-           ]
-
+    plt.close()
+    
+#%% Main
 model = [
        
         "A05I01",
@@ -337,48 +315,35 @@ model = [
         "G11I21",
          ]
 
-#For loop
-KPIs = [] 
-count = []
-for dev in devices:
+model1 = [
+       
+        "A05I01",
+        "A05I02",
+        "A05I03",
+        "A05I05",
+        "A05I06",
+        "A05I07",
+        "A05I08",
+        "A05I12",
     
-    HP = Heat_Pumps(dev)
-    HP.status_analysis()
-    # HP.plot_test("2025-01-10 00:00:00","2025-01-11 00:00:00",20)
-    # HP.plot_test("2025-01-28 00:00:00","2025-01-29 00:00:00",20)
+        "A12I10",
+        "A12I11",
+        "A12I14",
+        "A12I15",
+        "A12I16",
+        "A12I18",
+
+         ]
+
+
+
+# KPIs = pd.read_csv(os.path.join('..',"Result Analysis","New models results","KPIs.csv"))
+# barplot(model,KPIs,20,1)    
+
+KPIs = pd.read_csv(os.path.join('..',"Result Analysis","New models results","KPIs_sen.csv"))
+barplot(model1,KPIs,20,2)     
     
-
-    #Modelling
-    HP.interp_full_load()
-    HP.new_model_fit()
-    KPIs.append(HP.KPI)
-     
-
-    #Plots
-    # HP.plt_hist()
-    # HP.function_plot()
-    # HP.function_plot_2()
-    # HP.envelope_plot()
-    # df = HP.plot_full_load()
-    # HP.plot_power_ratio()
-    # P,S = HP.Selectbest(20)
-    # HP.plot_time_series("2025-01-10 00:00:00","2025-01-11 00:00:00",20 )
-    # HP.plot_time_series("2025-01-28 00:00:00","2025-01-29 00:00:00",20 )
     
-    #Counter
-    # HC =np.array(HP.test_fil["Status"])
-    # za = (HC != "STEADY STATE").sum()
-    # # print(za)
-    # # print(len(HP.test_fil["Status"]))
-    # relative = len(HP.test_fil["Status"])/len(HP.test["Status"])*100
-    # count.append(relative)
     
-KPIs = pd.concat(KPIs)
-# KPIs.to_csv(os.path.join('..',"Result Analysis","New models results","KPIs.csv"))
-barplot(model,KPIs,20,1)
-
-
-
-        
-        
-        
+    
+    

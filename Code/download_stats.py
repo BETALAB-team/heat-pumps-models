@@ -31,7 +31,7 @@ response = requests.get(url)
 meta = response.json()
 df = pd.DataFrame(meta)
 # %%
-r = df.loc[df["id"] == 78]
+r = df.loc[df["id"] == 151]
 # r = r.loc["uses_backup_heater"]
 heatpumps =df[["hp_model","hp_type","hp_output","refrigerant","id","notes"]]
 heatpumps.set_index("id",drop =True, inplace = True)
@@ -51,7 +51,7 @@ heatpumps.set_index("id",drop =True, inplace = True)
 # heatpumps = heatpumps.loc[heatpumps["hp_type"] == "Ground Source"]
 
 # heatpumps =  heatpumps.loc[heatpumps["hp_model"] == "Riello NXHM"]
-heatpumps =  heatpumps.loc[heatpumps["hp_output"] == 5]
+# heatpumps =  heatpumps.loc[heatpumps["hp_output"] == 5]
 # heatpumps =  heatpumps.loc[heatpumps["hp_model"] == "Vaillant Arotherm+"]
 # heatpumps =  heatpumps.loc[heatpumps["refrigerant"] == "R290"]
 
