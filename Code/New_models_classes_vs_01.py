@@ -15,7 +15,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.dates as mdates
 import seaborn as sns
-from scipy.stats import shapiro
 
 #%% Model vs 2.0 class structure
 
@@ -161,9 +160,9 @@ class Heat_Pumps():
         
         # Plottaggio dati principali
         axs1.plot(filtered_data["Time"], filtered_data["Heat Cap COND [kW]"], label="HC [kW]")
-        axs1.plot(filtered_data["Time"], filtered_data["Pow [kW]"], label="W [kW]")
+        axs1.plot(filtered_data["Time"], filtered_data["Pow [kW]"], label="P [kW]")
         axs1.set_xlabel("Time [h]", fontsize=font)
-        axs1.set_ylabel("W and HC [kW]", fontsize=font)
+        axs1.set_ylabel("P and HC [kW]", fontsize=font)
         axs1.tick_params(axis='x', labelsize=font)
         axs1.tick_params(axis='y', labelsize=font)
         axs1.xaxis.set_major_formatter(mdates.DateFormatter('%H'))
@@ -268,10 +267,10 @@ class Heat_Pumps():
             return state_handles
         
         # Plottaggio dati principali
-        axs1[0].plot(filtered_data["Time"], filtered_data["Pow_pred"], label="$W_{mod}$ [kW]",color ="blue")
-        axs1[0].plot(filtered_data["Time"], filtered_data["Pow [kW]"], label="W [kW]", color ="red")
+        axs1[0].plot(filtered_data["Time"], filtered_data["Pow_pred"], label="$P_{mod}$ [kW]",color ="blue")
+        axs1[0].plot(filtered_data["Time"], filtered_data["Pow [kW]"], label="$P_{exp}$ [kW]", color ="red")
         axs1[0].set_xlabel("Time [h]", fontsize=font)
-        axs1[0].set_ylabel("W and HC [kW]", fontsize=font)
+        axs1[0].set_ylabel("P [kW]", fontsize=font)
         axs1[0].tick_params(axis='x', labelsize=font)
         axs1[0].tick_params(axis='y', labelsize=font)
         axs1[0].xaxis.set_major_formatter(mdates.DateFormatter('%H'))
@@ -291,8 +290,8 @@ class Heat_Pumps():
         lines = axs1[0].get_lines() + axs2.get_lines() + axs1[1].get_lines()
         labels = [line.get_label() for line in lines]
         
-        axs1[0].legend(handles=lines + state_handles, labels=labels + [h.get_label() for h in state_handles],
-                    loc="center left", bbox_to_anchor=(1.1, 0.5), frameon = False, ncol = 1 , fontsize = font)
+        axs1[1].legend(handles=lines + state_handles, labels=labels + [h.get_label() for h in state_handles],
+                    loc="center left", bbox_to_anchor=(0, -0.4), frameon = False, ncol = 6, fontsize = font)
 
 
         # Secondo asse y per temperature
@@ -325,9 +324,9 @@ class Heat_Pumps():
         #Plot Power_pred vs residuals
         figure3, axs3 = plt.subplots(1, figsize = (19,9.5))
         sns.set_theme(rc={'figure.figsize':(12,9.5)},style = 'whitegrid')
-        residuals = Pow_pred - self.test_fil["Pow [kW]"]
+        residuals = (Pow_pred - self.test_fil["Pow [kW]"])/self.test_fil["Pow [kW]"]*100
         
-        plt.scatter(np.array(self.test_fil["Pow [kW]"]),residuals, c = self.test_fil["PLR"], cmap='jet', label = "COP_model")
+        plt.scatter(np.array(self.test_fil["PLR"]),residuals, c = self.test_fil["PLR"], cmap='jet', label = "COP_model")
         cbar = plt.colorbar()
         cbar.set_label("PLR")
         plt.xlabel("Power_exp [kW]")
@@ -335,8 +334,8 @@ class Heat_Pumps():
         plt.legend()
         
         # plt.tight_layout()
-        plt.savefig(os.path.join('..',"Results",f"{self.name}","New_models",f"Error_{status}.png"))
-        plt.close() 
+        # plt.savefig(os.path.join('..',"Results",f"{self.name}","New_models",f"Error_{status}.png"))
+        # plt.close() 
         
 #%%Full load plot    
     def plot_full_load(self):
@@ -574,33 +573,34 @@ class Heat_Pumps():
         
 #%%Select best features
     def Selectbest(self,font):
-        X = np.column_stack((self.test["PLR"],self.test["LExT [°C]"],self.test["SET [°C]"],self.test["LExT [°C]"] -self.test["SET [°C]"]))
-        Y = self.test["Pow [kW]"]/self.test["Pow full [kW]"]
+        # X = np.column_stack((self.test["PLR"],self.test["LExT [°C]"],self.test["SET [°C]"],self.test["LExT [°C]"] -self.test["SET [°C]"]))
+        # Y = self.test["Pow [kW]"]/self.test["Pow full [kW]"]
     
-        selector = SelectKBest(score_func=f_regression, k=2)
-        X_new = selector.fit_transform(X, Y)
+        # selector = SelectKBest(score_func=f_regression, k=2)
+        # X_new = selector.fit_transform(X, Y)
         
-        mask = selector.get_support()
-        selected_features =[i for i, x in enumerate(mask) if x]
+        # mask = selector.get_support()
+        # selected_features =[i for i, x in enumerate(mask) if x]
     
-        print("Migliori feature:", selected_features)
+        # print("Migliori feature:", selected_features)
         
         #Correlation 
-        fil = self.test.loc[(self.test['Status'] == 'ACCELERATION') | (self.test['Status'] == 'DECELERATION')
-                   | (self.test['Status'] == 'START') | (self.test['Status'] == 'STOP')]
-        fil = self.test[self.test['Status'] == 'STEADY STATE']
-        fil["DeltaT [K]"] = self.test["LExT [°C]"] -self.test["SET [°C]"]
-        fil["W ratio"] = self.test["Pow [kW]"]/self.test["Pow full [kW]"]
+        fil = self.test[(self.test['Status'] == 'ACCELERATION') | (self.test['Status'] == 'DECELERATION')| (self.test['Status'] == 'START') | (self.test['Status'] == 'STOP')
+                  | (self.test['Status'] == 'STEADY STATE') | (self.test['Status'] == 'DEF')  | (self.test['Status'] == 'DHW')]
+
+        # fil = self.test[self.test['Status'] == 'STEADY STATE']
+        fil["ΔT [K]"] = self.test["LExT [°C]"] -self.test["SET [°C]"]
+        fil["PR"] = self.test["Pow [kW]"]/self.test["Pow full [kW]"]
         
-        df = fil.loc[:,["W ratio", "PLR","LExT [°C]", "SET [°C]","DeltaT [K]"]] 
+        df = fil.loc[:,["PR", "PLR","LExT [°C]", "SET [°C]","ΔT [K]"]] 
         Pears = df.corr("pearson")
         Spear = df.corr("spearman")
         
         #Plot figure
         figure1, axs1 = plt.subplots(1,2, figsize = (19,9.5))
-        sns.heatmap(Pears, annot=True, cmap="coolwarm", center=0, fmt=".2f", ax = axs1[0], cbar=False, annot_kws={"size":font})
+        sns.heatmap(Pears, annot=True, cmap="RdBu", center=0, fmt=".2f", ax = axs1[0], cbar=False, annot_kws={"size":font})
         axs1[0].set_title("Pearson Matrix", fontsize= font)
-        sns.heatmap(Spear, annot=True, cmap="coolwarm", center=0, fmt=".2f", ax = axs1[1], cbar=False, annot_kws={"size":font}) 
+        sns.heatmap(Spear, annot=True, cmap="RdBu", center=0, fmt=".2f", ax = axs1[1], cbar=False, annot_kws={"size":font}) 
         axs1[1].set_title("Spearman Matrix", fontsize= font)
         for ax in axs1:
             ax.set_xticklabels(ax.get_xticklabels(), fontsize=font, rotation=45, ha="right")
@@ -813,7 +813,7 @@ class Heat_Pumps():
         
         #Cleaning data from oulayer HC
         # Q1 = self.test["Heat Cap COND [kW]"].quantile(0.25)
-        # Q3 = self.test["Heat Cap COND [kW]"].quantile(0.75)
+        # Q3 = self.test["Heat Cap COND [kW]"].quantile(0.999)
         # IQR = Q3 - Q1
         
         # lower_bound = Q1 - 1.5 * IQR
@@ -822,6 +822,8 @@ class Heat_Pumps():
         # # Filtrare outlier
         # self.test= self.test[(self.test["Heat Cap COND [kW]"] >= lower_bound) &
         #                                (self.test["Heat Cap COND [kW]"] <= upper_bound)]
+        
+        # self.test= self.test[(self.test["Heat Cap COND [kW]"] <= Q3)]
         
                
         return self.test , plt 
@@ -832,7 +834,7 @@ class Heat_Pumps():
 
         self.KPI = {}
         col = ["R2_Pow","MAE_Pow","cRMSE_Pow",
-               # "MAPE_COP","RMSE_COP",
+               "R2_COP","MAPE_COP","RMSE_COP",
                "SCOP_model","SCOP_exp","Err_SCOP [%]"]
         
         states = ["STEADY STATE","MODULATION","MOD + DEF","ALL"]
@@ -910,6 +912,10 @@ class Heat_Pumps():
             # COP_pred.replace([np.inf, -np.inf], np.nan, inplace=True)
             # COP_pred.fillna(0, inplace = True)
             
+            # self.test_fil["COP"].replace([np.inf, -np.inf], np.nan, inplace=True)
+            # self.test_fil["COP"].fillna(0, inplace = True)
+            
+            
             #SCOP calculation
             # SCOP_model = sum(np.array(self.test_fil["Heat Cap COND [kW]"]))/sum(np.array(self.test_fil["Pow_pred"]))
             # SCOP_exp = sum(np.array(self.test_fil["Heat Cap COND [kW]"]))/sum(np.array(self.test_fil["Pow [kW]"]))
@@ -933,6 +939,7 @@ class Heat_Pumps():
                self.KPI.loc[(self.name,"STEADY STATE"),"cRMSE_Pow"] = float(CV_RMSE(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                 
                #COP
+               # self.KPI.loc[(self.name,"STEADY STATE"),"R2_COP"] = float(r2_score(self.test_fil["COP"],COP_pred))
                # self.KPI.loc[(self.name,"STEADY STATE"),"MAPE_COP"] = float(relative_mean_absolute_error(self.test_fil["COP"],COP_pred))
                # self.KPI.loc[(self.name,"STEADY STATE"),"RMSE_COP"] = float(CV_RMSE(self.test_fil["COP"],COP_pred))
                   
@@ -958,6 +965,7 @@ class Heat_Pumps():
                self.KPI.loc[(self.name,"MODULATION"),"cRMSE_Pow"] = float(CV_RMSE(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                 
                 #COP
+               # self.KPI.loc[(self.name,"MODULATION"),"R2_COP"] = float(r2_score(self.test_fil["COP"],COP_pred)) 
                # self.KPI.loc[(self.name,"MODULATION"),"MAPE_COP"] = float(relative_mean_absolute_error(self.test_fil["COP"],COP_pred))
                # self.KPI.loc[(self.name,"MODULATION"),"RMSE_COP"] = float(CV_RMSE(self.test_fil["COP"],COP_pred))
                 
@@ -983,6 +991,7 @@ class Heat_Pumps():
                self.KPI.loc[(self.name,"MOD + DEF"),"cRMSE_Pow"] = float(CV_RMSE(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                 
                 #COP
+               # self.KPI.loc[(self.name,"MOD + DEF"),"R2_COP"] = float(r2_score(self.test_fil["COP"],COP_pred)) 
                # self.KPI.loc[(self.name,"MOD + DEF"),"MAPE_COP"] = float(relative_mean_absolute_error(self.test_fil["COP"],COP_pred))
                # self.KPI.loc[(self.name,"MOD + DEF"),"RMSE_COP"] = float(CV_RMSE(self.test_fil["COP"],COP_pred))
                 
@@ -1009,6 +1018,7 @@ class Heat_Pumps():
                self.KPI.loc[(self.name,"ALL"),"cRMSE_Pow"] = float(CV_RMSE(self.test_fil["Pow [kW]"],self.test_fil["Pow_pred"]))
                 
                 #COP
+               # self.KPI.loc[(self.name,"ALL"),"R2_COP"] = float(r2_score(self.test_fil["COP"],COP_pred)) 
                # self.KPI.loc[(self.name,"ALL"),"MAPE_COP"] = float(mean_absolute_error(self.test_fil["COP"],COP_pred))
                # self.KPI.loc[(self.name,"ALL"),"RMSE_COP"] = float(CV_RMSE(self.test_fil["COP"],COP_pred))
                 
@@ -1100,7 +1110,7 @@ class Heat_Pumps():
                self.KPI_ML.loc[(self.name,"STEADY STATE"),"MPE_Pow"] = float(mean_percentage_error(X_test[:,3],Pow_pred))
                self.KPI_ML.loc[(self.name,"STEADY STATE"),"RMSE_Pow"] = float(root_mean_squared_error(X_test[:,3],Pow_pred))
                 
-                # #COP
+               #COP
                self.KPI_ML.loc[(self.name,"STEADY STATE"),"MAPE_COP"] = float(mean_absolute_percentage_error(X_test[:,4],COP_pred))
                self.KPI_ML.loc[(self.name,"STEADY STATE"),"RMSE_COP"] = float(root_mean_squared_error(X_test[:,4],COP_pred))
                   

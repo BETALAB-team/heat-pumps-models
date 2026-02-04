@@ -7,6 +7,9 @@ import os
 import matplotlib.pyplot as plt
 #%% Set Seaborn theme
 sns.set_theme(rc={'figure.figsize':(19,9.5)},style = 'whitegrid')
+
+#%% Working directory
+os.chdir('..')
 #%%Barplot
 def barplot(model,KPI,font,k):
 
