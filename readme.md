@@ -71,5 +71,31 @@ after executions, you can save the generated KPI.csv and use the dedicated scrip
 > Plot_classes.py 
 
 
+## Citation 
+The methodology in this repository is described in the following article: 
+
+@article{BENA2026130133,
+
+title = {A method to evaluate the energy performance of inverter-driven heat pumps in real operating conditions},
+
+journal = {Applied Thermal Engineering},
+
+pages = {130133},
+
+year = {2026},
+
+issn = {1359-4311},
+
+doi = {https://doi.org/10.1016/j.applthermaleng.2026.130133},
+
+url = {https://www.sciencedirect.com/science/article/pii/S1359431126004412},
+
+author = {Francesco Benà and Mohamad Hasan Khajedehi and Jacopo Vivian and Angelo Zarrella},
+
+keywords = {Heat pumps, Energy efficiency, HVAC, Building simulation, Modelling},
+
+abstract = {Inverter-driven heat pumps, owing to their modulation capability, represent a promising alternative to gas boilers. As these systems frequently operate under transient and part-load conditions, their actual performance can differ significantly from the nominal values reported in manufacturers catalogues, despite remaining a valuable source of information. This paper presents a methodology that leverages manufacturer data to predict the performance of inverter-driven heat pumps. The objective of the work is to propose a simplified and reliable procedure to simulate heat pumps performance in partial and full load operation in real operating conditions whenever the available data are obtained by manufacturers' datasheets. A classifier was developed to identify the system's operating modes based on heat and power load patterns, as well as temperature gradients. A regression model was then trained using manufacturer data and validated against field measurements from 21 residential installations in the United Kingdom (20 air source and 1 ground source heat pumps). Two simulation approaches were compared: one that considered only stable operation and another that included all operations (both transient and stable). The results show strong agreement with measured data (R2between 0.64 and 0.95, rMAE between 7%–28%, CVRMSE between 12%–36%), with only a moderate reduction in accuracy when transient behaviour is included. Although discrepancies may occur at the hourly scale, they tend to compensate over time, leading to a mean relative error of the SCOP of 9% for both the simulations. Furthermore, the analysis shows that comparable predictive performance can be achieved with a reduced yet well-distributed training dataset.}
+}
+
 
 
