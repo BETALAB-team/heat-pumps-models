@@ -71,5 +71,15 @@ after executions, you can save the generated KPI.csv and use the dedicated scrip
 > Plot_classes.py 
 
 
+## Citation 
+The methodology in this repository is described in the following article: 
+
+@article{Bena2026HPMethod,
+  author  = {Benà, Francesco and Khajedehi, Mohamad Hasan and Vivian, Jacopo and Zarrella, Angelo},
+  title   = {A method to evaluate the energy performance of inverter-driven heat pumps in real operating conditions},
+  journal = {Applied Thermal Engineering},
+  year    = {2026},
+  doi     = {10.1016/j.applthermaleng.2026.130133}
+}
 
 
