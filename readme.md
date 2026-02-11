@@ -47,9 +47,9 @@ The main simulation file is the script
 to use this script the heat pump device shall be defined as a tuple with three variables: device = (exp, cat, type)
 
 * exp is the name of the file that includes the experimental points
-* 
+  
 * cat is the name of the file that includes the catalogue data
-* 
+  
 * type can be AtW or WtW based on the type of the heat pump, whether it is air to water or water to water. 
 
 In order to execute the model, you need to define the heat pump object: 
@@ -69,6 +69,7 @@ at this point the heat pump object will have its operating regimes determined. a
 after executions, you can save the generated KPI.csv and use the dedicated script to generate result plots: 
 
 > Plot_classes.py 
+
 
 
 
